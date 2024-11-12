@@ -4,14 +4,14 @@ Lang:
   lang: en_us
 
   # Send messages to clients in their own language, if available
-  client-lang: true
+  client-lang: false
 
 
 
 Options:
 
   # Plugin sends update notifications
-  check-for-update: true
+  check-for-update: false
 
   # List of active feature flags (primarily for unofficial features for individual use)
   FeatureFlags: []

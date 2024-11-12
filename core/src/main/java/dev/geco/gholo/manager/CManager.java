@@ -17,6 +17,8 @@ public class CManager {
 
     public boolean CHECK_FOR_UPDATE;
 
+    public double DEFAULT_RANGE;
+
     public List<String> FEATUREFLAGS = new ArrayList<>();
 
 
@@ -56,6 +58,7 @@ public class CManager {
         L_CLIENT_LANG = GPM.getConfig().getBoolean("Lang.client-lang", true);
 
         CHECK_FOR_UPDATE = GPM.getConfig().getBoolean("Options.check-for-update", true);
+        DEFAULT_RANGE = GPM.getConfig().getDouble("Options.default-range", 128);
         FEATUREFLAGS = GPM.getConfig().getStringList("Options.FeatureFlags");
     }
 

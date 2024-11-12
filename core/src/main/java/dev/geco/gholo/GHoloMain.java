@@ -12,6 +12,7 @@ import dev.geco.gholo.events.*;
 import dev.geco.gholo.link.*;
 import dev.geco.gholo.manager.*;
 import dev.geco.gholo.manager.mm.*;
+import dev.geco.gholo.util.*;
 
 public class GHoloMain extends JavaPlugin {
 
@@ -38,6 +39,9 @@ public class GHoloMain extends JavaPlugin {
 
     private MManager mManager;
     public MManager getMManager() { return mManager; }
+
+    private IEntityUtil entityUtil;
+    public IEntityUtil getEntityUtil() { return entityUtil; }
 
     private boolean placeholderAPILink;
     public boolean hasPlaceholderAPILink() { return placeholderAPILink; }
@@ -69,8 +73,8 @@ public class GHoloMain extends JavaPlugin {
         BStatsLink bstats = new BStatsLink(getInstance(), 4921);
 
         bstats.addCustomChart(new BStatsLink.SimplePie("plugin_language", () -> getCManager().L_LANG));
-        /*bstats.addCustomChart(new BStatsLink.SingleLineChart("holo_count", () -> getSitManager().getSitUsedCount()));
-        bstats.addCustomChart(new BStatsLink.SingleLineChart("holo_row_count", () -> getSitManager().getSitUsedCount()));*/
+        bstats.addCustomChart(new BStatsLink.SingleLineChart("holo_count", () -> getHoloManager().getHoloCount()));
+        bstats.addCustomChart(new BStatsLink.SingleLineChart("holo_row_count", () -> getHoloManager().getHoloRowCount()));
     }
 
     public void onLoad() {
@@ -87,12 +91,14 @@ public class GHoloMain extends JavaPlugin {
 
         preloadPluginDependencies();
 
-        mManager = supportsPaperFeature() && getSVManager().isNewerOrVersion(18, 2) ? new MPaperManager(getInstance()) : new MSpigotManager(getInstance());
+        mManager = supportsPaperFeature() ? new MPaperManager(getInstance()) : new MSpigotManager(getInstance());
     }
 
     public void onEnable() {
 
         if(!versionCheck()) return;
+
+        entityUtil = (IEntityUtil) getSVManager().getPackageObject("util.EntityUtil", getInstance());
 
         loadSettings(Bukkit.getConsoleSender());
 
@@ -121,7 +127,7 @@ public class GHoloMain extends JavaPlugin {
     private void setupCommands() {
 
         getCommand("gholo").setExecutor(new GHoloCommand(getInstance()));
-        getCommand("gholo").setTabCompleter(new EmptyTabComplete());
+        getCommand("gholo").setTabCompleter(new GHoloTabComplete(getInstance()));
         getCommand("gholo").setPermissionMessage(getMManager().getMessage("Messages.command-permission-error"));
         getCommand("gholoreload").setExecutor(new GHoloReloadCommand(getInstance()));
         getCommand("gholoreload").setTabCompleter(new EmptyTabComplete());
