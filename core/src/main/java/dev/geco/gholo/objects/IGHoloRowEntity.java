@@ -11,7 +11,7 @@ public interface IGHoloRowEntity {
 
     void updateHoloRowContent(String Content);
 
-    void updateHoloRowLocation(Location Location);
+    void adjustLocationToHolo();
 
     void removeHoloRow(Player Player);
 

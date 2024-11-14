@@ -28,6 +28,12 @@ public class GHoloMain extends JavaPlugin {
     private HoloManager holoManager;
     public HoloManager getHoloManager() { return holoManager; }
 
+    private HoloAnimationManager holoAnimationManager;
+    public HoloAnimationManager getHoloAnimationManager() { return holoAnimationManager; }
+
+    private HoloImportManager holoImportManager;
+    public HoloImportManager getHoloImportManager() { return holoImportManager; }
+
     private UManager uManager;
     public UManager getUManager() { return uManager; }
 
@@ -66,6 +72,7 @@ public class GHoloMain extends JavaPlugin {
 
         getHoloManager().createTables();
         getHoloManager().loadHolos();
+        ImageUtil.generateFolder();
     }
 
     private void linkBStats() {
@@ -88,6 +95,8 @@ public class GHoloMain extends JavaPlugin {
         pManager = new PManager(getInstance());
         tManager = new TManager(getInstance());
         holoManager = new HoloManager(getInstance());
+        holoAnimationManager = new HoloAnimationManager(getInstance());
+        holoImportManager = new HoloImportManager(getInstance());
 
         preloadPluginDependencies();
 

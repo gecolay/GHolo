@@ -11,7 +11,7 @@ public class GHolo {
     private Location location;
     private final Map<Integer, GHoloRow> rows = new TreeMap<>();
     private double maxRange = 64;
-    private final List<HumanEntity> players = new ArrayList<>();
+    private final List<Player> players = new ArrayList<>();
     private final List<UUID> tasks = new ArrayList<>();
 
     public GHolo(String Id, Location Location) {
@@ -47,11 +47,13 @@ public class GHolo {
         for(GHoloRow holoRow : sortedRows) rows.put(holoRow.getRow(), holoRow);
     }
 
+    public void clearRows() { rows.clear(); }
+
     public double getMaxRange() { return maxRange; }
 
     public void setMaxRange(double MaxRange) { maxRange = MaxRange; }
 
-    public List<HumanEntity> getPlayers() { return players; }
+    public List<Player> getPlayers() { return players; }
 
     public List<UUID> getTasks() { return tasks; }
 

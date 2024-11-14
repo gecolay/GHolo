@@ -29,10 +29,10 @@ public class SVManager {
         String version = Bukkit.getServer().getBukkitVersion();
         SERVER_VERSION = version.substring(0, version.indexOf('-'));
         PACKAGE_PATH = GPM.getClass().getPackage().getName() + ".mcv." + getPackageVersion();
-        AVAILABLE = hasPackageClass("objects.GHoloEntity");
+        AVAILABLE = hasPackageClass("objects.GHoloRowEntity");
         if(AVAILABLE) return;
         PACKAGE_PATH = GPM.getClass().getPackage().getName() + ".mcv." + LATEST_VERSION;
-        AVAILABLE = hasPackageClass("objects.GHoloEntity");
+        AVAILABLE = hasPackageClass("objects.GHoloRowEntity");
     }
 
     public String getServerVersion() { return SERVER_VERSION; }

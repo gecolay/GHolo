@@ -12,6 +12,7 @@ import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.mcv.x.objects.*;
 import dev.geco.gholo.objects.*;
 import dev.geco.gholo.util.*;
+import org.bukkit.craftbukkit.v1_21_R2.entity.CraftPlayer;
 
 public class EntityUtil implements IEntityUtil {
 
@@ -24,15 +25,19 @@ public class EntityUtil implements IEntityUtil {
         UUID taskId = GPM.getTManager().runAtFixedRate(() -> {
             Location location = Holo.getLocation();
             for(Player player : level.players()) {
-                if(player.distanceToSqr(location.getX(), location.getY(), location.getZ()) <= Holo.getMaxRange()) {
-                    if(!Holo.getPlayers().contains(player.getBukkitEntity())) {
-                        Holo.getPlayers().add(player.getBukkitEntity());
-                        // Holo.spawnRows();
+                if(player.distanceToSqr(location.getX(), location.getY(), location.getZ()) <= Holo.getMaxRange() * Holo.getMaxRange()) {
+                    if(!Holo.getPlayers().contains((CraftPlayer)player.getBukkitEntity())) {
+                        Holo.getPlayers().add((CraftPlayer)player.getBukkitEntity());
+                        for(GHoloRow row : Holo.getRows()) {
+                            row.getHoloRowEntity().spawnHoloRow((CraftPlayer) player.getBukkitEntity());
+                        }
                     }
                 } else {
-                    if(Holo.getPlayers().contains(player.getBukkitEntity())) {
-                        Holo.getPlayers().remove(player.getBukkitEntity());
-                        // Holo.deleteRows();
+                    if(Holo.getPlayers().contains((CraftPlayer) player.getBukkitEntity())) {
+                        Holo.getPlayers().remove((CraftPlayer) player.getBukkitEntity());
+                        for(GHoloRow row : Holo.getRows()) {
+                            row.getHoloRowEntity().removeHoloRow((CraftPlayer) player.getBukkitEntity());
+                        }
                     }
                 }
             }
@@ -42,6 +47,11 @@ public class EntityUtil implements IEntityUtil {
 
     public void stopHoloTicking(GHolo Holo) {
         for(UUID taskId : Holo.getTasks()) GPM.getTManager().cancel(taskId);
+        for(org.bukkit.entity.Player player : Holo.getPlayers()) {
+            for(GHoloRow row : Holo.getRows()) {
+                row.getHoloRowEntity().removeHoloRow(player);
+            }
+        }
     }
 
     public IGHoloRowEntity createHoloRowEntity(GHoloRow HoloRow) {
