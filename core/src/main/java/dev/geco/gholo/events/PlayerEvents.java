@@ -18,19 +18,13 @@ public class PlayerEvents implements Listener {
         Player player = Event.getPlayer();
 
         GPM.getUManager().loginCheckForUpdates(player);
-    }
 
-    /*@EventHandler
-    public void PQuiE(PlayerQuitEvent Event) { GPM.getHoloSpawnManager().removeForPlayer(Event.getPlayer()); }
+        GPM.getTManager().runDelayed(() -> GPM.getHoloManager().spawnHolosToPlayer(Event.getPlayer()), 1);
+    }
 
     @EventHandler
     public void PChaWE(PlayerChangedWorldEvent Event) {
-
-        GPM.getHoloSpawnManager().removeForPlayer(Event.getPlayer());
-
-        GPM.getTManager().runDelayed(() -> {
-            GPM.getHoloSpawnManager().updateStaticHolosForPlayer(Event.getPlayer());
-        }, 1);
-    }*/
+        GPM.getTManager().runDelayed(() -> GPM.getHoloManager().spawnHolosToPlayer(Event.getPlayer()), 1);
+    }
 
 }

@@ -4,19 +4,15 @@ import org.bukkit.entity.*;
 
 public interface IGHoloRowEntity {
 
+    void spawnHoloRow();
+
     void spawnHoloRow(Player Player);
-
-    void startTicking();
-
-    void stopTicking();
 
     void rerender();
 
-    void updateHoloRowRange(double Range);
+    void publishUpdate(GHoloRowUpdateType UpdateType);
 
-    void updateHoloRowContent(String Content);
-
-    void adjustLocationToHolo();
+    void removeHoloRow();
 
     void removeHoloRow(Player Player);
 

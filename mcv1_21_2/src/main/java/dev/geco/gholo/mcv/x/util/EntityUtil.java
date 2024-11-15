@@ -1,14 +1,5 @@
 package dev.geco.gholo.mcv.x.util;
 
-import java.util.*;
-
-import org.bukkit.*;
-import org.bukkit.craftbukkit.v1_21_R2.*;
-import org.bukkit.craftbukkit.v1_21_R2.entity.*;
-
-import net.minecraft.server.level.*;
-import net.minecraft.world.entity.player.*;
-
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.mcv.x.objects.*;
 import dev.geco.gholo.objects.*;
@@ -20,45 +11,29 @@ public class EntityUtil implements IEntityUtil {
 
     public EntityUtil(GHoloMain GPluginMain) { GPM = GPluginMain; }
 
-    public void startHoloTicking(GHolo Holo) {
-        ServerLevel level = ((CraftWorld) Holo.getRawLocation().getWorld()).getHandle();
-        UUID taskId = GPM.getTManager().runAtFixedRate(() -> {
-            Location location = Holo.getRawLocation();
-            for(Player player : level.players()) {
-                if(player.distanceToSqr(location.getX(), location.getY(), location.getZ()) <= Holo.getMaxRange() * Holo.getMaxRange()) {
-                    if(!Holo.getPlayers().contains((CraftPlayer)player.getBukkitEntity())) {
-                        Holo.getPlayers().add((CraftPlayer)player.getBukkitEntity());
-                        for(GHoloRow row : Holo.getRows()) {
-                            row.getHoloRowEntity().spawnHoloRow((CraftPlayer) player.getBukkitEntity());
-                        }
-                    }
-                } else {
-                    if(Holo.getPlayers().contains((CraftPlayer) player.getBukkitEntity())) {
-                        Holo.getPlayers().remove((CraftPlayer) player.getBukkitEntity());
-                        for(GHoloRow row : Holo.getRows()) {
-                            row.getHoloRowEntity().removeHoloRow((CraftPlayer) player.getBukkitEntity());
-                        }
-                    }
-                }
-            }
-        }, 0, 1);
-        Holo.addTask(taskId);
+    public void spawnHolo(GHolo Holo) {
+        for(org.bukkit.entity.Player player : Holo.getRawLocation().getWorld().getPlayers()) spawnHolo(Holo, player);
     }
 
-    public void stopHoloTicking(GHolo Holo) {
-        for(UUID taskId : Holo.getTasks()) GPM.getTManager().cancel(taskId);
-        for(GHoloRow row : Holo.getRows()) {
-            row.getHoloRowEntity().stopTicking();
-        }
-        for(org.bukkit.entity.Player player : Holo.getPlayers()) {
-            for(GHoloRow row : Holo.getRows()) {
-                row.getHoloRowEntity().removeHoloRow(player);
-            }
-        }
+    public void spawnHolo(GHolo Holo, org.bukkit.entity.Player Player) {
+        for(GHoloRow row : Holo.getRows()) row.getHoloRowEntity().spawnHoloRow(Player);
+    }
+
+    @Override
+    public void removeHolo(GHolo Holo) {
+        for(org.bukkit.entity.Player player : Holo.getRawLocation().getWorld().getPlayers()) removeHolo(Holo, player);
+    }
+
+    @Override
+    public void removeHolo(GHolo Holo, org.bukkit.entity.Player Player) {
+        for(GHoloRow row : Holo.getRows()) row.getHoloRowEntity().removeHoloRow(Player);
     }
 
     public IGHoloRowEntity createHoloRowEntity(GHoloRow HoloRow) {
-        return new GHoloRowEntity(HoloRow);
+        GHoloRowEntity holoRowEntity = new GHoloRowEntity(HoloRow);
+        HoloRow.setHoloRowEntity(holoRowEntity);
+        holoRowEntity.spawnHoloRow();
+        return holoRowEntity;
     }
 
 }
