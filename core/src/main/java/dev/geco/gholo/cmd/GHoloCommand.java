@@ -1,21 +1,19 @@
 package dev.geco.gholo.cmd;
 
-import java.awt.image.BufferedImage;
+import java.awt.image.*;
 import java.io.File;
 import java.util.*;
 
-import dev.geco.gholo.util.ImageUtil;
-import org.codehaus.plexus.util.cli.Arg;
 import org.jetbrains.annotations.*;
 
 import org.bukkit.*;
 import org.bukkit.event.player.*;
-
 import org.bukkit.command.*;
 import org.bukkit.entity.*;
 
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.objects.*;
+import dev.geco.gholo.util.*;
 
 public class GHoloCommand implements CommandExecutor {
 
@@ -23,7 +21,7 @@ public class GHoloCommand implements CommandExecutor {
 
     public GHoloCommand(GHoloMain GPluginMain) { GPM = GPluginMain; }
 
-    public static List<String> COMMAND_LIST = List.of("help", "list", "create", "info", "remove", "rename", "relocate", "tphere", "tpto", "align", "setrange", "tpto", "addrow", "insertrow", "moverow", "setrow", "removerow", "copyrows", "setimage", "importdata");
+    public static List<String> COMMAND_LIST = List.of("help", "list", "create", "info", "remove", "rename", "relocate", "tphere", "tpto", "align", "setrange", "addrow", "insertrow", "setrow", "removerow", "copyrows", "setimage", "importdata");
 
     @Override
     public boolean onCommand(@NotNull CommandSender Sender, @NotNull Command Command, @NotNull String Label, String[] Args) {
@@ -79,8 +77,10 @@ public class GHoloCommand implements CommandExecutor {
                     break;
                 }
                 GPM.getMManager().sendMessage(Sender, "HoloInfoCommand.header", "%Holo%", holo.getId());
+                int row = 1;
                 for(GHoloRow holoRow : holo.getRows()) {
-                    GPM.getMManager().sendMessage(Sender, "HoloInfoCommand.row", "%Row%", holoRow.getRow() + 1, "%Content%", holoRow.getContent());
+                    GPM.getMManager().sendMessage(Sender, "HoloInfoCommand.row", "%Row%", row, "%Content%", holoRow.getContent());
+                    row++;
                 }
                 GPM.getMManager().sendMessage(Sender, "HoloInfoCommand.footer", "%Holo%", holo.getId());
                 break;
@@ -237,7 +237,7 @@ public class GHoloCommand implements CommandExecutor {
                     break;
                 }
                 StringBuilder addIdStringBuilder = new StringBuilder();
-                for (int arg = 2; arg <= Args.length - 1; arg++) addIdStringBuilder.append(Args[arg]).append(" ");
+                for(int arg = 2; arg <= Args.length - 1; arg++) addIdStringBuilder.append(Args[arg]).append(" ");
                 addIdStringBuilder.deleteCharAt(addIdStringBuilder.length() - 1);
                 GPM.getHoloManager().createHoloRow(holo, addIdStringBuilder.toString());
                 GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-addrow", "%Holo%", holo.getId(), "%Content%", addIdStringBuilder.toString());
@@ -259,16 +259,13 @@ public class GHoloCommand implements CommandExecutor {
                         break;
                     }
                     StringBuilder insertIdStringBuilder = new StringBuilder();
-                    for (int arg = 3; arg <= Args.length - 1; arg++) insertIdStringBuilder.append(Args[arg]).append(" ");
+                    for(int arg = 3; arg <= Args.length - 1; arg++) insertIdStringBuilder.append(Args[arg]).append(" ");
                     insertIdStringBuilder.deleteCharAt(insertIdStringBuilder.length() - 1);
-                    GPM.getHoloManager().createHoloRow(holo, insertIdStringBuilder.toString(), Integer.parseInt(Args[2]));
-                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-insertrow", "%Holo%", holo.getId(), "%Row%", holoRow.getRow() + 1, "%Content%", insertIdStringBuilder.toString());
+                    GPM.getHoloManager().insertHoloRow(holo, holoRow.getRow(), insertIdStringBuilder.toString(), true);
+                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-insertrow", "%Holo%", holo.getId(), "%Row%", Integer.parseInt(Args[2]), "%Content%", insertIdStringBuilder.toString());
                 } catch (NumberFormatException e) {
                     GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-insertrow-row-error", "%Row%", Args[2]);
                 }
-                break;
-            case "moverow":
-                //TODO
                 break;
             case "setrow":
                 if(Args.length <= 3) {
@@ -287,10 +284,10 @@ public class GHoloCommand implements CommandExecutor {
                         break;
                     }
                     StringBuilder setIdStringBuilder = new StringBuilder();
-                    for (int arg = 3; arg <= Args.length - 1; arg++) setIdStringBuilder.append(Args[arg]).append(" ");
+                    for(int arg = 3; arg <= Args.length - 1; arg++) setIdStringBuilder.append(Args[arg]).append(" ");
                     setIdStringBuilder.deleteCharAt(setIdStringBuilder.length() - 1);
                     GPM.getHoloManager().updateHoloRowContent(holoRow, setIdStringBuilder.toString());
-                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-setrow", "%Holo%", holo.getId(), "%Row%", holoRow.getRow() + 1, "%Content%", setIdStringBuilder.toString());
+                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-setrow", "%Holo%", holo.getId(), "%Row%", Integer.parseInt(Args[2]), "%Content%", setIdStringBuilder.toString());
                 } catch (NumberFormatException e) {
                     GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-setrow-row-error", "%Row%", Args[2]);
                 }
@@ -312,13 +309,10 @@ public class GHoloCommand implements CommandExecutor {
                         break;
                     }
                     GPM.getHoloManager().removeHoloRow(holoRow, true);
-                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-removerow", "%Holo%", holo.getId(), "%Row%", holoRow.getRow() + 1);
+                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-removerow", "%Holo%", holo.getId(), "%Row%", Integer.parseInt(Args[2]));
                 } catch (NumberFormatException e) {
                     GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-removerow-row-error", "%Row%", Args[2]);
                 }
-                break;
-            case "condition":
-                //???
                 break;
             case "copyrows":
                 if(Args.length <= 2) {
@@ -378,10 +372,15 @@ public class GHoloCommand implements CommandExecutor {
                 }
                 List<String> rows;
                 if(Args.length > 4) {
-                    if(Args[4].contains(":")) {
-                        String[] sizes = Args[4].split(":");
-                        rows = new ImageUtil(bufferedImage, Integer.parseInt(sizes[0]), Integer.parseInt(sizes[1])).getLines();
-                    } else rows = new ImageUtil(bufferedImage, Integer.parseInt(Args[4])).getLines();
+                    try {
+                        if(Args[4].contains(":")) {
+                            String[] sizes = Args[4].split(":");
+                            rows = new ImageUtil(bufferedImage, Integer.parseInt(sizes[0]), Integer.parseInt(sizes[1])).getLines();
+                        } else rows = new ImageUtil(bufferedImage, Integer.parseInt(Args[4])).getLines();
+                    } catch (Throwable e) {
+                        GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-setimage-size-error");
+                        return true;
+                    }
                 }  else rows = new ImageUtil(bufferedImage).getLines();
                 GPM.getHoloManager().setRows(holo, rows);
                 GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-setimage", "%Holo%", holo.getId(), "%Type%", Args[2].toLowerCase(), "%Source%", Args[3]);

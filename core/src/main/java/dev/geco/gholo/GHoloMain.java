@@ -46,6 +46,9 @@ public class GHoloMain extends JavaPlugin {
     private MManager mManager;
     public MManager getMManager() { return mManager; }
 
+    private FormatUtil formatUtil;
+    public FormatUtil getFormatUtil() { return formatUtil; }
+
     private IEntityUtil entityUtil;
     public IEntityUtil getEntityUtil() { return entityUtil; }
 
@@ -70,6 +73,7 @@ public class GHoloMain extends JavaPlugin {
 
         if(!connectDatabase(Sender)) return;
 
+        getHoloAnimationManager().loadHoloAnimations();
         getHoloManager().createTables();
         getHoloManager().loadHolos();
         ImageUtil.generateFolder();
@@ -97,6 +101,8 @@ public class GHoloMain extends JavaPlugin {
         holoManager = new HoloManager(getInstance());
         holoAnimationManager = new HoloAnimationManager(getInstance());
         holoImportManager = new HoloImportManager(getInstance());
+
+        formatUtil = new FormatUtil(getInstance());
 
         preloadPluginDependencies();
 
@@ -131,6 +137,7 @@ public class GHoloMain extends JavaPlugin {
 
         getDManager().close();
         getHoloManager().clearHolos();
+        getHoloAnimationManager().stopHoloAnimations();
     }
 
     private void setupCommands() {

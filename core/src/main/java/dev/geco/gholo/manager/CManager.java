@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.charset.*;
 import java.util.*;
 
+import org.bukkit.configuration.*;
 import org.bukkit.configuration.file.*;
 
 import dev.geco.gholo.GHoloMain;
@@ -17,7 +18,13 @@ public class CManager {
 
     public boolean CHECK_FOR_UPDATE;
 
+    public double DEFAULT_SIZE_BETWEEN_ROWS;
+
     public double DEFAULT_RANGE;
+
+    public HashMap<String, String> SYMBOLS = new HashMap<>();
+
+    public boolean L_PLACEHOLDER_API;
 
     public List<String> FEATUREFLAGS = new ArrayList<>();
 
@@ -58,7 +65,18 @@ public class CManager {
         L_CLIENT_LANG = GPM.getConfig().getBoolean("Lang.client-lang", true);
 
         CHECK_FOR_UPDATE = GPM.getConfig().getBoolean("Options.check-for-update", true);
+        DEFAULT_SIZE_BETWEEN_ROWS = GPM.getConfig().getDouble("Options.default-size-between-rows", 0.26);
         DEFAULT_RANGE = GPM.getConfig().getDouble("Options.default-range", 128);
+        SYMBOLS.clear();
+        try {
+            ConfigurationSection symbolsSection = GPM.getConfig().getConfigurationSection("Options.Symbols");
+            if(symbolsSection != null) {
+                for(String symbol : symbolsSection.getKeys(false)) {
+                    SYMBOLS.put(symbol, String.valueOf(GPM.getConfig().getString("Options.Symbols." + symbol).toCharArray()[0]));
+                }
+            }
+        } catch (Throwable ignored) { }
+        L_PLACEHOLDER_API = GPM.getConfig().getBoolean("Options.Link.placeholder-api", true);
         FEATUREFLAGS = GPM.getConfig().getStringList("Options.FeatureFlags");
     }
 

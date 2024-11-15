@@ -4,7 +4,6 @@ import org.bukkit.util.*;
 
 public class GHoloRow {
 
-    private int row;
     private final GHolo holo;
     private String content;
     private Vector offsets = new Vector();
@@ -12,17 +11,14 @@ public class GHoloRow {
     private float locationPitch = 0;
     private IGHoloRowEntity holoRowEntity;
 
-    public GHoloRow(int Row, GHolo Holo, String Content) {
-        row = Row;
+    public GHoloRow(GHolo Holo, String Content) {
         holo = Holo;
         content = Content;
     }
 
-    public int getRow() { return row; }
-
-    public void setRow(int Row) { row = Row; }
-
     public GHolo getHolo() { return holo; }
+
+    public int getRow() { return holo.getRows().indexOf(this); }
 
     public String getContent() { return content; }
 

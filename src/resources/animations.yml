@@ -1,0 +1,34 @@
+# ===============================================================================================
+#
+# Animations are created from an id
+# An animation contains a tick amount that defines how quickly the animation is updated in ticks
+# The content of the animation defines which lines should be looped through
+#
+# PlaceholderAPI placeholders, if active, can be used in an animation
+#
+# Animations can contain other animations, but only those created before the containing animation
+# In the default example with "test" and "test_2" -> only "test2" may contain "test" but "test" may not contain "test_2"
+#
+# Animation can be inserted into holos in the format "%animation_id%" like "%test%"
+#
+# ===============================================================================================
+
+Animations:
+
+  "test":
+
+    ticks: 10
+
+    content:
+      - "Test"
+      - "Animation"
+
+  "test_2":
+
+    ticks: 5
+
+    content:
+      - "&a%test%"
+      - "&b%test%"
+      - "&c%test%"
+      - "&d%test%"

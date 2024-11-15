@@ -9,8 +9,8 @@ public class GHolo {
 
     private String id;
     private Location location;
-    private final Map<Integer, GHoloRow> rows = new TreeMap<>();
-    private double maxRange = 64;
+    private final List<GHoloRow> rows = new ArrayList<>();
+    private double maxRange = 128;
     private final List<Player> players = new ArrayList<>();
     private final List<UUID> tasks = new ArrayList<>();
 
@@ -33,21 +33,13 @@ public class GHolo {
         location.setPitch(0);
     }
 
-    public List<GHoloRow> getRows() { return new ArrayList<>(rows.values()); }
+    public List<GHoloRow> getRows() { return rows; }
 
     public GHoloRow getRow(int Row) { return rows.get(Row); }
 
-    public void addRow(GHoloRow HoloRow) { rows.put(HoloRow.getRow(), HoloRow); }
+    public void addRow(GHoloRow HoloRow) { rows.add(HoloRow); }
 
     public void removeRow(int Row) { rows.remove(Row); }
-
-    public void reorderRows() {
-        List<GHoloRow> sortedRows = getRows();
-        rows.clear();
-        for(GHoloRow holoRow : sortedRows) rows.put(holoRow.getRow(), holoRow);
-    }
-
-    public void clearRows() { rows.clear(); }
 
     public double getMaxRange() { return maxRange; }
 

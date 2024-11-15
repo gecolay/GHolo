@@ -3,6 +3,7 @@ package dev.geco.gholo.manager;
 import java.io.*;
 import java.sql.*;
 
+import org.bukkit.*;
 import org.bukkit.configuration.file.*;
 
 import dev.geco.gholo.GHoloMain;
@@ -12,6 +13,7 @@ public class DManager {
     private final GHoloMain GPM;
 
     protected final int MAX_RETRIES = 3;
+    protected boolean DEBUG = false;
 
     private Connection connection;
     private String type = null;
@@ -79,6 +81,11 @@ public class DManager {
         ensureConnection();
         try(PreparedStatement preparedStatement = connection.prepareStatement(Query)) {
             for(int i = 1; i <= Data.length; i++) preparedStatement.setObject(i, Data[i - 1]);
+            if(DEBUG) {
+                String debugQuery = Query;
+                for(int i = 1; i <= Data.length; i++) debugQuery = debugQuery.replaceFirst("\\?",  Data[i - 1].toString());
+                Bukkit.getConsoleSender().sendMessage(debugQuery);
+            }
             preparedStatement.executeUpdate();
         }
     }
@@ -87,6 +94,11 @@ public class DManager {
         ensureConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(Query);
         for(int i = 1; i <= Data.length; i++) preparedStatement.setObject(i, Data[i - 1]);
+        if(DEBUG) {
+            String debugQuery = Query;
+            for(int i = 1; i <= Data.length; i++) debugQuery = debugQuery.replaceFirst("\\?",  Data[i - 1].toString());
+            Bukkit.getConsoleSender().sendMessage(debugQuery);
+        }
         return preparedStatement.executeQuery();
     }
 

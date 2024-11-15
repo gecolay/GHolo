@@ -40,7 +40,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         setInvulnerable(true);
 
         setBillboardConstraints(BillboardConstraints.CENTER);
-        setWidth(1000);
+        entityData.set(DATA_LINE_WIDTH_ID, 1000);
 
         EntityDataAccessor<Component> dataAccessor;
         try {
