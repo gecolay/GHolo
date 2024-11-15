@@ -21,9 +21,9 @@ public class EntityUtil implements IEntityUtil {
     public EntityUtil(GHoloMain GPluginMain) { GPM = GPluginMain; }
 
     public void startHoloTicking(GHolo Holo) {
-        ServerLevel level = ((CraftWorld) Holo.getLocation().getWorld()).getHandle();
+        ServerLevel level = ((CraftWorld) Holo.getRawLocation().getWorld()).getHandle();
         UUID taskId = GPM.getTManager().runAtFixedRate(() -> {
-            Location location = Holo.getLocation();
+            Location location = Holo.getRawLocation();
             for(Player player : level.players()) {
                 if(player.distanceToSqr(location.getX(), location.getY(), location.getZ()) <= Holo.getMaxRange() * Holo.getMaxRange()) {
                     if(!Holo.getPlayers().contains((CraftPlayer)player.getBukkitEntity())) {
@@ -47,6 +47,9 @@ public class EntityUtil implements IEntityUtil {
 
     public void stopHoloTicking(GHolo Holo) {
         for(UUID taskId : Holo.getTasks()) GPM.getTManager().cancel(taskId);
+        for(GHoloRow row : Holo.getRows()) {
+            row.getHoloRowEntity().stopTicking();
+        }
         for(org.bukkit.entity.Player player : Holo.getPlayers()) {
             for(GHoloRow row : Holo.getRows()) {
                 row.getHoloRowEntity().removeHoloRow(player);

@@ -6,7 +6,13 @@ public interface IGHoloRowEntity {
 
     void spawnHoloRow(Player Player);
 
+    void startTicking();
+
+    void stopTicking();
+
     void rerender();
+
+    void updateHoloRowRange(double Range);
 
     void updateHoloRowContent(String Content);
 

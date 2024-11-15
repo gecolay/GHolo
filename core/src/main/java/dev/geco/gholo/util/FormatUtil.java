@@ -20,7 +20,9 @@ public class FormatUtil {
     public String formatBase(String Text) { return GPM.getMManager().toFormattedMessage(formatSymbols(Text)); }
 
     public String formatPlaceholders(String Text, Player Player) {
-        return formatPlaceholdersWithAnimations(Text, Player, GPM.getHoloAnimationManager().getAnimations());
+        if(countAnimationChars(Text) < 2) return formatBase(Text);
+        String text = formatPlaceholdersWithAnimations(Text, Player, GPM.getHoloAnimationManager().getAnimations());
+        return formatBase(text);
     }
 
     private String formatPlaceholdersWithAnimations(String Text, Player Player, Collection<GHoloAnimation> Animations) {
@@ -40,6 +42,12 @@ public class FormatUtil {
             Text = Text.replace(key, value);
         }
         return Text;
+    }
+
+    public int countAnimationChars(String Text) {
+        int count = 0;
+        for(int i = 0; i < Text.length(); i++) if(Text.charAt(i) == HoloAnimationManager.AMIMATION_CHAR) count++;
+        return count;
     }
 
 }

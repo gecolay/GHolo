@@ -27,6 +27,8 @@ public class GHolo {
 
     public Location getLocation() { return location.clone(); }
 
+    public Location getRawLocation() { return location; }
+
     public void setLocation(Location Location) {
         location = Location.clone();
         location.setYaw(0);

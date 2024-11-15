@@ -4,6 +4,7 @@ import java.sql.*;
 import java.util.*;
 
 import org.bukkit.*;
+import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
 
 import dev.geco.gholo.*;
@@ -73,6 +74,7 @@ public class HoloManager {
 
                             IGHoloRowEntity holoRowEntity = GPM.getEntityUtil().createHoloRowEntity(holoRow);
                             holoRow.setHoloRowEntity(holoRowEntity);
+                            holoRowEntity.startTicking();
                             holoRowEntity.rerender();
 
                             holoRowMap.put(row, holoRow);
@@ -114,9 +116,9 @@ public class HoloManager {
     public GHoloRow createHoloRow(GHolo Holo, String Content) {
         try {
             int row = Holo.getRows().size();
-            double offset = -GPM.getCManager().DEFAULT_SIZE_BETWEEN_ROWS;
+            double offset = GPM.getCManager().DEFAULT_SIZE_BETWEEN_ROWS;
             double rowOffset = offset * row;
-            Vector offsets = new Vector(0, rowOffset, 0);
+            Vector offsets = new Vector(0, -rowOffset, 0);
             GPM.getDManager().execute("INSERT INTO holo_row (row_number, holo_id, content, o_x, o_y, o_z, l_yaw, l_pitch) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                     row,
                     Holo.getId(),
@@ -134,6 +136,7 @@ public class HoloManager {
 
             IGHoloRowEntity holoRowEntity = GPM.getEntityUtil().createHoloRowEntity(holoRow);
             holoRow.setHoloRowEntity(holoRowEntity);
+            holoRowEntity.startTicking();
             holoRowEntity.rerender();
 
             return holoRow;
@@ -143,15 +146,15 @@ public class HoloManager {
 
     public GHoloRow insertHoloRow(GHolo Holo, int Row, String Content, boolean updateOffset) {
         try {
-            double offset = -GPM.getCManager().DEFAULT_SIZE_BETWEEN_ROWS;
+            double offset = GPM.getCManager().DEFAULT_SIZE_BETWEEN_ROWS;
             double rowOffset = offset * Row;
-            Vector offsets = new Vector(0, rowOffset, 0);
+            Vector offsets = new Vector(0, -rowOffset, 0);
 
             if(updateOffset) {
-                GPM.getDManager().execute("UPDATE holo_row SET o_y = o_y + ? WHERE holo_id = ? AND row_number >= ?", offset, Holo.getId(), Row);
+                GPM.getDManager().execute("UPDATE holo_row SET o_y = o_y - ? WHERE holo_id = ? AND row_number >= ?", offset, Holo.getId(), Row);
                 for(GHoloRow holoRow : Holo.getRows().subList(Row, Holo.getRows().size())) {
                     Vector rowOffsets = holoRow.getOffsets();
-                    rowOffsets.setY(rowOffsets.getY() + offset);
+                    rowOffsets.setY(rowOffsets.getY() - offset);
                     holoRow.setOffsets(rowOffsets);
                     holoRow.getHoloRowEntity().adjustLocationToHolo();
                 }
@@ -176,6 +179,7 @@ public class HoloManager {
 
             IGHoloRowEntity holoRowEntity = GPM.getEntityUtil().createHoloRowEntity(holoRow);
             holoRow.setHoloRowEntity(holoRowEntity);
+            holoRowEntity.startTicking();
             holoRowEntity.rerender();
 
             return holoRow;
@@ -196,19 +200,23 @@ public class HoloManager {
         try {
             GHolo holo = HoloRow.getHolo();
             int row = HoloRow.getRow();
-            double offset = -GPM.getCManager().DEFAULT_SIZE_BETWEEN_ROWS;
+            double offset = GPM.getCManager().DEFAULT_SIZE_BETWEEN_ROWS;
             GPM.getDManager().execute("DELETE FROM holo_row where holo_id = ? AND row_number = ?", holo.getId(), row);
             if(updateOffset) {
-                GPM.getDManager().execute("UPDATE holo_row SET o_y = o_y - ? WHERE holo_id = ? AND row_number > ?", offset, holo.getId(), row);
+                GPM.getDManager().execute("UPDATE holo_row SET o_y = o_y + ? WHERE holo_id = ? AND row_number > ?", offset, holo.getId(), row);
                 for(GHoloRow holoRow : holo.getRows().subList(row + 1, holo.getRows().size())) {
                     Vector rowOffsets = holoRow.getOffsets();
-                    rowOffsets.setY(rowOffsets.getY() - offset);
+                    rowOffsets.setY(rowOffsets.getY() + offset);
                     holoRow.setOffsets(rowOffsets);
                     holoRow.getHoloRowEntity().adjustLocationToHolo();
                 }
             }
             GPM.getDManager().execute("UPDATE holo_row SET row_number = row_number - 1 WHERE holo_id = ? AND row_number > ?", holo.getId(), row);
             holo.removeRow(row);
+            HoloRow.getHoloRowEntity().stopTicking();
+            for(Player player : holo.getPlayers()) {
+                HoloRow.getHoloRowEntity().removeHoloRow(player);
+            }
         } catch (Exception e) { e.printStackTrace(); }
     }
 
@@ -289,6 +297,7 @@ public class HoloManager {
 
                     IGHoloRowEntity holoRowEntity = GPM.getEntityUtil().createHoloRowEntity(holoRow);
                     holoRow.setHoloRowEntity(holoRowEntity);
+                    holoRowEntity.startTicking();
                     holoRowEntity.rerender();
 
                     holoRowMap.put(rowNumber, holoRow);

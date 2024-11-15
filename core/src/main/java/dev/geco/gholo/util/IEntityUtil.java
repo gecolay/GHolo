@@ -4,9 +4,9 @@ import dev.geco.gholo.objects.*;
 
 public interface IEntityUtil {
 
-    void startHoloTicking(GHolo Holo);
+    void spawnHolo(GHolo Holo);
 
-    void stopHoloTicking(GHolo Holo);
+    void removeHolo(GHolo Holo);
 
     IGHoloRowEntity createHoloRowEntity(GHoloRow HoloRow);
 
