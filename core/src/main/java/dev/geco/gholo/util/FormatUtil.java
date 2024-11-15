@@ -17,12 +17,12 @@ public class FormatUtil {
 
     public FormatUtil(GHoloMain GPluginMain) { GPM = GPluginMain; }
 
-    public String formatBase(String Text) { return GPM.getMManager().toFormattedMessage(formatSymbols(Text)); }
+    public String formatBase(String Text) { return formatSymbols(Text); }
 
     public String formatPlaceholders(String Text, Player Player) {
         if(countAnimationChars(Text) < 2) return formatBase(Text);
         String text = formatPlaceholdersWithAnimations(Text, Player, GPM.getHoloAnimationManager().getAnimations());
-        return formatBase(text);
+        return GPM.getMManager().toFormattedMessage(formatBase(text));
     }
 
     private String formatPlaceholdersWithAnimations(String Text, Player Player, Collection<GHoloAnimation> Animations) {

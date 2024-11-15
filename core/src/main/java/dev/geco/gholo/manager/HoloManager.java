@@ -51,7 +51,7 @@ public class HoloManager {
                     holos.add(holo);
 
                     int range = resultSet.getInt("range");
-                    holo.setRange(range);
+                    //holo.setRange(range);
 
                     try(ResultSet rowResultSet = GPM.getDManager().executeAndGet("SELECT * FROM holo_row where holo_id = ?", holo.getId())) {
 
@@ -102,7 +102,7 @@ public class HoloManager {
             );
 
             GHolo holo = new GHolo(Id, Location);
-            holo.setRange(GPM.getCManager().DEFAULT_RANGE);
+            //holo.setRange(GPM.getCManager().DEFAULT_RANGE);
             holos.add(holo);
 
             return holo;
@@ -169,7 +169,7 @@ public class HoloManager {
 
             GHoloRow holoRow = new GHoloRow(Holo, GPM.getFormatUtil().formatBase(Content));
             holoRow.setOffsets(offsets);
-            Holo.getRows().add(Row, holoRow);
+            Holo.insertRow(holoRow, Row);
 
             GPM.getEntityUtil().createHoloRowEntity(holoRow);
 
@@ -233,7 +233,7 @@ public class HoloManager {
     public void updateRange(GHolo Holo, double Range) {
         try {
             GPM.getDManager().execute("UPDATE holo SET range = ? WHERE id = ?", Range, Holo.getId());
-            Holo.setRange(Range);
+            //Holo.setRange(Range);
             for(GHoloRow holoRow : Holo.getRows()) holoRow.getHoloRowEntity().publishUpdate(GHoloRowUpdateType.RANGE);
         } catch (Exception e) { e.printStackTrace(); }
     }

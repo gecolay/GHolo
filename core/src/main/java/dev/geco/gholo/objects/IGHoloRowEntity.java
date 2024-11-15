@@ -8,8 +8,6 @@ public interface IGHoloRowEntity {
 
     void spawnHoloRow(Player Player);
 
-    void rerender();
-
     void publishUpdate(GHoloRowUpdateType UpdateType);
 
     void removeHoloRow();

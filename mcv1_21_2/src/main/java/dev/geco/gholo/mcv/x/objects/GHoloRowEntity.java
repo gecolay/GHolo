@@ -39,10 +39,12 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
 
         setNoGravity(true);
         setInvulnerable(true);
+        setAlignment(3);
+        setSeeThrough(true);
+        setShadow(true);
 
-        setBillboardConstraints(BillboardConstraints.CENTER);
         entityData.set(DATA_LINE_WIDTH_ID, 1000);
-        setViewRange((float) (holoRow.getHolo().getRange() / 64));
+        //setViewRange((float) (holoRow.getHolo().getRange() / 64));
 
         EntityDataAccessor<Component> dataAccessor;
         try {
@@ -55,6 +57,24 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
             dataAccessor = null;
         }
         textDataAccessor = dataAccessor;
+    }
+
+    private void setBackgroundColor(int BackgroundColor) { entityData.set(DATA_BACKGROUND_COLOR_ID, java.awt.Color.decode("").getRGB()); }
+
+    private void setAlignment(int Alignment) { setBillboardConstraints(BillboardConstraints.values()[Alignment]); }
+
+    private void setShadow(boolean Shadow) {
+        byte flags = getFlags();
+        if(Shadow) flags |= (byte) (1 << 1);
+        else flags &= ~(byte) (1 << 1);
+        setFlags(flags);
+    }
+
+    private void setSeeThrough(boolean SeeThrough) {
+        byte flags = getFlags();
+        if(SeeThrough) flags |= (byte) (1 << 2);
+        else flags &= ~(byte) (1 << 2);
+        setFlags(flags);
     }
 
     @Override
@@ -87,14 +107,6 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     }
 
     @Override
-    public void rerender() {
-        for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
-            removeHoloRow(player);
-            spawnHoloRow(player);
-        }
-    }
-
-    @Override
     public void publishUpdate(GHoloRowUpdateType UpdateType) {
         switch (UpdateType) {
             case CONTENT:
@@ -106,11 +118,27 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
                 Location location = holoRow.getHolo().getLocation();
                 location.add(holoRow.getOffsets());
                 setPos(location.getX(), location.getY(), location.getZ());
-                rerender();
+                ClientboundTeleportEntityPacket teleportEntityPacket = new ClientboundTeleportEntityPacket(getId(), PositionMoveRotation.of(this), Set.of(), false);
+                for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
+                    ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+                    serverPlayer.connection.send(teleportEntityPacket);
+                }
                 break;
             case RANGE:
-                setViewRange((float) (holoRow.getHolo().getRange() / 64));
-                rerender();
+                //setViewRange((float) (holoRow.getHolo().getRange() / 64));
+                for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
+                    ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+                    serverPlayer.connection.send(getDataPacket(player));
+                }
+            case BACKGROUND_COLOR:
+                break;
+            case TEXT_OPACITY:
+                break;
+            case SHADOW:
+                break;
+            case ALIGNMENT:
+
+                break;
         }
     }
 
@@ -120,28 +148,10 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         Component contentComponent = CraftChatMessage.fromJSON(GPM.getMManager().getAsJSON(content));
         List<SynchedEntityData.DataValue<?>> data = getEntityData().getNonDefaultValues();
         if(data == null) data = new ArrayList<>();
-        else data.removeIf(a -> a.id() == 23);
+        else data.removeIf(dataValue -> dataValue.id() == textDataAccessor.id());
         data.add(new SynchedEntityData.DataValue<>(textDataAccessor.id(), textDataAccessor.serializer(), contentComponent));
         return new ClientboundSetEntityDataPacket(getId(), data);
     }
-
-    /*public void startTicking() {
-        if(GPM.getFormatUtil().countAnimationChars(holoRow.getContent()) < 2) {
-            stopTicking();
-            return;
-        }
-        taskId = GPM.getTManager().runAtFixedRate(() -> {
-            for(Player player : holoRow.getHolo().getPlayers()) {
-                ServerPlayer player2 = ((CraftPlayer) player).getHandle();
-                player2.connection.send(getDataPacket(player));
-            }
-        }, 0, 1);
-    }
-
-    public void stopTicking() {
-        if(taskId != null) GPM.getTManager().cancel(taskId);
-        taskId = null;
-    }*/
 
     @Override
     public void removeHoloRow() {

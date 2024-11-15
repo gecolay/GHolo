@@ -9,7 +9,6 @@ public class GHolo {
     private String id;
     private Location location;
     private final List<GHoloRow> rows = new ArrayList<>();
-    private double range = 128;
 
     public GHolo(String Id, Location Location) {
         id = Id;
@@ -38,10 +37,8 @@ public class GHolo {
 
     public void addRow(GHoloRow HoloRow) { rows.add(HoloRow); }
 
+    public void insertRow(GHoloRow HoloRow, int Index) { rows.add(Index, HoloRow); }
+
     public void removeRow(int Row) { rows.remove(Row); }
-
-    public double getRange() { return range; }
-
-    public void setRange(double Range) { range = Range; }
 
 }

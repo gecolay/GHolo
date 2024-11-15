@@ -66,7 +66,7 @@ public class MPaperManager extends MManager {
 
     private @NotNull Component toFormattedComponent(String Text, Object... RawReplaceList) { return miniMessage.deserialize(replaceLegacyColors(replaceText(Text, RawReplaceList))); }
 
-    private String formatText(String Text, Object... RawReplaceList) { return legacyComponentSerializer.serialize( miniMessage.deserialize(replaceText(Text, RawReplaceList))); }
+    private String formatText(String Text, Object... RawReplaceList) { return legacyComponentSerializer.serialize(miniMessage.deserialize(replaceText(Text, RawReplaceList))); }
 
     private String replaceLegacyColors(String text) {
         Matcher matcher = HEX_PATTERN.matcher(text);
