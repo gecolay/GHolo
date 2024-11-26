@@ -9,6 +9,7 @@ public class GHolo {
     private String id;
     private Location location;
     private final List<GHoloRow> rows = new ArrayList<>();
+    private GHoloRowData defaultRowData;
 
     public GHolo(String Id, Location Location) {
         id = Id;
@@ -40,5 +41,9 @@ public class GHolo {
     public void insertRow(GHoloRow HoloRow, int Index) { rows.add(Index, HoloRow); }
 
     public void removeRow(int Row) { rows.remove(Row); }
+
+    public GHoloRowData getDefaultRowData() { return defaultRowData; }
+
+    public void setDefaultRowData(GHoloRowData DefaultRowData) { defaultRowData = DefaultRowData; }
 
 }

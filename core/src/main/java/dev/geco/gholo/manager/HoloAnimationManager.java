@@ -18,9 +18,9 @@ public class HoloAnimationManager {
 
     private final HashMap<String, GHoloAnimation> animations = new HashMap<>();
 
-    private final List<UUID> taskIds = new ArrayList<>();
+    private final HashMap<String, List<GHoloRow>> animationSubscriber = new HashMap<>();
 
-    public HashMap<String, GHoloAnimation> getAnimationSet() { return animations; }
+    private final List<UUID> taskIds = new ArrayList<>();
 
     public Collection<GHoloAnimation> getAnimations() { return animations.values(); }
 
@@ -32,15 +32,31 @@ public class HoloAnimationManager {
         try {
             for(String id : Objects.requireNonNull(animationsData.getConfigurationSection("Animations")).getKeys(false)) {
                 animations.put(id.toLowerCase(), new GHoloAnimation(id.toLowerCase(), animationsData.getLong("Animations." + id + ".ticks", 20), animationsData.getStringList("Animations." + id + ".content")));
+                animationSubscriber.put(id.toLowerCase(), new ArrayList<>());
             }
             startHoloAnimations();
         } catch (Throwable e) { e.printStackTrace(); }
+    }
+
+    public void updateSubscriptionStatus(GHoloRow HoloRow) {
+        for(GHoloAnimation animation : animations.values()) {
+            // Nested animations should be no problem, because they are covered by their parent animation cycle
+            if(HoloRow.getContent().contains(AMIMATION_CHAR + animation.getId() + AMIMATION_CHAR)) animationSubscriber.get(animation.getId()).add(HoloRow);
+            else animationSubscriber.get(animation.getId()).remove(HoloRow);
+        }
+    }
+
+    public void unsubscribe(GHoloRow HoloRow) {
+        for(List<GHoloRow> holoRows : animationSubscriber.values()) holoRows.remove(HoloRow);
     }
 
     private void startHoloAnimations() {
         for(GHoloAnimation animation : animations.values()) {
             UUID taskId = GPM.getTManager().runAtFixedRate(() -> {
                 animation.setRow(animation.getRow() + 1 >= animation.getSize() ? 0 : animation.getRow() + 1);
+                for(GHoloRow holoRow : animationSubscriber.get(animation.getId().toLowerCase())) {
+                    holoRow.getHoloRowEntity().publishUpdate(GHoloRowUpdateType.CONTENT);
+                }
             }, false, 0, animation.getTicks());
             taskIds.add(taskId);
         }
@@ -50,6 +66,7 @@ public class HoloAnimationManager {
         for(UUID taskId : taskIds) GPM.getTManager().cancel(taskId);
         taskIds.clear();
         animations.clear();
+        animationSubscriber.clear();
     }
 
 }

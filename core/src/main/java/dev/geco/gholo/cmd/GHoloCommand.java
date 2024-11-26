@@ -21,7 +21,7 @@ public class GHoloCommand implements CommandExecutor {
 
     public GHoloCommand(GHoloMain GPluginMain) { GPM = GPluginMain; }
 
-    public static List<String> COMMAND_LIST = List.of("help", "list", "create", "info", "remove", "rename", "relocate", "tphere", "tpto", "align", "setrange", "addrow", "insertrow", "setrow", "removerow", "copyrows", "setimage", "importdata");
+    public static List<String> COMMAND_LIST = List.of("help", "list", "create", "info", "remove", "rename", "relocate", "tphere", "tpto", "align", "addrow", "insertrow", "setrow", "removerow", "copyrows", "data", "setimage", "importdata");
 
     @Override
     public boolean onCommand(@NotNull CommandSender Sender, @NotNull Command Command, @NotNull String Label, String[] Args) {
@@ -207,24 +207,8 @@ public class GHoloCommand implements CommandExecutor {
                 GPM.getHoloManager().updateLocation(holo, holoLocation);
                 GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-align", "%Holo%", holo.getId(), "%Axis%", appliedAxis, "%AlignOnHolo%", alignOnHolo.getId());
                 break;
-            case "setrange":
-                if(Args.length <= 2) {
-                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-setrange-use-error");
-                    break;
-                }
-                holo = GPM.getHoloManager().getHolo(Args[1]);
-                if(holo == null) {
-                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-exist-error", "%Holo%", Args[1].toLowerCase());
-                    break;
-                }
-                double range;
-                try {
-                    range = Double.parseDouble(Args[2]);
-                    GPM.getHoloManager().updateRange(holo, range);
-                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-setrange", "%Holo%", holo.getId(), "%Range%", range);
-                } catch (NumberFormatException e) {
-                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-setrange-range-error", "%Range%", Args[2]);
-                }
+            case "positionrow":
+                // TODO: positionrow <Id> <Row> <x/y/z/yaw/pitch> <Value>
                 break;
             case "addrow":
                 if(Args.length <= 2) {
@@ -331,6 +315,112 @@ public class GHoloCommand implements CommandExecutor {
                 }
                 GPM.getHoloManager().copyRows(holo, copyToHolo);
                 GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-copyrows", "%Holo%", holo.getId(), "%CopyToHolo%", copyToHolo.getId());
+                break;
+            case "data":
+                if(Args.length <= 4) {
+                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-use-error");
+                    break;
+                }
+                holo = GPM.getHoloManager().getHolo(Args[1]);
+                if(holo == null) {
+                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-exist-error", "%Holo%", Args[1].toLowerCase());
+                    break;
+                }
+                GHoloRowData rowData = null;
+                int arg = 3;
+                GHoloRow holoRow = null;
+                switch (Args[2].toLowerCase()) {
+                    case "default":
+                        rowData = holo.getDefaultRowData();
+                        break;
+                    case "row":
+                        try {
+                            holoRow = holo.getRow(Integer.parseInt(Args[3]) - 1);
+                            if (holoRow == null) {
+                                GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-row-error", "%Row%", Args[3]);
+                                return true;
+                            }
+                            rowData = holoRow.getRowData();
+                            arg = 4;
+                        } catch (NumberFormatException e) {
+                            GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-row-error", "%Row%", Args[3]);
+                            return true;
+                        }
+                        break;
+                }
+                if(rowData == null) {
+                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-use-error");
+                    break;
+                }
+                GHoloRowUpdateType updateType = null;
+                // TODO: On default value reset to null
+                switch (Args[arg].toLowerCase()) {
+                    case "range":
+                        try {
+                            double range = Double.parseDouble(Args[arg + 1]);
+                            rowData.setRange(range);
+                            updateType = GHoloRowUpdateType.RANGE;
+                        } catch (NumberFormatException e) {
+                            GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-value-error", "%Data%", Args[arg].toLowerCase(), "%Value%", Args[arg + 1]);
+                        }
+                        break;
+                    case "background_color":
+                        String backgroundColor = Args[arg + 1];
+                        rowData.setBackgroundColor(backgroundColor);
+                        updateType = GHoloRowUpdateType.BACKGROUND_COLOR;
+                        break;
+                    case "text_opacity":
+                        try {
+                            byte textOpacity = Byte.parseByte(Args[arg + 1]);
+                            rowData.setTextOpacity(textOpacity);
+                            updateType = GHoloRowUpdateType.TEXT_OPACITY;
+                        } catch (NumberFormatException e) {
+                            GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-value-error", "%Data%", Args[arg].toLowerCase(), "%Value%", Args[arg + 1]);
+                        }
+                        break;
+                    case "text_shadow":
+                        try {
+                            boolean textShadow = Boolean.parseBoolean(Args[arg + 1]);
+                            rowData.setTextShadow(textShadow);
+                            updateType = GHoloRowUpdateType.TEXT_SHADOW;
+                        } catch (NumberFormatException e) {
+                            GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-value-error", "%Data%", Args[arg].toLowerCase(), "%Value%", Args[arg + 1]);
+                        }
+                        break;
+                    case "billboard":
+                        try {
+                            Display.Billboard billboard = Display.Billboard.valueOf(Args[arg + 1].toUpperCase());
+                            rowData.setBillboard(billboard.name().toLowerCase());
+                            updateType = GHoloRowUpdateType.BILLBOARD;
+                        } catch (IllegalArgumentException e) {
+                            GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-value-error", "%Data%", Args[arg].toLowerCase(), "%Value%", Args[arg + 1].toUpperCase());
+                        }
+                        break;
+                    case "see_through":
+                        try {
+                            boolean seeThrough = Boolean.parseBoolean(Args[arg + 1]);
+                            rowData.setSeeThrough(seeThrough);
+                            updateType = GHoloRowUpdateType.SEE_THROUGH;
+                        } catch (NumberFormatException e) {
+                            GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-value-error", "%Data%", Args[arg].toLowerCase(), "%Value%", Args[arg + 1]);
+                        }
+                        break;
+                    case "size":
+                        try {
+                            float size = Float.parseFloat(Args[arg + 1]);
+                            rowData.setSize(size);
+                            updateType = GHoloRowUpdateType.SIZE;
+                        } catch (NumberFormatException e) {
+                            GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-value-error", "%Data%", Args[arg].toLowerCase(), "%Value%", Args[arg + 1]);
+                        }
+                        break;
+                }
+                if(holoRow == null) {
+                    for(GHoloRow updateHoloRow : holo.getRows()) updateHoloRow.getHoloRowEntity().publishUpdate(updateType);
+                } else {
+                    holoRow.getHoloRowEntity().publishUpdate(updateType);
+                }
+                GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data", "%Data%", Args[arg].toLowerCase(), "%Value%", Args[arg + 1].toLowerCase());
                 break;
             case "setimage":
                 if(Args.length <= 3) {

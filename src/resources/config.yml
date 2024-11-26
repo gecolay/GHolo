@@ -16,9 +16,6 @@ Options:
   # Defines the default size between the top parts of rows
   default-size-between-rows: 0.26
 
-  # Defines the default maximum range at which a holo is visible
-  default-range: 128
-
   # Defines a list of Unicode symbols to be converted within holo rows
   Symbols:
 

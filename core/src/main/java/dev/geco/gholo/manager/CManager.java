@@ -20,8 +20,6 @@ public class CManager {
 
     public double DEFAULT_SIZE_BETWEEN_ROWS;
 
-    public double DEFAULT_RANGE;
-
     public HashMap<String, String> SYMBOLS = new HashMap<>();
 
     public boolean L_PLACEHOLDER_API;
@@ -66,7 +64,6 @@ public class CManager {
 
         CHECK_FOR_UPDATE = GPM.getConfig().getBoolean("Options.check-for-update", true);
         DEFAULT_SIZE_BETWEEN_ROWS = GPM.getConfig().getDouble("Options.default-size-between-rows", 0.26);
-        DEFAULT_RANGE = GPM.getConfig().getDouble("Options.default-range", 128);
         SYMBOLS.clear();
         try {
             ConfigurationSection symbolsSection = GPM.getConfig().getConfigurationSection("Options.Symbols");

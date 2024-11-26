@@ -9,6 +9,7 @@ public class GHoloRow {
     private Vector offsets = new Vector();
     private float locationYaw = 0;
     private float locationPitch = 0;
+    private GHoloRowData rowData;
     private IGHoloRowEntity holoRowEntity;
 
     public GHoloRow(GHolo Holo, String Content) {
@@ -35,6 +36,10 @@ public class GHoloRow {
     public float getLocationPitch() { return locationPitch; }
 
     public void setLocationPitch(float LocationPitch) { locationPitch = LocationPitch; }
+
+    public GHoloRowData getRowData() { return rowData; }
+
+    public void setRowData(GHoloRowData RowData) { rowData = RowData; }
 
     public IGHoloRowEntity getHoloRowEntity() { return holoRowEntity; }
 

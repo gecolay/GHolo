@@ -8,7 +8,6 @@ public class GHoloAnimation {
     private final long ticks;
     private final List<String> content;
     private final int size;
-    private long currentTick = 0;
     private int row = 0;
 
     public GHoloAnimation(String Id, long Ticks, List<String> Content) {
@@ -22,10 +21,6 @@ public class GHoloAnimation {
     public String getId() { return id; }
 
     public long getTicks() { return ticks; }
-
-    public long getCurrentTick() { return currentTick; }
-
-    public void setCurrentTick(long CurrentTick) { currentTick = CurrentTick; }
 
     public List<String> getContent() { return content; }
 

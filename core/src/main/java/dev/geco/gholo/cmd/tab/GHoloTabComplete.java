@@ -25,7 +25,7 @@ public class GHoloTabComplete implements TabCompleter {
 
         List<String> complete = new ArrayList<>(), completeStarted = new ArrayList<>();
 
-        List<String> holoIdArg = new ArrayList<>(List.of("info", "remove", "rename", "relocate", "tphere", "tpto", "align", "setrange", "addrow", "insertrow", "setrow", "removerow", "copyrows", "setimage"));
+        List<String> holoIdArg = new ArrayList<>(List.of("info", "remove", "rename", "relocate", "tphere", "tpto", "align", "addrow", "insertrow", "setrow", "removerow", "copyrows", "data", "setimage"));
 
         if(!(Sender instanceof Player)) holoIdArg.removeAll(List.of("tpto", "tphere"));
 
@@ -69,6 +69,10 @@ public class GHoloTabComplete implements TabCompleter {
                 if(holo != null) for(int row = 1; row <= holo.getRows().size(); row++) complete.add("" + row);
             }
 
+            if(Args[0].equalsIgnoreCase("data")) {
+                complete.addAll(List.of("default", "row"));
+            }
+
             if(Args[0].equalsIgnoreCase("setimage")) {
                 complete.addAll(ImageUtil.IMAGE_TYPES);
             }
@@ -85,6 +89,18 @@ public class GHoloTabComplete implements TabCompleter {
                 complete.addAll(List.of("x", "y", "z", "xy", "xz", "yz", "xyz"));
             }
 
+            if(Args[0].equalsIgnoreCase("data")) {
+
+                if(Args[2].equalsIgnoreCase("default")) {
+                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "billboard", "see_through", "size"));
+                }
+
+                if(Args[2].equalsIgnoreCase("row")) {
+                    GHolo holo = GPM.getHoloManager().getHolo(Args[1]);
+                    if(holo != null) for(int row = 1; row <= holo.getRows().size(); row++) complete.add("" + row);
+                }
+            }
+
             if(Args[0].equalsIgnoreCase("setimage")) {
 
                 if(Args[2].equalsIgnoreCase("file")) {
@@ -94,6 +110,60 @@ public class GHoloTabComplete implements TabCompleter {
 
                 if(Args[2].equalsIgnoreCase("avatar") || Args[2].equalsIgnoreCase("helm")) {
                     complete.addAll(Arrays.stream(Bukkit.getOfflinePlayers()).map(OfflinePlayer::getName).toList());
+                }
+            }
+
+            if(!Args[Args.length - 1].isEmpty()) {
+
+                for(String entry : complete) if(entry.toLowerCase().startsWith(Args[Args.length - 1].toLowerCase())) completeStarted.add(entry);
+
+                complete.clear();
+            }
+        } else if(Args.length == 5) {
+
+            if(Args[0].equalsIgnoreCase("data")) {
+
+                if(Args[2].equalsIgnoreCase("default")) {
+                    if(Args[3].equalsIgnoreCase("text_shadow") || Args[3].equalsIgnoreCase("see_through")) {
+                        complete.addAll(List.of("true", "false"));
+                    }
+                    if(Args[3].equalsIgnoreCase("text_opacity")) {
+                        List<String> textOpacityNumbers = new ArrayList<>();
+                        for(int i = 0; i <= 100; i++) textOpacityNumbers.add(String.format("%03d", i));
+                        complete.addAll(textOpacityNumbers);
+                    }
+                    if(Args[3].equalsIgnoreCase("billboard")) {
+                        complete.addAll(Arrays.stream(Display.Billboard.values()).map(b -> b.name().toLowerCase()).toList());
+                    }
+                }
+
+                if(Args[2].equalsIgnoreCase("row")) {
+                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "billboard", "see_through", "size"));
+                }
+            }
+
+            if(!Args[Args.length - 1].isEmpty()) {
+
+                for(String entry : complete) if(entry.toLowerCase().startsWith(Args[Args.length - 1].toLowerCase())) completeStarted.add(entry);
+
+                complete.clear();
+            }
+        } else if(Args.length == 6) {
+
+            if(Args[0].equalsIgnoreCase("data")) {
+
+                if(Args[2].equalsIgnoreCase("row")) {
+                    if(Args[4].equalsIgnoreCase("text_shadow") || Args[4].equalsIgnoreCase("see_through")) {
+                        complete.addAll(List.of("true", "false"));
+                    }
+                    if(Args[4].equalsIgnoreCase("text_opacity")) {
+                        List<String> textOpacityNumbers = new ArrayList<>();
+                        for(int i = 0; i <= 100; i++) textOpacityNumbers.add(String.format("%03d", i));
+                        complete.addAll(textOpacityNumbers);
+                    }
+                    if(Args[4].equalsIgnoreCase("billboard")) {
+                        complete.addAll(Arrays.stream(Display.Billboard.values()).map(b -> b.name().toLowerCase()).toList());
+                    }
                 }
             }
 
