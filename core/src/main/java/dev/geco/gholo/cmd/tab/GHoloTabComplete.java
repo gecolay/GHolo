@@ -127,11 +127,6 @@ public class GHoloTabComplete implements TabCompleter {
                     if(Args[3].equalsIgnoreCase("text_shadow") || Args[3].equalsIgnoreCase("see_through")) {
                         complete.addAll(List.of("true", "false"));
                     }
-                    if(Args[3].equalsIgnoreCase("text_opacity")) {
-                        List<String> textOpacityNumbers = new ArrayList<>();
-                        for(int i = 0; i <= 100; i++) textOpacityNumbers.add(String.format("%03d", i));
-                        complete.addAll(textOpacityNumbers);
-                    }
                     if(Args[3].equalsIgnoreCase("billboard")) {
                         complete.addAll(Arrays.stream(Display.Billboard.values()).map(b -> b.name().toLowerCase()).toList());
                     }
@@ -155,11 +150,6 @@ public class GHoloTabComplete implements TabCompleter {
                 if(Args[2].equalsIgnoreCase("row")) {
                     if(Args[4].equalsIgnoreCase("text_shadow") || Args[4].equalsIgnoreCase("see_through")) {
                         complete.addAll(List.of("true", "false"));
-                    }
-                    if(Args[4].equalsIgnoreCase("text_opacity")) {
-                        List<String> textOpacityNumbers = new ArrayList<>();
-                        for(int i = 0; i <= 100; i++) textOpacityNumbers.add(String.format("%03d", i));
-                        complete.addAll(textOpacityNumbers);
                     }
                     if(Args[4].equalsIgnoreCase("billboard")) {
                         complete.addAll(Arrays.stream(Display.Billboard.values()).map(b -> b.name().toLowerCase()).toList());

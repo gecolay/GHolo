@@ -22,6 +22,7 @@ public class UManager {
 
     public void checkForUpdates() {
         if(!GPM.getCManager().CHECK_FOR_UPDATE) return;
+        // TODO: cache per day, to rerun it later without the need of a server reload
         checkVersion();
         if(latestVersion) return;
         for(Player player : Bukkit.getOnlinePlayers()) if(GPM.getPManager().hasPermission(player, "Update")) GPM.getMManager().sendMessage(player, "Plugin.plugin-update", "%Name%", GPM.NAME, "%NewVersion%", spigotVersion, "%Version%", GPM.getDescription().getVersion(), "%Path%", GPM.getDescription().getWebsite());

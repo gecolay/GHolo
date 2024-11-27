@@ -2,6 +2,7 @@ package dev.geco.gholo.objects;
 
 public class GHoloRowData {
 
+    // TODO: Define default values to allow easy resets
     private Double range;
     private String backgroundColor;
     private Byte textOpacity;

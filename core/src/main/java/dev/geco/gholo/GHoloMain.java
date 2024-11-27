@@ -193,31 +193,20 @@ public class GHoloMain extends JavaPlugin {
     }
 
     private boolean connectDatabase(CommandSender Sender) {
-
         boolean connect = getDManager().connect();
-
         if(connect) return true;
-
         getMManager().sendMessage(Sender, "Plugin.plugin-data");
-
         Bukkit.getPluginManager().disablePlugin(getInstance());
-
         return false;
     }
 
     private boolean versionCheck() {
-
         if(!getSVManager().isNewerOrVersion(19, 4) || !getSVManager().isAvailable()) {
-
             getMManager().sendMessage(Bukkit.getConsoleSender(), "Plugin.plugin-version", "%Version%", getSVManager().getServerVersion());
-
             getUManager().checkForUpdates();
-
             Bukkit.getPluginManager().disablePlugin(getInstance());
-
             return false;
         }
-
         return true;
     }
 

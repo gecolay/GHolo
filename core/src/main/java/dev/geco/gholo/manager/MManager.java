@@ -37,17 +37,12 @@ abstract public class MManager {
 
     public void loadMessages() {
         messages.clear();
-        boolean betterSave = GPM.getSVManager().isNewerOrVersion(18, 2);
         try(JarFile jarFile = new JarFile(Paths.get(GPM.getClass().getProtectionDomain().getCodeSource().getLocation().toURI()).toString())) {
             Enumeration<JarEntry> jarFiles = jarFile.entries();
             while(jarFiles.hasMoreElements()) {
                 JarEntry jarEntry = jarFiles.nextElement();
                 if(!jarEntry.getName().startsWith("lang") || jarEntry.isDirectory()) continue;
                 File langFile = new File(GPM.getDataFolder(), jarEntry.getName());
-                if(!betterSave) {
-                    if(!langFile.exists()) GPM.saveResource(jarEntry.getName(), false);
-                    continue;
-                }
                 FileConfiguration lang = YamlConfiguration.loadConfiguration(langFile);
                 InputStream langSteam = GPM.getResource(jarEntry.getName());
                 if(langSteam != null) {

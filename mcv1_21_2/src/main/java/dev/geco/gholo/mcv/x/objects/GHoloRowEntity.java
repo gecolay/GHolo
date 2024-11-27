@@ -136,7 +136,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
                 setSize(size);
                 break;
         }
-        publishFinalUpdate();
+        finishUpdate();
     }
 
     private void setBackgroundColor(String Color) {
@@ -169,7 +169,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
 
     private void setSize(float Size) { entityData.set(HOLO_SIZE_DATA, new Vector3f(Size)); }
 
-    private void publishFinalUpdate() {
+    private void finishUpdate() {
         for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
             ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
             serverPlayer.connection.send(getDataPacket(player));
@@ -183,8 +183,10 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         List<SynchedEntityData.DataValue<?>> data = getEntityData().getNonDefaultValues();
         if(data == null) data = new ArrayList<>();
         else data.removeIf(dataValue -> dataValue.id() == HOLO_TEXT_DATA.id());
-        List<SynchedEntityData.DataValue<?>> data2 = getEntityData().packDirty();
-        if(data2 != null) data.addAll(data2);
+        // TODO: Currently only required for the reset of e.g. the billboard to "fixed"
+        List<SynchedEntityData.DataValue<?>> defaultData = getEntityData().packDirty();
+        if(defaultData != null) data.addAll(defaultData);
+        //
         data.add(new SynchedEntityData.DataValue<>(HOLO_TEXT_DATA.id(), HOLO_TEXT_DATA.serializer(), contentComponent));
         return new ClientboundSetEntityDataPacket(getId(), data);
     }

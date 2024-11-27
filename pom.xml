@@ -8,9 +8,9 @@
     <artifactId>GHolo</artifactId>
     <name>GHolo</name>
     <version>1.0.0</version>
-    <description>Holos</description>
+    <description>Create modern &amp; lightweight holograms!</description>
     <url>https://www.spigotmc.org/resources/000000</url>
-    <inceptionYear>2018</inceptionYear>
+    <inceptionYear>2024</inceptionYear>
     <packaging>pom</packaging>
 
     <licenses>

@@ -33,24 +33,22 @@ public class CManager {
 
         GPM = GPluginMain;
 
-        if(GPM.getSVManager().isNewerOrVersion(18, 2)) {
-            try {
-                File configFile = new File(GPM.getDataFolder(), "config.yml");
-                FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
-                InputStream configSteam = GPM.getResource("config.yml");
-                if(configSteam != null) {
-                    FileConfiguration configSteamConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(configSteam, StandardCharsets.UTF_8));
-                    if(!config.getKeys(true).equals(configSteamConfig.getKeys(true))) {
-                        config.setDefaults(configSteamConfig);
-                        YamlConfigurationOptions options = (YamlConfigurationOptions) config.options();
-                        options.parseComments(true).copyDefaults(true).width(500);
-                        config.loadFromString(config.saveToString());
-                        for(String comments : config.getKeys(true)) config.setComments(comments, configSteamConfig.getComments(comments));
-                        config.save(configFile);
-                    }
-                } else GPM.saveDefaultConfig();
-            } catch (Throwable e) { GPM.saveDefaultConfig(); }
-        } else GPM.saveDefaultConfig();
+        try {
+            File configFile = new File(GPM.getDataFolder(), "config.yml");
+            FileConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+            InputStream configSteam = GPM.getResource("config.yml");
+            if(configSteam != null) {
+                FileConfiguration configSteamConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(configSteam, StandardCharsets.UTF_8));
+                if(!config.getKeys(true).equals(configSteamConfig.getKeys(true))) {
+                    config.setDefaults(configSteamConfig);
+                    YamlConfigurationOptions options = (YamlConfigurationOptions) config.options();
+                    options.parseComments(true).copyDefaults(true).width(500);
+                    config.loadFromString(config.saveToString());
+                    for(String comments : config.getKeys(true)) config.setComments(comments, configSteamConfig.getComments(comments));
+                    config.save(configFile);
+                }
+            } else GPM.saveDefaultConfig();
+        } catch (Throwable e) { GPM.saveDefaultConfig(); }
 
         reload();
     }

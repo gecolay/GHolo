@@ -11,10 +11,13 @@ public class EntityUtil implements IEntityUtil {
 
     public EntityUtil(GHoloMain GPluginMain) { GPM = GPluginMain; }
 
+    // TODO: Maybe move these 4 methods to a manager class since they are the same for all versions
+    @Override
     public void spawnHolo(GHolo Holo) {
         for(org.bukkit.entity.Player player : Holo.getRawLocation().getWorld().getPlayers()) spawnHolo(Holo, player);
     }
 
+    @Override
     public void spawnHolo(GHolo Holo, org.bukkit.entity.Player Player) {
         for(GHoloRow row : Holo.getRows()) row.getHoloRowEntity().spawnHoloRow(Player);
     }
@@ -29,6 +32,7 @@ public class EntityUtil implements IEntityUtil {
         for(GHoloRow row : Holo.getRows()) row.getHoloRowEntity().removeHoloRow(Player);
     }
 
+    @Override
     public IGHoloRowEntity createHoloRowEntity(GHoloRow HoloRow) {
         GHoloRowEntity holoRowEntity = new GHoloRowEntity(HoloRow);
         HoloRow.setHoloRowEntity(holoRowEntity);
