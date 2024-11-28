@@ -11,7 +11,6 @@ public class EntityUtil implements IEntityUtil {
 
     public EntityUtil(GHoloMain GPluginMain) { GPM = GPluginMain; }
 
-    // TODO: Maybe move these 4 methods to a manager class since they are the same for all versions
     @Override
     public void spawnHolo(GHolo Holo) {
         for(org.bukkit.entity.Player player : Holo.getRawLocation().getWorld().getPlayers()) spawnHolo(Holo, player);

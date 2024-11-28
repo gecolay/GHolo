@@ -1,7 +1,7 @@
 package dev.geco.gholo.cmd;
 
 import java.awt.image.*;
-import java.io.File;
+import java.io.*;
 import java.util.*;
 
 import org.jetbrains.annotations.*;
@@ -10,7 +10,6 @@ import org.bukkit.*;
 import org.bukkit.event.player.*;
 import org.bukkit.command.*;
 import org.bukkit.entity.*;
-import org.bukkit.util.Vector;
 
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.objects.*;
@@ -22,7 +21,7 @@ public class GHoloCommand implements CommandExecutor {
 
     public GHoloCommand(GHoloMain GPluginMain) { GPM = GPluginMain; }
 
-    public static List<String> COMMAND_LIST = List.of("help", "list", "create", "info", "remove", "rename", "relocate", "tphere", "tpto", "align", "addrow", "insertrow", "setrow", "removerow", "copyrows", "data", "setimage", "importdata");
+    public static List<String> COMMAND_LIST = List.of("help", "list", "create", "info", "remove", "rename", "relocate", "tphere", "tpto", "align", "positionrow", "addrow", "insertrow", "setrow", "removerow", "copyrows", "data", "setimage", "importdata");
 
     @Override
     public boolean onCommand(@NotNull CommandSender Sender, @NotNull Command Command, @NotNull String Label, String[] Args) {
@@ -209,7 +208,7 @@ public class GHoloCommand implements CommandExecutor {
                 GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-align", "%Holo%", holo.getId(), "%Axis%", appliedAxis, "%AlignOnHolo%", alignOnHolo.getId());
                 break;
             case "positionrow":
-                if(Args.length <= 3) {
+                if(Args.length <= 4) {
                     GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-positionrow-use-error");
                     break;
                 }
@@ -225,32 +224,31 @@ public class GHoloCommand implements CommandExecutor {
                         break;
                     }
                     try {
-                        Vector offsets = holoRow.getOffsets();
+                        Location position = holoRow.getPosition();
                         switch(Args[3].toLowerCase()) {
                             case "xoffset":
-                                holoRow.setOffsets(offsets.setX(Double.parseDouble(Args[4])));
+                                position.setX(Double.parseDouble(Args[4]));
                                 break;
                             case "yoffset":
-                                holoRow.setOffsets(offsets.setY(Double.parseDouble(Args[4])));
+                                position.setY(Double.parseDouble(Args[4]));
                                 break;
                             case "zoffset":
-                                holoRow.setOffsets(offsets.setZ(Double.parseDouble(Args[4])));
+                                position.setZ(Double.parseDouble(Args[4]));
                                 break;
                             case "yaw":
-                                holoRow.setLocationYaw(Float.parseFloat(Args[4]));
+                                position.setYaw(Float.parseFloat(Args[4]));
                                 break;
                             case "pitch":
-                                holoRow.setLocationPitch(Float.parseFloat(Args[4]));
+                                position.setPitch(Float.parseFloat(Args[4]));
                                 break;
                             default:
                                 GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-positionrow-use-error");
-                                break;
+                                return true;
                         }
-                        // TODO: Save to db
-                        holoRow.getHoloRowEntity().publishUpdate(GHoloRowUpdateType.LOCATION);
+                        GPM.getHoloManager().updateHoloRowPosition(holoRow, position);
                         GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-positionrow");
                     } catch (NumberFormatException e) {
-                        GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-positionrow-value-error", "%Row%", Args[2]);
+                        GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-positionrow-value-error", "%Value%", Args[4]);
                     }
                 } catch (NumberFormatException e) {
                     GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-row-error", "%Row%", Args[2]);
@@ -399,26 +397,36 @@ public class GHoloCommand implements CommandExecutor {
                     break;
                 }
                 GHoloRowUpdateType updateType = null;
-                // TODO: On default value reset to null
                 switch (Args[arg].toLowerCase()) {
                     case "range":
                         try {
-                            double range = Double.parseDouble(Args[arg + 1]);
-                            rowData.setRange(range);
+                            if(Args[arg + 1].equalsIgnoreCase("*")) rowData.setRange(rowData.getDefaultRange());
+                            else {
+                                double range = Double.parseDouble(Args[arg + 1]);
+                                rowData.setRange(range);
+                            }
                             updateType = GHoloRowUpdateType.RANGE;
                         } catch (NumberFormatException e) {
                             GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-value-error", "%Data%", Args[arg].toLowerCase(), "%Value%", Args[arg + 1]);
                         }
                         break;
                     case "background_color":
-                        String backgroundColor = Args[arg + 1];
-                        rowData.setBackgroundColor(backgroundColor);
+                        if(Args[arg + 1].equalsIgnoreCase("*")) rowData.setBackgroundColor(rowData.getDefaultBackgroundColor());
+                        else {
+                            String backgroundColor = Args[arg + 1];
+                            if(!backgroundColor.matches("^[0-9A-F]{6}|[0-9A-F]{8}$")) {
+                                GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-value-error", "%Data%", Args[arg].toLowerCase(), "%Value%", Args[arg + 1]);
+                            } else rowData.setBackgroundColor(backgroundColor);
+                        }
                         updateType = GHoloRowUpdateType.BACKGROUND_COLOR;
                         break;
                     case "text_opacity":
                         try {
-                            byte textOpacity = Byte.parseByte(Args[arg + 1]);
-                            rowData.setTextOpacity(textOpacity);
+                            if(Args[arg + 1].equalsIgnoreCase("*")) rowData.setTextOpacity(rowData.getDefaultTextOpacity());
+                            else {
+                                byte textOpacity = Byte.parseByte(Args[arg + 1]);
+                                rowData.setTextOpacity(textOpacity);
+                            }
                             updateType = GHoloRowUpdateType.TEXT_OPACITY;
                         } catch (NumberFormatException e) {
                             GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-value-error", "%Data%", Args[arg].toLowerCase(), "%Value%", Args[arg + 1]);
@@ -426,8 +434,11 @@ public class GHoloCommand implements CommandExecutor {
                         break;
                     case "text_shadow":
                         try {
-                            boolean textShadow = Boolean.parseBoolean(Args[arg + 1]);
-                            rowData.setTextShadow(textShadow);
+                            if(Args[arg + 1].equalsIgnoreCase("*")) rowData.setTextShadow(rowData.getDefaultTextShadow());
+                            else {
+                                boolean textShadow = Boolean.parseBoolean(Args[arg + 1]);
+                                rowData.setTextShadow(textShadow);
+                            }
                             updateType = GHoloRowUpdateType.TEXT_SHADOW;
                         } catch (NumberFormatException e) {
                             GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-value-error", "%Data%", Args[arg].toLowerCase(), "%Value%", Args[arg + 1]);
@@ -435,8 +446,11 @@ public class GHoloCommand implements CommandExecutor {
                         break;
                     case "billboard":
                         try {
-                            Display.Billboard billboard = Display.Billboard.valueOf(Args[arg + 1].toUpperCase());
-                            rowData.setBillboard(billboard.name().toLowerCase());
+                            if(Args[arg + 1].equalsIgnoreCase("*")) rowData.setBillboard(rowData.getDefaultBillboard());
+                            else {
+                                Display.Billboard billboard = Display.Billboard.valueOf(Args[arg + 1].toUpperCase());
+                                rowData.setBillboard(billboard.name().toLowerCase());
+                            }
                             updateType = GHoloRowUpdateType.BILLBOARD;
                         } catch (IllegalArgumentException e) {
                             GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-value-error", "%Data%", Args[arg].toLowerCase(), "%Value%", Args[arg + 1].toUpperCase());
@@ -444,8 +458,11 @@ public class GHoloCommand implements CommandExecutor {
                         break;
                     case "see_through":
                         try {
-                            boolean seeThrough = Boolean.parseBoolean(Args[arg + 1]);
-                            rowData.setSeeThrough(seeThrough);
+                            if(Args[arg + 1].equalsIgnoreCase("*")) rowData.setSeeThrough(rowData.getDefaultSeeThrough());
+                            else {
+                                boolean seeThrough = Boolean.parseBoolean(Args[arg + 1]);
+                                rowData.setSeeThrough(seeThrough);
+                            }
                             updateType = GHoloRowUpdateType.SEE_THROUGH;
                         } catch (NumberFormatException e) {
                             GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-value-error", "%Data%", Args[arg].toLowerCase(), "%Value%", Args[arg + 1]);
@@ -453,15 +470,18 @@ public class GHoloCommand implements CommandExecutor {
                         break;
                     case "size":
                         try {
-                            float size = Float.parseFloat(Args[arg + 1]);
-                            rowData.setSize(size);
+                            if(Args[arg + 1].equalsIgnoreCase("*")) rowData.setSize(rowData.getDefaultSize());
+                            else {
+                                float size = Float.parseFloat(Args[arg + 1]);
+                                rowData.setSize(size);
+                            }
                             updateType = GHoloRowUpdateType.SIZE;
                         } catch (NumberFormatException e) {
                             GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-value-error", "%Data%", Args[arg].toLowerCase(), "%Value%", Args[arg + 1]);
                         }
                         break;
                 }
-                // TODO: Save to database
+                GPM.getHoloManager().updateData(holo, holoRow);
                 if(holoRow == null) {
                     for(GHoloRow updateHoloRow : holo.getRows()) updateHoloRow.getHoloRowEntity().publishUpdate(updateType);
                 } else {

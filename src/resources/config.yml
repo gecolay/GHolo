@@ -4,14 +4,14 @@ Lang:
   lang: en_us
 
   # Send messages to clients in their own language, if available
-  client-lang: false
+  client-lang: true
 
 
 
 Options:
 
   # Plugin sends update notifications
-  check-for-update: false
+  check-for-update: true
 
   # Defines the default size between the top parts of rows
   default-size-between-rows: 0.26

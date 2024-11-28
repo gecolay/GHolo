@@ -1,14 +1,12 @@
 package dev.geco.gholo.objects;
 
-import org.bukkit.util.*;
+import org.bukkit.*;
 
 public class GHoloRow {
 
     private final GHolo holo;
     private String content;
-    private Vector offsets = new Vector();
-    private float locationYaw = 0;
-    private float locationPitch = 0;
+    private Location position = new Location(null, 0, 0, 0);
     private GHoloRowData rowData;
     private IGHoloRowEntity holoRowEntity;
 
@@ -25,17 +23,9 @@ public class GHoloRow {
 
     public void setContent(String Content) { content = Content; }
 
-    public Vector getOffsets() { return offsets.clone(); }
+    public Location getPosition() { return position.clone(); }
 
-    public void setOffsets(Vector Offsets) { offsets = Offsets.clone(); }
-
-    public float getLocationYaw() { return locationYaw; }
-
-    public void setLocationYaw(float LocationYaw) { locationYaw = LocationYaw; }
-
-    public float getLocationPitch() { return locationPitch; }
-
-    public void setLocationPitch(float LocationPitch) { locationPitch = LocationPitch; }
+    public void setPosition(Location Position) { position = Position.clone(); }
 
     public GHoloRowData getRowData() { return rowData; }
 

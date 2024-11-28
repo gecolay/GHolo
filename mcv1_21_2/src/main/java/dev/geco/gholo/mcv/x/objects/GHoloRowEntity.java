@@ -36,13 +36,16 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
 
         persist = false;
         Location location = HoloRow.getHolo().getLocation();
-        location.add(holoRow.getOffsets());
+        Location position = holoRow.getPosition();
+        location.add(position);
         setPos(location.getX(), location.getY(), location.getZ());
-        setRot(holoRow.getLocationYaw(), holoRow.getLocationPitch());
+        setRot(position.getYaw(), position.getPitch());
 
         setNoGravity(true);
         setInvulnerable(true);
         entityData.set(DATA_LINE_WIDTH_ID, 10000);
+        setBillboard(BillboardConstraints.CENTER.name());
+        setViewRange((float) (120 / 64));
 
         EntityDataAccessor<Component> textAccessor = null;
         try {
@@ -99,8 +102,10 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         switch (UpdateType) {
             case LOCATION:
                 Location location = holoRow.getHolo().getLocation();
-                location.add(holoRow.getOffsets());
+                Location position = holoRow.getPosition();
+                location.add(position);
                 setPos(location.getX(), location.getY(), location.getZ());
+                setRot(position.getYaw(), position.getPitch());
                 ClientboundTeleportEntityPacket teleportEntityPacket = new ClientboundTeleportEntityPacket(getId(), PositionMoveRotation.of(this), Set.of(), false);
                 for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
                     ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();

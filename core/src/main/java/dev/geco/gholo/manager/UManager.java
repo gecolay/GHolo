@@ -2,6 +2,7 @@ package dev.geco.gholo.manager;
 
 import java.io.*;
 import java.net.*;
+import java.time.*;
 import java.util.*;
 import java.util.function.*;
 
@@ -13,23 +14,27 @@ import dev.geco.gholo.GHoloMain;
 public class UManager {
 
     private final GHoloMain GPM;
-
+    private LocalDate lastCheck = null;
     private String spigotVersion = null;
-
     private boolean latestVersion = true;
 
     public UManager(GHoloMain GPluginMain) { GPM = GPluginMain; }
 
     public void checkForUpdates() {
         if(!GPM.getCManager().CHECK_FOR_UPDATE) return;
-        // TODO: cache per day, to rerun it later without the need of a server reload
         checkVersion();
         if(latestVersion) return;
         for(Player player : Bukkit.getOnlinePlayers()) if(GPM.getPManager().hasPermission(player, "Update")) GPM.getMManager().sendMessage(player, "Plugin.plugin-update", "%Name%", GPM.NAME, "%NewVersion%", spigotVersion, "%Version%", GPM.getDescription().getVersion(), "%Path%", GPM.getDescription().getWebsite());
         GPM.getMManager().sendMessage(Bukkit.getConsoleSender(), "Plugin.plugin-update", "%Name%", GPM.NAME, "%NewVersion%", spigotVersion, "%Version%", GPM.getDescription().getVersion(), "%Path%", GPM.getDescription().getWebsite());
     }
 
-    public void loginCheckForUpdates(Player Player) { if(GPM.getCManager().CHECK_FOR_UPDATE && !latestVersion && GPM.getPManager().hasPermission(Player, "Update")) GPM.getMManager().sendMessage(Player, "Plugin.plugin-update", "%Name%", GPM.NAME, "%NewVersion%", spigotVersion, "%Version%", GPM.getDescription().getVersion(), "%Path%", GPM.getDescription().getWebsite()); }
+    public void loginCheckForUpdates(Player Player) {
+        if(!GPM.getCManager().CHECK_FOR_UPDATE) return;
+        if(!GPM.getPManager().hasPermission(Player, "Update")) return;
+        checkVersion();
+        if(latestVersion) return;
+        GPM.getMManager().sendMessage(Player, "Plugin.plugin-update", "%Name%", GPM.NAME, "%NewVersion%", spigotVersion, "%Version%", GPM.getDescription().getVersion(), "%Path%", GPM.getDescription().getWebsite());
+    }
 
     private void getSpigotVersion(final Consumer<String> VersionConsumer) {
         GPM.getTManager().run(() -> {
@@ -45,7 +50,10 @@ public class UManager {
 
     private void checkVersion() {
         try {
+            LocalDate today = LocalDate.now();
+            if(lastCheck != null && lastCheck.equals(today)) return;
             getSpigotVersion(sVersion -> {
+                lastCheck = today;
                 spigotVersion = sVersion;
                 if(spigotVersion == null) {
                     latestVersion = true;
