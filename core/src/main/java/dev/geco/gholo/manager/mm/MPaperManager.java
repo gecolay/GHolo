@@ -10,7 +10,6 @@ import org.bukkit.entity.*;
 
 import net.kyori.adventure.text.*;
 import net.kyori.adventure.text.minimessage.*;
-import net.kyori.adventure.text.serializer.json.*;
 import net.kyori.adventure.text.serializer.legacy.*;
 
 import dev.geco.gholo.GHoloMain;
@@ -19,14 +18,12 @@ import dev.geco.gholo.manager.*;
 public class MPaperManager extends MManager {
 
     protected final LegacyComponentSerializer legacyComponentSerializer;
-    protected Object jsonComponentSerializer;
     protected final MiniMessage miniMessage;
     protected final Map<String, String> TAGS;
 
     public MPaperManager(GHoloMain GPluginMain) {
         super(GPluginMain);
         legacyComponentSerializer = LegacyComponentSerializer.builder().character(AMPERSAND_CHAR).hexColors().build();
-        if(GPluginMain.getSVManager().isNewerOrVersion(20, 0)) jsonComponentSerializer = JSONComponentSerializer.json();
         miniMessage = MiniMessage.miniMessage();
         Map<String, String> tags = new HashMap<>();
         tags.put("0", "<black>");
@@ -53,8 +50,6 @@ public class MPaperManager extends MManager {
         tags.put("r", "<reset>");
         TAGS = Collections.unmodifiableMap(tags);
     }
-
-    public String getAsJSON(String Text, Object... RawReplaceList) { return jsonComponentSerializer != null ? ((JSONComponentSerializer) jsonComponentSerializer).serialize(toFormattedComponent(Text, RawReplaceList)) : super.getAsJSON(Text, RawReplaceList); }
 
     public String toFormattedMessage(String Text, Object... RawReplaceList) { return org.bukkit.ChatColor.translateAlternateColorCodes(AMPERSAND_CHAR, replaceHexColorsDirect(formatText(Text, RawReplaceList))); }
 

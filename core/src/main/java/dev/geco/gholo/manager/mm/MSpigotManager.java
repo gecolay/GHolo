@@ -19,7 +19,7 @@ public class MSpigotManager extends MManager {
         try { Class.forName("net.md_5.bungee.api.ChatMessageType"); } catch (Throwable e) { allowBungeeMessages = false; }
     }
 
-    public String toFormattedMessage(String Text, Object... RawReplaceList) { return org.bukkit.ChatColor.translateAlternateColorCodes(AMPERSAND_CHAR, replaceHexColorsDirect(replaceText(Text, RawReplaceList).replace("<lang:key.sneak>", "Sneak"))); }
+    public String toFormattedMessage(String Text, Object... RawReplaceList) { return org.bukkit.ChatColor.translateAlternateColorCodes(AMPERSAND_CHAR, replaceHexColorsDirect(replaceText(Text, RawReplaceList))); }
 
     public void sendMessage(@NotNull CommandSender Target, String Message, Object... ReplaceList) { Target.sendMessage(getMessageByLanguage(Message, getLanguage(Target), ReplaceList)); }
 
