@@ -6,7 +6,6 @@ import java.util.regex.*;
 import org.jetbrains.annotations.*;
 
 import org.bukkit.command.*;
-import org.bukkit.entity.*;
 
 import net.kyori.adventure.text.*;
 import net.kyori.adventure.text.minimessage.*;
@@ -17,6 +16,7 @@ import dev.geco.gholo.manager.*;
 
 public class MPaperManager extends MManager {
 
+    protected final Pattern PARSED_HEX_PATTERN = Pattern.compile("§x(§[0-9a-fA-F]){6}");
     protected final LegacyComponentSerializer legacyComponentSerializer;
     protected final MiniMessage miniMessage;
     protected final Map<String, String> TAGS;
@@ -55,23 +55,19 @@ public class MPaperManager extends MManager {
 
     public void sendMessage(@NotNull CommandSender Target, String Message, Object... ReplaceList) { Target.sendMessage(getLanguageComponent(Message, getLanguage(Target), ReplaceList)); }
 
-    public void sendActionBarMessage(@NotNull Player Target, String Message, Object... ReplaceList) { Target.sendActionBar(getLanguageComponent(Message, getLanguage(Target), ReplaceList)); }
-
     private @NotNull Component getLanguageComponent(String Message, String LanguageCode, Object... ReplaceList) { return toFormattedComponent(getRawMessageByLanguage(Message, LanguageCode, ReplaceList)); }
 
     private @NotNull Component toFormattedComponent(String Text, Object... RawReplaceList) { return miniMessage.deserialize(replaceLegacyColors(replaceText(Text, RawReplaceList))); }
 
-    private String formatText(String Text, Object... RawReplaceList) { return legacyComponentSerializer.serialize(miniMessage.deserialize(replaceText(Text, RawReplaceList))); }
-
-    private String replaceLegacyColors(String text) {
-        Matcher matcher = HEX_PATTERN.matcher(text);
-        StringBuilder result = new StringBuilder(text.length());
+    private String replaceLegacyColors(String Text) {
+        Matcher matcher = HEX_PATTERN.matcher(Text);
+        StringBuilder result = new StringBuilder(Text.length());
         int lastIndex = 0;
         while(matcher.find()) {
-            result.append(text, lastIndex, matcher.start()).append("<color:").append(matcher.group()).append(">");
+            result.append(Text, lastIndex, matcher.start()).append("<color:").append(matcher.group()).append(">");
             lastIndex = matcher.end();
         }
-        result.append(text, lastIndex, text.length());
+        result.append(Text, lastIndex, Text.length());
         for(Map.Entry<String, String> tag : TAGS.entrySet()) {
             String key = tag.getKey();
             String value = tag.getValue();
@@ -79,6 +75,16 @@ public class MPaperManager extends MManager {
             result = new StringBuilder(result.toString().replace(AMPERSAND_CHAR + key, value).replace(AMPERSAND_CHAR + upperKey, value).replace(org.bukkit.ChatColor.COLOR_CHAR + key, value).replace(org.bukkit.ChatColor.COLOR_CHAR + upperKey, value));
         }
         return result.toString();
+    }
+
+    private String formatText(String Text, Object... RawReplaceList) { return legacyComponentSerializer.serialize(miniMessage.deserialize(replaceParsedLegacyColors(replaceText(Text, RawReplaceList)))); }
+
+    private String replaceParsedLegacyColors(String Text) {
+        Matcher matcher = PARSED_HEX_PATTERN.matcher(Text);
+        StringBuilder result = new StringBuilder();
+        while (matcher.find()) matcher.appendReplacement(result, "#" + matcher.group().replaceAll("§x|§", ""));
+        matcher.appendTail(result);
+        return result.toString().replace(String.valueOf(org.bukkit.ChatColor.COLOR_CHAR), String.valueOf(AMPERSAND_CHAR));
     }
 
 }

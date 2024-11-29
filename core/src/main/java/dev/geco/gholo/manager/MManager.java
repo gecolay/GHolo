@@ -66,8 +66,6 @@ abstract public class MManager {
 
     abstract public void sendMessage(@NotNull CommandSender Target, String Message, Object... ReplaceList);
 
-    abstract public void sendActionBarMessage(@NotNull Player Target, String Message, Object... ReplaceList);
-
     public String getMessage(String Message, Object... ReplaceList) { return getMessage(Message, null, ReplaceList); }
 
     public String getMessage(String Message, Entity Entity, Object... ReplaceList) { return getMessageByLanguage(Message, getLanguage(Entity), ReplaceList); }
