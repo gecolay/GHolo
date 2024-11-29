@@ -81,7 +81,7 @@ public class GHoloMain extends JavaPlugin {
 
     private void linkBStats() {
 
-        BStatsLink bstats = new BStatsLink(getInstance(), 4921);
+        BStatsLink bstats = new BStatsLink(getInstance(), 24037);
 
         bstats.addCustomChart(new BStatsLink.SimplePie("plugin_language", () -> getCManager().L_LANG));
         bstats.addCustomChart(new BStatsLink.SingleLineChart("holo_count", () -> getHoloManager().getHoloCount()));
