@@ -7,7 +7,7 @@ public class GHoloRow {
     private final GHolo holo;
     private String content;
     private Location position = new Location(null, 0, 0, 0);
-    private GHoloRowData rowData;
+    private GHoloData data = new GHoloData();
     private IGHoloRowEntity holoRowEntity;
 
     public GHoloRow(GHolo Holo, String Content) {
@@ -27,9 +27,9 @@ public class GHoloRow {
 
     public void setPosition(Location Position) { position = Position.clone(); }
 
-    public GHoloRowData getRowData() { return rowData; }
+    public GHoloData getData() { return data; }
 
-    public void setRowData(GHoloRowData RowData) { rowData = RowData; }
+    public void setData(GHoloData Data) { data = Data; }
 
     public IGHoloRowEntity getHoloRowEntity() { return holoRowEntity; }
 

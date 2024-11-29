@@ -99,45 +99,48 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
 
     @Override
     public void publishUpdate(GHoloRowUpdateType UpdateType) {
+        if(UpdateType == GHoloRowUpdateType.LOCATION) {
+            Location location = holoRow.getHolo().getLocation();
+            Location position = holoRow.getPosition();
+            location.add(position);
+            setPos(location.getX(), location.getY(), location.getZ());
+            setRot(position.getYaw(), position.getPitch());
+            ClientboundTeleportEntityPacket teleportEntityPacket = new ClientboundTeleportEntityPacket(getId(), PositionMoveRotation.of(this), Set.of(), false);
+            for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
+                ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+                serverPlayer.connection.send(teleportEntityPacket);
+            }
+            return;
+        }
+        GHoloData defaultData = holoRow.getHolo().getDefaultData();
+        GHoloData data = holoRow.getData();
         switch (UpdateType) {
-            case LOCATION:
-                Location location = holoRow.getHolo().getLocation();
-                Location position = holoRow.getPosition();
-                location.add(position);
-                setPos(location.getX(), location.getY(), location.getZ());
-                setRot(position.getYaw(), position.getPitch());
-                ClientboundTeleportEntityPacket teleportEntityPacket = new ClientboundTeleportEntityPacket(getId(), PositionMoveRotation.of(this), Set.of(), false);
-                for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
-                    ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-                    serverPlayer.connection.send(teleportEntityPacket);
-                }
-                return;
             case RANGE:
-                double range = holoRow.getRowData().getRange() != null ? holoRow.getRowData().getRange() : holoRow.getHolo().getDefaultRowData().getRange();
+                double range = data.getRange() != null ? data.getRange() : (defaultData.getRange() != null ? defaultData.getRange() : GHoloData.DEFAULT_RANGE);
                 setViewRange((float) (range / 64));
                 break;
             case BACKGROUND_COLOR:
-                String backgroundColor = holoRow.getRowData().getBackgroundColor() != null ? holoRow.getRowData().getBackgroundColor() : holoRow.getHolo().getDefaultRowData().getBackgroundColor();
+                String backgroundColor = data.getBackgroundColor() != null ? data.getBackgroundColor() : (defaultData.getBackgroundColor() != null ? defaultData.getBackgroundColor() : GHoloData.DEFAULT_BACKGROUND_COLOR);
                 setBackgroundColor(backgroundColor);
                 break;
             case TEXT_OPACITY:
-                byte textOpacity = holoRow.getRowData().getTextOpacity() != null ? holoRow.getRowData().getTextOpacity() : holoRow.getHolo().getDefaultRowData().getTextOpacity();
+                byte textOpacity = data.getTextOpacity() != null ? data.getTextOpacity() : (defaultData.getTextOpacity() != null ? defaultData.getTextOpacity() : GHoloData.DEFAULT_TEXT_OPACITY);
                 setRealTextOpacity(textOpacity);
                 break;
             case TEXT_SHADOW:
-                boolean textShadow = holoRow.getRowData().getTextShadow() != null ? holoRow.getRowData().getTextShadow() : holoRow.getHolo().getDefaultRowData().getTextShadow();
+                boolean textShadow = data.getTextShadow() != null ? data.getTextShadow() : (defaultData.getTextShadow() != null ? defaultData.getTextShadow() : GHoloData.DEFAULT_TEXT_SHADOW);
                 setTextShadow(textShadow);
                 break;
             case BILLBOARD:
-                String billboard = holoRow.getRowData().getBillboard() != null ? holoRow.getRowData().getBillboard() : holoRow.getHolo().getDefaultRowData().getBillboard();
+                String billboard = data.getBillboard() != null ? data.getBillboard() : (defaultData.getBillboard() != null ? defaultData.getBillboard() : GHoloData.DEFAULT_BILLBOARD);
                 setBillboard(billboard);
                 break;
             case SEE_THROUGH:
-                boolean seeThrough = holoRow.getRowData().getSeeThrough() != null ? holoRow.getRowData().getSeeThrough() : holoRow.getHolo().getDefaultRowData().getSeeThrough();
+                boolean seeThrough = data.getSeeThrough() != null ? data.getSeeThrough() : (defaultData.getSeeThrough() != null ? defaultData.getSeeThrough() : GHoloData.DEFAULT_SEE_THROUGH);
                 setSeeThrough(seeThrough);
                 break;
             case SIZE:
-                float size = holoRow.getRowData().getSize() != null ? holoRow.getRowData().getSize() : holoRow.getHolo().getDefaultRowData().getSize();
+                float size = data.getSize() != null ? data.getSize() : (defaultData.getSize() != null ? defaultData.getSize() : GHoloData.DEFAULT_SIZE);
                 setSize(size);
                 break;
         }

@@ -100,7 +100,10 @@ public class HoloImportManager {
             Location location = new Location(world, Double.parseDouble(args[1].replace(",", ".")), Double.parseDouble(args[2].replace(",", ".")) - 0.41, Double.parseDouble(args[3].replace(",", ".")));
 
             GHolo holo = GPM.getHoloManager().createHolo(name, location);
-            // TODO: GPM.getHoloManager().updateRange(holo, range);
+            GHoloData rowData = new GHoloData();
+            rowData.setRange((double) range);
+            holo.setDefaultData(rowData);
+            GPM.getHoloManager().updateHoloData(holo, null);
 
             for(Object section : Objects.requireNonNull(fileContent.getList("pages"))) {
 

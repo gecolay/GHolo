@@ -17,10 +17,8 @@ public class HoloManager {
 
     public void createTables() {
         try {
-            GPM.getDManager().execute("CREATE TABLE IF NOT EXISTS holo (id TEXT, l_world TEXT, l_x REAL, l_y REAL, l_z REAL);");
-            GPM.getDManager().execute("CREATE TABLE IF NOT EXISTS holo_row (row_number INTEGER, holo_id TEXT, content TEXT, o_x REAL, o_y REAL, o_z REAL, l_yaw REAL, l_pitch REAL);");
-            // TODO: Maybe remove this table again
-            GPM.getDManager().execute("CREATE TABLE IF NOT EXISTS holo_row_data (row_number INTEGER, holo_id TEXT, property TEXT, value TEXT);");
+            GPM.getDManager().execute("CREATE TABLE IF NOT EXISTS holo (id TEXT, l_world TEXT, l_x REAL, l_y REAL, l_z REAL, default_data TEXT);");
+            GPM.getDManager().execute("CREATE TABLE IF NOT EXISTS holo_row (row_number INTEGER, holo_id TEXT, content TEXT, o_x REAL, o_y REAL, o_z REAL, l_yaw REAL, l_pitch REAL, data TEXT);");
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
@@ -35,7 +33,7 @@ public class HoloManager {
     public int getHoloRowCount() { return holos.stream().mapToInt(holo -> holo.getRows().size()).sum(); }
 
     public void loadHolos() {
-        clearHolos();
+        unloadHolos();
         try {
             try(ResultSet resultSet = GPM.getDManager().executeAndGet("SELECT * FROM holo")) {
                 while(resultSet.next()) {
@@ -50,10 +48,8 @@ public class HoloManager {
                     Location location = new Location(world, locationX, locationY, locationZ);
                     GHolo holo = new GHolo(id, location);
 
-                    try(ResultSet dataResultSet = GPM.getDManager().executeAndGet("SELECT * FROM holo_row_data where holo_id = ? and row_number = -1", id)) {
-                        GHoloRowData rowData = parseHoloRowData(dataResultSet, false);
-                        holo.setDefaultRowData(rowData);
-                    }
+                    String defaultDataString = resultSet.getString("default_data");
+                    holo.getDefaultData().loadString(defaultDataString);
 
                     holos.add(holo);
 
@@ -74,17 +70,15 @@ public class HoloManager {
                             Location position = new Location(world, offsetX, offsetY, offsetZ, locationYaw, locationPitch);
                             holoRow.setPosition(position);
 
-                            try(ResultSet dataResultSet = GPM.getDManager().executeAndGet("SELECT * FROM holo_row_data where holo_id = ? and row_number = ?", id, row)) {
-                                GHoloRowData rowData = parseHoloRowData(dataResultSet, true);
-                                holoRow.setRowData(rowData);
-                            }
+                            String rowDataString = resultSet.getString("default_data");
+                            holoRow.getData().loadString(rowDataString);
 
                             holoRowMap.put(row, holoRow);
                         }
 
                         for(GHoloRow holoRow : holoRowMap.values()) {
                             holo.addRow(holoRow);
-                            GPM.getEntityUtil().createHoloRowEntity(holoRow);
+                            GPM.getEntityUtil().loadHoloRowEntity(holoRow);
                             GPM.getHoloAnimationManager().updateSubscriptionStatus(holoRow);
                         }
                     }
@@ -93,53 +87,39 @@ public class HoloManager {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    private GHoloRowData parseHoloRowData(ResultSet ResultSet, boolean NullDefaultValues) throws SQLException {
-        GHoloRowData rowData = new GHoloRowData(NullDefaultValues);
-        while(ResultSet.next()) {
-            String value = ResultSet.getString("value");
-            switch (ResultSet.getString("property").toLowerCase()) {
-                case "range":
-                    rowData.setRange(Double.parseDouble(value));
-                    break;
-                case "background_color":
-                    rowData.setBackgroundColor(value);
-                    break;
-                case "text_opacity":
-                    rowData.setTextOpacity(Byte.parseByte(value));
-                    break;
-                case "text_shadow":
-                    rowData.setTextShadow(Boolean.parseBoolean(value));
-                    break;
-                case "billboard":
-                    rowData.setBillboard(value);
-                    break;
-                case "see_through":
-                    rowData.setSeeThrough(Boolean.parseBoolean(value));
-                    break;
-                case "size":
-                    rowData.setSize(Float.parseFloat(value));
-                    break;
-            }
-        }
-        return rowData;
+    public void spawnHolosToPlayer(Player Player) {
+        for(GHolo holo : holos) spawnHolo(holo, Player);
     }
 
-    public void spawnHolosToPlayer(Player Player) {
-        for(GHolo holo : holos) GPM.getEntityUtil().spawnHolo(holo, Player);
+    public void spawnHolo(GHolo Holo) {
+        for(Player player : Holo.getRawLocation().getWorld().getPlayers()) spawnHolo(Holo, player);
+    }
+
+    public void spawnHolo(GHolo Holo, Player Player) {
+        for(GHoloRow row : Holo.getRows()) row.getHoloRowEntity().spawnHoloRow(Player);
+    }
+
+    public void removeHolo(GHolo Holo) {
+        for(Player player : Holo.getRawLocation().getWorld().getPlayers()) removeHolo(Holo, player);
+    }
+
+    public void removeHolo(GHolo Holo, Player Player) {
+        for(GHoloRow row : Holo.getRows()) row.getHoloRowEntity().removeHoloRow(Player);
     }
 
     public GHolo createHolo(String Id, Location Location) {
         try {
-            GPM.getDManager().execute("INSERT INTO holo (id, l_world, l_x, l_y, l_z) VALUES (?, ?, ?, ?, ?)",
+            GHolo holo = new GHolo(Id, Location);
+
+            GPM.getDManager().execute("INSERT INTO holo (id, l_world, l_x, l_y, l_z, default_data) VALUES (?, ?, ?, ?, ?, ?)",
                     Id,
                     Location.getWorld().getUID().toString(),
                     Location.getX(),
                     Location.getY(),
-                    Location.getZ()
+                    Location.getZ(),
+                    holo.getDefaultData().toString()
             );
 
-            GHolo holo = new GHolo(Id, Location);
-            holo.setDefaultRowData(new GHoloRowData(true));
             holos.add(holo);
 
             return holo;
@@ -153,7 +133,8 @@ public class HoloManager {
             double offset = GPM.getCManager().DEFAULT_SIZE_BETWEEN_ROWS;
             double rowOffset = offset * row;
             Location position = new Location(Holo.getRawLocation().getWorld(), 0, -rowOffset, 0, 0, 0);
-            GPM.getDManager().execute("INSERT INTO holo_row (row_number, holo_id, content, o_x, o_y, o_z, l_yaw, l_pitch) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+
+            GPM.getDManager().execute("INSERT INTO holo_row (row_number, holo_id, content, o_x, o_y, o_z, l_yaw, l_pitch, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     row,
                     Holo.getId(),
                     Content,
@@ -161,15 +142,15 @@ public class HoloManager {
                     position.getY(),
                     position.getZ(),
                     position.getYaw(),
-                    position.getPitch()
+                    position.getPitch(),
+                    ""
             );
 
             GHoloRow holoRow = new GHoloRow(Holo, GPM.getFormatUtil().formatBase(Content));
             holoRow.setPosition(position);
-            holoRow.setRowData(new GHoloRowData(false));
             Holo.addRow(holoRow);
 
-            GPM.getEntityUtil().createHoloRowEntity(holoRow);
+            GPM.getEntityUtil().loadHoloRowEntity(holoRow);
             GPM.getHoloAnimationManager().updateSubscriptionStatus(holoRow);
 
             return holoRow;
@@ -195,7 +176,7 @@ public class HoloManager {
 
             GPM.getDManager().execute("UPDATE holo_row SET row_number = row_number + 1 WHERE holo_id = ? AND row_number >= ?", Holo.getId(), Row);
 
-            GPM.getDManager().execute("INSERT INTO holo_row (row_number, holo_id, content, o_x, o_y, o_z, l_yaw, l_pitch) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            GPM.getDManager().execute("INSERT INTO holo_row (row_number, holo_id, content, o_x, o_y, o_z, l_yaw, l_pitch, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                     Row,
                     Holo.getId(),
                     Content,
@@ -203,15 +184,15 @@ public class HoloManager {
                     position.getY(),
                     position.getZ(),
                     position.getYaw(),
-                    position.getPitch()
+                    position.getPitch(),
+                    ""
             );
 
             GHoloRow holoRow = new GHoloRow(Holo, GPM.getFormatUtil().formatBase(Content));
             holoRow.setPosition(position);
-            holoRow.setRowData(new GHoloRowData(false));
             Holo.insertRow(holoRow, Row);
 
-            GPM.getEntityUtil().createHoloRowEntity(holoRow);
+            GPM.getEntityUtil().loadHoloRowEntity(holoRow);
             GPM.getHoloAnimationManager().updateSubscriptionStatus(holoRow);
 
             return holoRow;
@@ -267,7 +248,7 @@ public class HoloManager {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public void updateId(GHolo Holo, String Id) {
+    public void updateHoloId(GHolo Holo, String Id) {
         try {
             GPM.getDManager().execute("UPDATE holo SET id = ? WHERE id = ?", Id, Holo.getId());
             GPM.getDManager().execute("UPDATE holo_row SET holo_id = ? WHERE holo_id = ?", Id, Holo.getId());
@@ -275,7 +256,7 @@ public class HoloManager {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public void updateLocation(GHolo Holo, Location Location) {
+    public void updateHoloLocation(GHolo Holo, Location Location) {
         try {
             GPM.getDManager().execute("UPDATE holo SET l_world = ?, l_x = ?, l_y = ?, l_z = ? WHERE id = ?",
                     Location.getWorld().getUID().toString(),
@@ -289,20 +270,22 @@ public class HoloManager {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public void updateData(GHolo Holo, GHoloRow HoloRow) {
+    public void updateHoloData(GHolo Holo, GHoloData RowData) {
         try {
-            int row = HoloRow != null ? HoloRow.getRow() : -1;
-            GHoloRowData rowData = HoloRow != null ? HoloRow.getRowData() : Holo.getDefaultRowData();
-            GPM.getDManager().execute("DELETE FROM holo_row_data where row_number = ? AND holo_id = ?", row, Holo.getId());
-            for(Map.Entry<String, String> data : rowData.getData().entrySet()) {
-                if(data.getValue() == null) continue;
-                GPM.getDManager().execute("INSERT INTO holo_row_data (row_number, holo_id, property, value) VALUES (?, ?, ?, ?)", row, Holo.getId(), data.getKey(), data.getValue());
-            }
+            GPM.getDManager().execute("UPDATE holo SET default_data = ? WHERE id = ?", RowData.toString(), Holo.getId());
+            Holo.setDefaultData(RowData);
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public void setRows(GHolo Holo, List<String> Rows) {
-        GPM.getEntityUtil().removeHolo(Holo);
+    public void updateHoloRowData(GHoloRow HoloRow, GHoloData RowData) {
+        try {
+            GPM.getDManager().execute("UPDATE holo_row SET data = ? WHERE row_number = ? AND holo_id = ?", RowData.toString(), HoloRow.getRow(), HoloRow.getHolo().getId());
+            HoloRow.setData(RowData);
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    public void setHoloRows(GHolo Holo, List<String> Rows) {
+        removeHolo(Holo);
         Holo.getRows().clear();
         try {
             GPM.getDManager().execute("DELETE FROM holo_row where holo_id = ?", Holo.getId());
@@ -310,10 +293,10 @@ public class HoloManager {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public void copyRows(GHolo Holo, GHolo CopyToHolo) {
+    public void copyHoloRows(GHolo Holo, GHolo CopyToHolo) {
         try {
             try (ResultSet resultSet = GPM.getDManager().executeAndGet("SELECT * FROM holo_row WHERE holo_id = ?", Holo.getId())) {
-                GPM.getEntityUtil().removeHolo(CopyToHolo);
+                removeHolo(CopyToHolo);
                 for(GHoloRow holoRow : CopyToHolo.getRows()) GPM.getHoloAnimationManager().unsubscribe(holoRow);
                 CopyToHolo.getRows().clear();
                 GPM.getDManager().execute("DELETE FROM holo_row where holo_id = ?", CopyToHolo.getId());
@@ -329,8 +312,9 @@ public class HoloManager {
                     float locationYaw = resultSet.getFloat("l_yaw");
                     float locationPitch = resultSet.getFloat("l_pitch");
                     Location position = new Location(CopyToHolo.getRawLocation().getWorld(), offsetX, offsetY, offsetZ, locationYaw, locationPitch);
+                    String rowDataString = resultSet.getString("data");
 
-                    GPM.getDManager().execute("INSERT INTO holo_row (row_number, holo_id, content, o_x, o_y, o_z, l_yaw, l_pitch) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    GPM.getDManager().execute("INSERT INTO holo_row (row_number, holo_id, content, o_x, o_y, o_z, l_yaw, l_pitch, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                             rowNumber,
                             CopyToHolo.getId(),
                             content,
@@ -338,19 +322,21 @@ public class HoloManager {
                             position.getY(),
                             position.getZ(),
                             locationYaw,
-                            locationPitch
+                            locationPitch,
+                            rowDataString
                     );
 
                     GHoloRow holoRow = new GHoloRow(CopyToHolo, GPM.getFormatUtil().formatBase(content));
                     holoRow.setPosition(position);
-                    //TODO: copy data
+
+                    holoRow.getData().loadString(rowDataString);
 
                     holoRowMap.put(rowNumber, holoRow);
                 }
 
                 for(GHoloRow holoRow : holoRowMap.values()) {
                     CopyToHolo.addRow(holoRow);
-                    GPM.getEntityUtil().createHoloRowEntity(holoRow);
+                    GPM.getEntityUtil().loadHoloRowEntity(holoRow);
                     GPM.getHoloAnimationManager().updateSubscriptionStatus(holoRow);
                 }
             }
@@ -364,14 +350,14 @@ public class HoloManager {
             GPM.getDManager().execute("DELETE FROM holo_row_data WHERE holo_id = ?", Holo.getId());
             holos.remove(Holo);
             for(GHoloRow holoRow : Holo.getRows()) GPM.getHoloAnimationManager().unsubscribe(holoRow);
-            GPM.getEntityUtil().removeHolo(Holo);
+            removeHolo(Holo);
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public void clearHolos() {
+    public void unloadHolos() {
         for(GHolo holo : holos) {
             for(GHoloRow holoRow : holo.getRows()) GPM.getHoloAnimationManager().unsubscribe(holoRow);
-            GPM.getEntityUtil().removeHolo(holo);
+            removeHolo(holo);
         }
         holos.clear();
     }

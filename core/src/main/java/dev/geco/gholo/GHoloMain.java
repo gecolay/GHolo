@@ -136,7 +136,7 @@ public class GHoloMain extends JavaPlugin {
     private void unload() {
 
         getDManager().close();
-        getHoloManager().clearHolos();
+        getHoloManager().unloadHolos();
         getHoloAnimationManager().stopHoloAnimations();
     }
 
