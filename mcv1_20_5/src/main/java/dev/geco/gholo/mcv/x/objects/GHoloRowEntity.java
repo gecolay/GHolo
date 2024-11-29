@@ -6,9 +6,9 @@ import java.util.*;
 import org.joml.Vector3f;
 
 import org.bukkit.*;
-import org.bukkit.craftbukkit.v1_21_R2.*;
-import org.bukkit.craftbukkit.v1_21_R2.entity.*;
-import org.bukkit.craftbukkit.v1_21_R2.util.*;
+import org.bukkit.craftbukkit.v1_20_R4.*;
+import org.bukkit.craftbukkit.v1_20_R4.entity.*;
+import org.bukkit.craftbukkit.v1_20_R4.util.*;
 import org.bukkit.entity.Player;
 
 import net.minecraft.network.chat.*;
@@ -49,7 +49,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         try {
             List<Field> textFieldList = new ArrayList<>();
             for(Field field : TextDisplay.class.getDeclaredFields()) if(field.getType().equals(EntityDataAccessor.class)) textFieldList.add(field);
-            Field textField = textFieldList.getFirst();
+            Field textField = textFieldList.get(0);
             textField.setAccessible(true);
             textAccessor = (EntityDataAccessor<Component>) textField.get(this);
         } catch (Throwable ignored) { }
@@ -81,7 +81,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     public void move(MoverType MoverType, Vec3 Vec3) { }
 
     @Override
-    public void handlePortal() { }
+    public boolean canChangeDimensions() { return false; }
 
     @Override
     public boolean dismountsUnderwater() { return false; }
@@ -111,7 +111,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
             location.add(position);
             setPos(location.getX(), location.getY(), location.getZ());
             setRot(position.getYaw(), position.getPitch());
-            ClientboundTeleportEntityPacket teleportEntityPacket = new ClientboundTeleportEntityPacket(getId(), PositionMoveRotation.of(this), Set.of(), false);
+            ClientboundTeleportEntityPacket teleportEntityPacket = new ClientboundTeleportEntityPacket(this);
             for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
                 ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
                 serverPlayer.connection.send(teleportEntityPacket);
