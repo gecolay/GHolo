@@ -197,7 +197,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     private ClientboundSetEntityDataPacket getDataPacket(Player Player) {
         String content = holoRow.getContent();
         content = GPM.getFormatUtil().formatPlaceholders(content, Player);
-        Component contentComponent = CraftChatMessage.fromString(content)[0];
+        Component contentComponent = CraftChatMessage.fromString(content, false, true)[0];
         List<SynchedEntityData.DataValue<?>> data = getEntityData().getNonDefaultValues();
         if(data == null) data = new ArrayList<>();
         else data.removeIf(dataValue -> dataValue.id() == HOLO_TEXT_DATA.getId());
