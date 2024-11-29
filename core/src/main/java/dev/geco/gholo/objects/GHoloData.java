@@ -45,6 +45,24 @@ public class GHoloData implements Cloneable {
                 case "range":
                     range = Double.parseDouble(dataSplit[1]);
                     break;
+                case "background_color":
+                    backgroundColor = dataSplit[1];
+                    break;
+                case "text_opacity":
+                    textOpacity = Byte.parseByte(dataSplit[1]);
+                    break;
+                case "text_shadow":
+                    textShadow = Boolean.parseBoolean(dataSplit[1]);
+                    break;
+                case "billboard":
+                    billboard = dataSplit[1];
+                    break;
+                case "see_through":
+                    seeThrough = Boolean.parseBoolean(dataSplit[1]);
+                    break;
+                case "size":
+                    size = Float.parseFloat(dataSplit[1]);
+                    break;
             }
         }
     }
@@ -78,12 +96,6 @@ public class GHoloData implements Cloneable {
     public void setSize(Float Size) { size = Size; }
 
     @Override
-    public GHoloData clone() {
-        try {
-            return (GHoloData) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new Error(e);
-        }
-    }
+    public GHoloData clone() { try { return (GHoloData) super.clone(); } catch (CloneNotSupportedException e) { throw new Error(e); } }
 
 }

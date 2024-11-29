@@ -70,7 +70,7 @@ public class HoloManager {
                             Location position = new Location(world, offsetX, offsetY, offsetZ, locationYaw, locationPitch);
                             holoRow.setPosition(position);
 
-                            String rowDataString = resultSet.getString("default_data");
+                            String rowDataString = rowResultSet.getString("data");
                             holoRow.getData().loadString(rowDataString);
 
                             holoRowMap.put(row, holoRow);

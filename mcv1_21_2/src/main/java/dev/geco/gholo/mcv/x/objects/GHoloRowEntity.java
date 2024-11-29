@@ -44,8 +44,6 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         setNoGravity(true);
         setInvulnerable(true);
         entityData.set(DATA_LINE_WIDTH_ID, 10000);
-        setBillboard(BillboardConstraints.CENTER.name());
-        setViewRange((float) (120 / 64));
 
         EntityDataAccessor<Component> textAccessor = null;
         try {
@@ -66,6 +64,14 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
             sizeAccessor = (EntityDataAccessor<Vector3f>) textField.get(this);
         } catch (Throwable ignored) { }
         HOLO_SIZE_DATA = sizeAccessor;
+
+        handleUpdate(GHoloRowUpdateType.RANGE);
+        handleUpdate(GHoloRowUpdateType.BACKGROUND_COLOR);
+        handleUpdate(GHoloRowUpdateType.TEXT_OPACITY);
+        handleUpdate(GHoloRowUpdateType.TEXT_SHADOW);
+        handleUpdate(GHoloRowUpdateType.BILLBOARD);
+        handleUpdate(GHoloRowUpdateType.SEE_THROUGH);
+        handleUpdate(GHoloRowUpdateType.SIZE);
     }
 
     @Override
@@ -112,6 +118,11 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
             }
             return;
         }
+        handleUpdate(UpdateType);
+        finishUpdate();
+    }
+
+    private void handleUpdate(GHoloRowUpdateType UpdateType) {
         GHoloData defaultData = holoRow.getHolo().getDefaultData();
         GHoloData data = holoRow.getData();
         switch (UpdateType) {
@@ -144,7 +155,6 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
                 setSize(size);
                 break;
         }
-        finishUpdate();
     }
 
     private void setBackgroundColor(String Color) {
