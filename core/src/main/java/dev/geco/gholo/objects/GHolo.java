@@ -13,9 +13,7 @@ public class GHolo {
 
     public GHolo(String Id, Location Location) {
         id = Id;
-        location = Location.clone();
-        location.setYaw(0);
-        location.setPitch(0);
+        setLocation(Location);
     }
 
     public String getId() { return id; }

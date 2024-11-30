@@ -122,6 +122,8 @@ public class GHoloMain extends JavaPlugin {
         setupEvents();
         linkBStats();
 
+        Bukkit.getPluginManager().callEvent(new GHoloLoadedEvent(getInstance()));
+
         getMManager().sendMessage(Bukkit.getConsoleSender(), "Plugin.plugin-enabled");
 
         printPluginLinks(Bukkit.getConsoleSender());
@@ -179,7 +181,9 @@ public class GHoloMain extends JavaPlugin {
     }
 
     public void reload(CommandSender Sender) {
-        Bukkit.getPluginManager().callEvent(new GHoloReloadEvent(getInstance()));
+        GHoloReloadEvent reloadEvent = new GHoloReloadEvent(getInstance());
+        Bukkit.getPluginManager().callEvent(reloadEvent);
+        if(reloadEvent.isCancelled()) return;
         unload();
         getCManager().reload();
         getMManager().loadMessages();
@@ -187,6 +191,7 @@ public class GHoloMain extends JavaPlugin {
         loadSettings(Sender);
         printPluginLinks(Sender);
         getUManager().checkForUpdates();
+        Bukkit.getPluginManager().callEvent(new GHoloLoadedEvent(getInstance()));
     }
 
     private boolean connectDatabase(CommandSender Sender) {

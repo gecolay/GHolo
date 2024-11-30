@@ -7,14 +7,13 @@ import org.bukkit.event.server.*;
 
 import dev.geco.gholo.GHoloMain;
 
-public class GHoloReloadEvent extends PluginEvent implements Cancellable {
+public class GHoloLoadedEvent extends PluginEvent {
 
     private static final HandlerList HANDLERS = new HandlerList();
-    private boolean cancel = false;
 
     private final GHoloMain GPM;
 
-    public GHoloReloadEvent(GHoloMain GPluginMain) {
+    public GHoloLoadedEvent(GHoloMain GPluginMain) {
         super(GPluginMain);
         GPM = GPluginMain;
     }
@@ -24,9 +23,5 @@ public class GHoloReloadEvent extends PluginEvent implements Cancellable {
     public @NotNull HandlerList getHandlers() { return HANDLERS; }
 
     public static HandlerList getHandlerList() { return HANDLERS; }
-
-    public boolean isCancelled() { return cancel; }
-
-    public void setCancelled(boolean Cancel) { cancel = Cancel; }
 
 }

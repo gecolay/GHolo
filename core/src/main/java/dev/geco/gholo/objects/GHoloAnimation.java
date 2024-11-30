@@ -11,7 +11,6 @@ public class GHoloAnimation {
     private int row = 0;
 
     public GHoloAnimation(String Id, long Ticks, List<String> Content) {
-
         id = Id;
         ticks = Ticks;
         content = Content;
