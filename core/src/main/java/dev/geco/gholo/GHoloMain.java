@@ -104,7 +104,7 @@ public class GHoloMain extends JavaPlugin {
 
         formatUtil = new FormatUtil(getInstance());
 
-        preloadPluginDependencies();
+        loadFeatures();
 
         mManager = supportsPaperFeature() ? new MPaperManager(getInstance()) : new MSpigotManager(getInstance());
     }
@@ -115,6 +115,7 @@ public class GHoloMain extends JavaPlugin {
 
         entityUtil = (IEntityUtil) getSVManager().getPackageObject("util.EntityUtil", getInstance());
 
+        loadPluginDependencies();
         loadSettings(Bukkit.getConsoleSender());
 
         setupCommands();
@@ -123,7 +124,7 @@ public class GHoloMain extends JavaPlugin {
 
         getMManager().sendMessage(Bukkit.getConsoleSender(), "Plugin.plugin-enabled");
 
-        loadPluginDependencies(Bukkit.getConsoleSender());
+        printPluginLinks(Bukkit.getConsoleSender());
         getUManager().checkForUpdates();
     }
 
@@ -155,7 +156,7 @@ public class GHoloMain extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerEvents(getInstance()), getInstance());
     }
 
-    private void preloadPluginDependencies() {
+    private void loadFeatures() {
 
         try {
             Class.forName("io.papermc.paper.event.entity.EntityMoveEvent");
@@ -168,27 +169,23 @@ public class GHoloMain extends JavaPlugin {
         } catch (ClassNotFoundException ignored) { supportsTaskFeature = false; }
     }
 
-    private void loadPluginDependencies(CommandSender Sender) {
-
+    private void loadPluginDependencies() {
         Plugin plugin = Bukkit.getPluginManager().getPlugin("PlaceholderAPI");
+        placeholderAPILink = plugin != null && plugin.isEnabled();
+    }
 
-        if(plugin != null && plugin.isEnabled()) {
-            placeholderAPILink = true;
-            getMManager().sendMessage(Sender, "Plugin.plugin-link", "%Link%", plugin.getName());
-        } else placeholderAPILink = false;
+    private void printPluginLinks(CommandSender Sender) {
+        if(placeholderAPILink) getMManager().sendMessage(Sender, "Plugin.plugin-link", "%Link%", Bukkit.getPluginManager().getPlugin("PlaceholderAPI").getName());
     }
 
     public void reload(CommandSender Sender) {
-
         Bukkit.getPluginManager().callEvent(new GHoloReloadEvent(getInstance()));
-
+        unload();
         getCManager().reload();
         getMManager().loadMessages();
-
-        unload();
-
+        loadPluginDependencies();
         loadSettings(Sender);
-        loadPluginDependencies(Sender);
+        printPluginLinks(Sender);
         getUManager().checkForUpdates();
     }
 
