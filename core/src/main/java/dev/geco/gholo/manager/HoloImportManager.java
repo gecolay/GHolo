@@ -11,14 +11,14 @@ import dev.geco.gholo.objects.*;
 
 public class HoloImportManager {
 
-    private final GHoloMain GPM;
-
-    public HoloImportManager(GHoloMain GPluginMain) { GPM = GPluginMain; }
-
     public List<String> AVAILABLE_PLUGIN_IMPORTS = new ArrayList<>(); {
         AVAILABLE_PLUGIN_IMPORTS.add("holographic_displays");
         AVAILABLE_PLUGIN_IMPORTS.add("decent_holograms");
     }
+
+    private final GHoloMain GPM;
+
+    public HoloImportManager(GHoloMain GPluginMain) { GPM = GPluginMain; }
 
     public int importFromPlugin(String Plugin) {
         try {

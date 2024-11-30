@@ -12,22 +12,15 @@ import dev.geco.gholo.GHoloMain;
 
 public class ImageUtil {
 
-    private static final String AVATAR_URL_WITH_OVERLAY = "https://minotar.net/helm/";
-
-    private static final String AVATAR_URL_WITHOUT_OVERLAY = "https://minotar.net/avatar/";
-
-    private static final int DEFAULT_SIZE = 16;
-
     public static final org.bukkit.ChatColor DEFAULT_TRANSPARENCY_COLOR = org.bukkit.ChatColor.GRAY;
-
-    private final boolean HEX_COLORS = Arrays.stream(net.md_5.bungee.api.ChatColor.class.getMethods()).filter(m -> "of".equals(m.getName())).findFirst().orElse(null) != null;
-
-    private final int MAX_SIZE = 500;
-
     public static final List<String> IMAGE_TYPES = Arrays.asList("avatar", "helm", "file", "url");
-
     public static final File IMAGE_FOLDER = new File(GHoloMain.getInstance().getDataFolder(), "images/");
 
+    private static final String AVATAR_URL_WITH_OVERLAY = "https://minotar.net/helm/";
+    private static final String AVATAR_URL_WITHOUT_OVERLAY = "https://minotar.net/avatar/";
+    private static final int DEFAULT_SIZE = 16;
+    private final boolean HEX_COLORS = Arrays.stream(net.md_5.bungee.api.ChatColor.class.getMethods()).filter(m -> "of".equals(m.getName())).findFirst().orElse(null) != null;
+    private final int MAX_SIZE = 500;
     private final Color[] colors = {
 
             new Color(0, 0, 0),
@@ -47,7 +40,6 @@ public class ImageUtil {
             new Color(255, 255, 85),
             new Color(255, 255, 255)
     };
-
     private final String[] lines;
 
     public List<String> getLines() { return new ArrayList<>(Arrays.asList(lines)); }

@@ -12,6 +12,7 @@ import dev.geco.gholo.objects.*;
 public class HoloManager {
 
     private final GHoloMain GPM;
+    private final List<GHolo> holos = new ArrayList<>();
 
     public HoloManager(GHoloMain GPluginMain) { GPM = GPluginMain; }
 
@@ -21,8 +22,6 @@ public class HoloManager {
             GPM.getDManager().execute("CREATE TABLE IF NOT EXISTS holo_row (row_number INTEGER, holo_id TEXT, content TEXT, o_x REAL, o_y REAL, o_z REAL, l_yaw REAL, l_pitch REAL, data TEXT);");
         } catch (SQLException e) { e.printStackTrace(); }
     }
-
-    private final List<GHolo> holos = new ArrayList<>();
 
     public List<GHolo> getHolos() { return new ArrayList<>(holos); }
 

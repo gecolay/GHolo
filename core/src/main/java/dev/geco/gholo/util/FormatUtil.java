@@ -27,15 +27,9 @@ public class FormatUtil {
     }
 
     public String formatPlaceholders(String Text, Player Player) {
-        if(countAnimationChars(Text) < 2) return GPM.getMManager().toFormattedMessage(Text);
+        if(HoloAnimationManager.countAnimationChars(Text) < 2) return GPM.getMManager().toFormattedMessage(Text);
         String text = formatPlaceholdersWithAnimations(Text, Player, GPM.getHoloAnimationManager().getAnimations());
         return GPM.getMManager().toFormattedMessage(formatBase(text));
-    }
-
-    private int countAnimationChars(String Text) {
-        int count = 0;
-        for(int i = 0; i < Text.length(); i++) if(Text.charAt(i) == HoloAnimationManager.AMIMATION_CHAR) count++;
-        return count;
     }
 
     private String formatPlaceholdersWithAnimations(String Text, Player Player, Collection<GHoloAnimation> Animations) {

@@ -10,17 +10,15 @@ import dev.geco.gholo.objects.*;
 
 public class HoloAnimationManager {
 
-    private final GHoloMain GPM;
-
-    public HoloAnimationManager(GHoloMain GPluginMain) { GPM = GPluginMain; }
-
     public static final char AMIMATION_CHAR = '%';
 
+    private final GHoloMain GPM;
     private final HashMap<String, GHoloAnimation> animations = new HashMap<>();
-
     private final HashMap<String, List<GHoloRow>> animationSubscriber = new HashMap<>();
-
+    private final List<GHoloRow> placeholderAPISubscriber = new ArrayList<>();
     private final List<UUID> taskIds = new ArrayList<>();
+
+    public HoloAnimationManager(GHoloMain GPluginMain) { GPM = GPluginMain; }
 
     public Collection<GHoloAnimation> getAnimations() { return animations.values(); }
 
@@ -44,10 +42,13 @@ public class HoloAnimationManager {
             if(HoloRow.getContent().contains(AMIMATION_CHAR + animation.getId() + AMIMATION_CHAR)) animationSubscriber.get(animation.getId()).add(HoloRow);
             else animationSubscriber.get(animation.getId()).remove(HoloRow);
         }
+        if(!GPM.getCManager().L_PLACEHOLDER_API || !GPM.hasPlaceholderAPILink() || countAnimationChars(HoloRow.getContent()) < 2) return;
+        placeholderAPISubscriber.add(HoloRow);
     }
 
     public void unsubscribe(GHoloRow HoloRow) {
         for(List<GHoloRow> holoRows : animationSubscriber.values()) holoRows.remove(HoloRow);
+        placeholderAPISubscriber.remove(HoloRow);
     }
 
     private void startHoloAnimations() {
@@ -60,6 +61,13 @@ public class HoloAnimationManager {
             }, false, 0, animation.getTicks());
             taskIds.add(taskId);
         }
+        if(!GPM.getCManager().L_PLACEHOLDER_API || !GPM.hasPlaceholderAPILink()) return;
+        UUID placeholderAPITaskId = GPM.getTManager().runAtFixedRate(() -> {
+            for(GHoloRow holoRow : placeholderAPISubscriber) {
+                holoRow.getHoloRowEntity().publishUpdate(GHoloRowUpdateType.CONTENT);
+            }
+        }, false, 0, 10);
+        taskIds.add(placeholderAPITaskId);
     }
 
     public void stopHoloAnimations() {
@@ -67,6 +75,13 @@ public class HoloAnimationManager {
         taskIds.clear();
         animations.clear();
         animationSubscriber.clear();
+        placeholderAPISubscriber.clear();
+    }
+
+    public static int countAnimationChars(String Text) {
+        int count = 0;
+        for(int i = 0; i < Text.length(); i++) if(Text.charAt(i) == AMIMATION_CHAR) count++;
+        return count;
     }
 
 }
