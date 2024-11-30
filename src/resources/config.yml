@@ -25,7 +25,7 @@ Options:
   Link:
 
     # Defines whether the PlaceholderAPI link should be active
-    placeholder-api: true
+    placeholder-api: false
 
   # List of active feature flags (primarily for unofficial features for individual use)
   FeatureFlags: []
