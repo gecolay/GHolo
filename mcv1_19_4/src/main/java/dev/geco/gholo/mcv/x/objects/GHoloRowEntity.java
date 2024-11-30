@@ -87,7 +87,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     public boolean dismountsUnderwater() { return false; }
 
     @Override
-    public void spawnHoloRow() {
+    public void loadHoloRow() {
         ClientboundAddEntityPacket addEntityPacket = new ClientboundAddEntityPacket(getId(), getUUID(), getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYHeadRot());
         for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
             ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
@@ -97,7 +97,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     }
 
     @Override
-    public void spawnHoloRow(Player Player) {
+    public void loadHoloRow(Player Player) {
         ServerPlayer serverPlayer = ((CraftPlayer) Player).getHandle();
         serverPlayer.connection.send(new ClientboundAddEntityPacket(getId(), getUUID(), getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYHeadRot()));
         serverPlayer.connection.send(getDataPacket(Player));
@@ -210,7 +210,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     }
 
     @Override
-    public void removeHoloRow() {
+    public void unloadHoloRow() {
         ClientboundRemoveEntitiesPacket removeEntityPacket = new ClientboundRemoveEntitiesPacket(getId());
         for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
             ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
@@ -219,7 +219,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     }
 
     @Override
-    public void removeHoloRow(Player Player) {
+    public void unloadHoloRow(Player Player) {
         ServerPlayer serverPlayer = ((CraftPlayer) Player).getHandle();
         serverPlayer.connection.send(new ClientboundRemoveEntitiesPacket(getId()));
     }

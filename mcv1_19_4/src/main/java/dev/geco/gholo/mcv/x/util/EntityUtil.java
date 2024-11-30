@@ -15,7 +15,7 @@ public class EntityUtil implements IEntityUtil {
     public void loadHoloRowEntity(GHoloRow HoloRow) {
         GHoloRowEntity holoRowEntity = new GHoloRowEntity(HoloRow);
         HoloRow.setHoloRowEntity(holoRowEntity);
-        holoRowEntity.spawnHoloRow();
+        holoRowEntity.loadHoloRow();
     }
 
 }

@@ -94,7 +94,7 @@ public class GHoloCommand implements CommandExecutor {
                     GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-exist-error", "%Holo%", Args[1].toLowerCase());
                     break;
                 }
-                GPM.getHoloManager().deleteHolo(holo);
+                GPM.getHoloManager().removeHolo(holo);
                 GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-remove", "%Holo%", holo.getId());
                 break;
             case "rename":

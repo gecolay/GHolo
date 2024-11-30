@@ -24,7 +24,7 @@ public class HoloManager {
 
     private final List<GHolo> holos = new ArrayList<>();
 
-    public List<GHolo> getHolos() { return holos; }
+    public List<GHolo> getHolos() { return new ArrayList<>(holos); }
 
     public GHolo getHolo(String Id) { return holos.stream().filter(holo -> holo.getId().equalsIgnoreCase(Id)).findFirst().orElse(null); }
 
@@ -89,24 +89,24 @@ public class HoloManager {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public void spawnHolosToPlayer(Player Player) {
-        for(GHolo holo : holos) spawnHolo(holo, Player);
+    public void loadHolosForPlayer(Player Player) {
+        for(GHolo holo : holos) loadHoloForPlayer(holo, Player);
     }
 
-    public void spawnHolo(GHolo Holo) {
-        for(Player player : Holo.getRawLocation().getWorld().getPlayers()) spawnHolo(Holo, player);
+    public void loadHolo(GHolo Holo) {
+        for(Player player : Holo.getRawLocation().getWorld().getPlayers()) loadHoloForPlayer(Holo, player);
     }
 
-    public void spawnHolo(GHolo Holo, Player Player) {
-        for(GHoloRow row : Holo.getRows()) row.getHoloRowEntity().spawnHoloRow(Player);
+    public void loadHoloForPlayer(GHolo Holo, Player Player) {
+        for(GHoloRow row : Holo.getRows()) row.getHoloRowEntity().loadHoloRow(Player);
     }
 
-    public void removeHolo(GHolo Holo) {
-        for(Player player : Holo.getRawLocation().getWorld().getPlayers()) removeHolo(Holo, player);
+    public void unloadHolo(GHolo Holo) {
+        for(Player player : Holo.getRawLocation().getWorld().getPlayers()) unloadHoloForPlayer(Holo, player);
     }
 
-    public void removeHolo(GHolo Holo, Player Player) {
-        for(GHoloRow row : Holo.getRows()) row.getHoloRowEntity().removeHoloRow(Player);
+    public void unloadHoloForPlayer(GHolo Holo, Player Player) {
+        for(GHoloRow row : Holo.getRows()) row.getHoloRowEntity().unloadHoloRow(Player);
     }
 
     public GHolo createHolo(String Id, Location Location) {
@@ -161,13 +161,13 @@ public class HoloManager {
         return null;
     }
 
-    public GHoloRow insertHoloRow(GHolo Holo, int Row, String Content, boolean updateOffset) {
+    public GHoloRow insertHoloRow(GHolo Holo, int Row, String Content, boolean UpdateOffset) {
         try {
             double offset = GPM.getCManager().DEFAULT_SIZE_BETWEEN_ROWS;
             double rowOffset = offset * Row;
             Location position = new Location(Holo.getRawLocation().getWorld(), 0, -rowOffset, 0, 0, 0);
 
-            if(updateOffset) {
+            if(UpdateOffset) {
                 GPM.getDManager().execute("UPDATE holo_row SET o_y = o_y - ? WHERE holo_id = ? AND row_number >= ?", offset, Holo.getId(), Row);
                 for(GHoloRow holoRow : Holo.getRows().subList(Row, Holo.getRows().size())) {
                     Location rowPosition = holoRow.getPosition();
@@ -230,13 +230,20 @@ public class HoloManager {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public void removeHoloRow(GHoloRow HoloRow, boolean updateOffset) {
+    public void updateHoloRowData(GHoloRow HoloRow, GHoloData RowData) {
+        try {
+            GPM.getDManager().execute("UPDATE holo_row SET data = ? WHERE row_number = ? AND holo_id = ?", RowData.toString(), HoloRow.getRow(), HoloRow.getHolo().getId());
+            HoloRow.setData(RowData);
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    public void removeHoloRow(GHoloRow HoloRow, boolean UpdateOffset) {
         try {
             GHolo holo = HoloRow.getHolo();
             int row = HoloRow.getRow();
             double offset = GPM.getCManager().DEFAULT_SIZE_BETWEEN_ROWS;
             GPM.getDManager().execute("DELETE FROM holo_row where holo_id = ? AND row_number = ?", holo.getId(), row);
-            if(updateOffset) {
+            if(UpdateOffset) {
                 GPM.getDManager().execute("UPDATE holo_row SET o_y = o_y + ? WHERE holo_id = ? AND row_number > ?", offset, holo.getId(), row);
                 for(GHoloRow holoRow : holo.getRows().subList(row + 1, holo.getRows().size())) {
                     Location rowPosition = holoRow.getPosition();
@@ -247,7 +254,7 @@ public class HoloManager {
             }
             GPM.getDManager().execute("UPDATE holo_row SET row_number = row_number - 1 WHERE holo_id = ? AND row_number > ?", holo.getId(), row);
             holo.removeRow(row);
-            HoloRow.getHoloRowEntity().removeHoloRow();
+            HoloRow.getHoloRowEntity().unloadHoloRow();
             GPM.getHoloAnimationManager().unsubscribe(HoloRow);
         } catch (Exception e) { e.printStackTrace(); }
     }
@@ -281,15 +288,8 @@ public class HoloManager {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public void updateHoloRowData(GHoloRow HoloRow, GHoloData RowData) {
-        try {
-            GPM.getDManager().execute("UPDATE holo_row SET data = ? WHERE row_number = ? AND holo_id = ?", RowData.toString(), HoloRow.getRow(), HoloRow.getHolo().getId());
-            HoloRow.setData(RowData);
-        } catch (Exception e) { e.printStackTrace(); }
-    }
-
     public void setHoloRows(GHolo Holo, List<String> Rows) {
-        removeHolo(Holo);
+        unloadHolo(Holo);
         Holo.getRows().clear();
         try {
             GPM.getDManager().execute("DELETE FROM holo_row where holo_id = ?", Holo.getId());
@@ -300,7 +300,7 @@ public class HoloManager {
     public void copyHoloRows(GHolo Holo, GHolo CopyToHolo) {
         try {
             try (ResultSet resultSet = GPM.getDManager().executeAndGet("SELECT * FROM holo_row WHERE holo_id = ?", Holo.getId())) {
-                removeHolo(CopyToHolo);
+                unloadHolo(CopyToHolo);
                 for(GHoloRow holoRow : CopyToHolo.getRows()) GPM.getHoloAnimationManager().unsubscribe(holoRow);
                 CopyToHolo.getRows().clear();
                 GPM.getDManager().execute("DELETE FROM holo_row where holo_id = ?", CopyToHolo.getId());
@@ -347,21 +347,21 @@ public class HoloManager {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public void deleteHolo(GHolo Holo) {
+    public void removeHolo(GHolo Holo) {
         try {
             GPM.getDManager().execute("DELETE FROM holo WHERE id = ?", Holo.getId());
             GPM.getDManager().execute("DELETE FROM holo_row WHERE holo_id = ?", Holo.getId());
             GPM.getDManager().execute("DELETE FROM holo_row_data WHERE holo_id = ?", Holo.getId());
             holos.remove(Holo);
             for(GHoloRow holoRow : Holo.getRows()) GPM.getHoloAnimationManager().unsubscribe(holoRow);
-            removeHolo(Holo);
+            unloadHolo(Holo);
         } catch (Exception e) { e.printStackTrace(); }
     }
 
     public void unloadHolos() {
         for(GHolo holo : holos) {
             for(GHoloRow holoRow : holo.getRows()) GPM.getHoloAnimationManager().unsubscribe(holoRow);
-            removeHolo(holo);
+            unloadHolo(holo);
         }
         holos.clear();
     }
