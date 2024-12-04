@@ -25,7 +25,7 @@ public class GHoloTabComplete implements TabCompleter {
 
         List<String> complete = new ArrayList<>(), completeStarted = new ArrayList<>();
 
-        List<String> holoIdArg = new ArrayList<>(List.of("info", "remove", "rename", "relocate", "tphere", "tpto", "align", "positionrow", "addrow", "insertrow", "setrow", "removerow", "copyrows", "data", "setimage"));
+        List<String> holoIdArg = new ArrayList<>(List.of("info", "remove", "rename", "relocate", "tphere", "tpto", "align", "addrow", "insertrow", "setrow", "removerow", "positionrow", "copyrows", "data", "setimage"));
 
         if(!(Sender instanceof Player)) holoIdArg.removeAll(List.of("tpto", "tphere"));
 
@@ -64,7 +64,7 @@ public class GHoloTabComplete implements TabCompleter {
                 complete.addAll(GPM.getHoloManager().getHolos().stream().map(GHolo::getId).filter(holoId -> !holoId.equalsIgnoreCase(Args[1])).toList());
             }
 
-            if(Args[0].equalsIgnoreCase("positionrow") || Args[0].equalsIgnoreCase("insertrow") || Args[0].equalsIgnoreCase("setrow") || Args[0].equalsIgnoreCase("removerow")) {
+            if(Args[0].equalsIgnoreCase("insertrow") || Args[0].equalsIgnoreCase("setrow") || Args[0].equalsIgnoreCase("removerow") || Args[0].equalsIgnoreCase("positionrow")) {
                 GHolo holo = GPM.getHoloManager().getHolo(Args[1]);
                 if(holo != null) for(int row = 1; row <= holo.getRows().size(); row++) complete.add("" + row);
             }
@@ -85,12 +85,12 @@ public class GHoloTabComplete implements TabCompleter {
             }
         } else if(Args.length == 4) {
 
-            if(Args[0].equalsIgnoreCase("positionrow")) {
-                complete.addAll(List.of("xoffset", "yoffset", "zoffset", "yaw", "pitch"));
-            }
-
             if(Args[0].equalsIgnoreCase("align")) {
                 complete.addAll(List.of("x", "y", "z", "xy", "xz", "yz", "xyz"));
+            }
+
+            if(Args[0].equalsIgnoreCase("positionrow")) {
+                complete.addAll(List.of("xoffset", "yoffset", "zoffset", "yaw", "pitch"));
             }
 
             if(Args[0].equalsIgnoreCase("data")) {

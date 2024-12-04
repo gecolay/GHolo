@@ -170,7 +170,7 @@ public class HoloManager {
                 GPM.getDManager().execute("UPDATE holo_row SET o_y = o_y - ? WHERE holo_id = ? AND row_number >= ?", offset, Holo.getId(), Row);
                 for(GHoloRow holoRow : Holo.getRows().subList(Row, Holo.getRows().size())) {
                     Location rowPosition = holoRow.getPosition();
-                    rowPosition.setY(position.getY() - offset);
+                    rowPosition.setY(rowPosition.getY() - offset);
                     holoRow.setPosition(rowPosition);
                     holoRow.getHoloRowEntity().publishUpdate(GHoloRowUpdateType.LOCATION);
                 }
