@@ -63,7 +63,7 @@ public class GHoloMain extends JavaPlugin {
 
     public final String NAME = "GHolo";
 
-    public final String RESOURCE = "000000";
+    public final String RESOURCE = "121144";
 
     private static GHoloMain GPM;
 
@@ -81,7 +81,7 @@ public class GHoloMain extends JavaPlugin {
 
     private void linkBStats() {
 
-        BStatsLink bstats = new BStatsLink(getInstance(), 24037);
+        BStatsLink bstats = new BStatsLink(getInstance(), 24075);
 
         bstats.addCustomChart(new BStatsLink.SimplePie("plugin_language", () -> getCManager().L_LANG));
         bstats.addCustomChart(new BStatsLink.SingleLineChart("holo_count", () -> getHoloManager().getHoloCount()));

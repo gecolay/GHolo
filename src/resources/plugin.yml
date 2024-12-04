@@ -2,7 +2,7 @@ name: ${project.parent.name}
 version: ${project.parent.version}
 description: ${project.description}
 authors: [Gecolay]
-website: https://www.spigotmc.org/resources/000000
+website: https://www.spigotmc.org/resources/121144
 main: ${project.parent.groupId}.${project.parent.artifactId}Main
 api-version: 1.19
 folia-supported: true

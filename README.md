@@ -4,7 +4,7 @@
 
 This repository contains the GHolo project from the GPlugins series!
 
-- Website: [GHolo - Spigot](https://www.spigotmc.org/resources/GHolo.000000)
+- Website: [GHolo - Spigot](https://www.spigotmc.org/resources/GHolo.121144)
 - GitHub: [GHolo - GitHub](https://github.com/Gecolay/GHolo)
 - Discord: [GPlugins - Discord](https://discord.gg/Cy2P4AU)
 
