@@ -11,6 +11,7 @@ public enum GHoloRowUpdateType {
     TEXT_ALIGNMENT,
     BILLBOARD,
     SEE_THROUGH,
-    SCALE
+    SCALE,
+    BRIGHTNESS
 
 }

@@ -96,7 +96,7 @@ public class GHoloTabComplete implements TabCompleter {
             if(Args[0].equalsIgnoreCase("data")) {
 
                 if(Args[2].equalsIgnoreCase("default")) {
-                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "text_alignment", "billboard", "see_through", "scale"));
+                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "text_alignment", "billboard", "see_through", "scale", "brightness"));
                 }
 
                 if(Args[2].equalsIgnoreCase("row")) {
@@ -137,10 +137,11 @@ public class GHoloTabComplete implements TabCompleter {
                     if(Args[3].equalsIgnoreCase("billboard")) {
                         complete.addAll(Arrays.stream(Display.Billboard.values()).map(b -> b.name().toLowerCase()).toList());
                     }
+                    complete.add("*");
                 }
 
                 if(Args[2].equalsIgnoreCase("row")) {
-                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "text_alignment", "billboard", "see_through", "scale"));
+                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "text_alignment", "billboard", "see_through", "scale", "brightness"));
                 }
             }
 
@@ -164,6 +165,7 @@ public class GHoloTabComplete implements TabCompleter {
                     if(Args[4].equalsIgnoreCase("billboard")) {
                         complete.addAll(Arrays.stream(Display.Billboard.values()).map(b -> b.name().toLowerCase()).toList());
                     }
+                    complete.add("*");
                 }
             }
 

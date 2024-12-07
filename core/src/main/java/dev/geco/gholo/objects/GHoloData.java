@@ -14,6 +14,7 @@ public class GHoloData implements Cloneable {
     public static final String DEFAULT_BILLBOARD = "center";
     public static final boolean DEFAULT_SEE_THROUGH = false;
     public static final Vector3f DEFAULT_SCALE = new Vector3f(1f, 1f, 1f);
+    public static final Byte DEFAULT_BRIGHTNESS = null;
 
     private Double range;
     private String backgroundColor;
@@ -23,6 +24,7 @@ public class GHoloData implements Cloneable {
     private String billboard;
     private Boolean seeThrough;
     private Vector3f scale;
+    private Byte brightness;
 
     @Override
     public String toString() {
@@ -35,6 +37,7 @@ public class GHoloData implements Cloneable {
         if(billboard != null) stringMap.put("billboard", billboard);
         if(seeThrough != null) stringMap.put("see_through", seeThrough);
         if(scale != null) stringMap.put("scale", scale.toString());
+        if(brightness != null) stringMap.put("brightness", brightness);
         StringBuilder dataString = new StringBuilder();
         for (HashMap.Entry<String, Object> entry : stringMap.entrySet()) {
             if(!dataString.isEmpty()) dataString.append("§§");
@@ -72,6 +75,9 @@ public class GHoloData implements Cloneable {
                     String[] scaleSplit = dataSplit[1].split(",");
                     scale = new Vector3f(Float.parseFloat(scaleSplit[0]), Float.parseFloat(scaleSplit[1]), Float.parseFloat(scaleSplit[2]));
                     break;
+                case "brightness":
+                    brightness = Byte.parseByte(dataSplit[1]);
+                    break;
             }
         }
     }
@@ -107,6 +113,10 @@ public class GHoloData implements Cloneable {
     public Vector3f getScale() { return scale; }
 
     public void setScale(Vector3f Scale) { scale = Scale; }
+
+    public Byte getBrightness() { return brightness; }
+
+    public void setBrightness(Byte Brightness) { brightness = Brightness; }
 
     @Override
     public GHoloData clone() { try { return (GHoloData) super.clone(); } catch (CloneNotSupportedException e) { throw new Error(e); } }

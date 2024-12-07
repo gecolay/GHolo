@@ -15,8 +15,8 @@ import net.minecraft.network.chat.*;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.network.syncher.*;
 import net.minecraft.server.level.*;
+import net.minecraft.util.*;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.phys.*;
 
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.objects.*;
@@ -35,14 +35,6 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         GPM = GHoloMain.getInstance();
 
         persist = false;
-        Location location = HoloRow.getHolo().getLocation();
-        Location position = holoRow.getPosition();
-        location.add(position);
-        setPos(location.getX(), location.getY(), location.getZ());
-        setRot(position.getYaw(), position.getPitch());
-
-        setNoGravity(true);
-        setInvulnerable(true);
         entityData.set(DATA_LINE_WIDTH_ID, 10000);
 
         EntityDataAccessor<Component> textAccessor = null;
@@ -65,23 +57,8 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         } catch (Throwable ignored) { }
         HOLO_SCALE_DATA = scaleAccessor;
 
-        for(GHoloRowUpdateType updateType : GHoloRowUpdateType.values()) {
-            if(updateType == GHoloRowUpdateType.CONTENT || updateType == GHoloRowUpdateType.LOCATION) continue;
-            handleUpdate(updateType);
-        }
+        for(GHoloRowUpdateType updateType : GHoloRowUpdateType.values()) handleUpdate(updateType);
     }
-
-    @Override
-    public void tick() { }
-
-    @Override
-    public void move(MoverType MoverType, Vec3 Vec3) { }
-
-    @Override
-    public boolean canChangeDimensions() { return false; }
-
-    @Override
-    public boolean dismountsUnderwater() { return false; }
 
     @Override
     public void loadHoloRow() {
@@ -102,12 +79,8 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
 
     @Override
     public void publishUpdate(GHoloRowUpdateType UpdateType) {
+        handleUpdate(UpdateType);
         if(UpdateType == GHoloRowUpdateType.LOCATION) {
-            Location location = holoRow.getHolo().getLocation();
-            Location position = holoRow.getPosition();
-            location.add(position);
-            setPos(location.getX(), location.getY(), location.getZ());
-            setRot(position.getYaw(), position.getPitch());
             ClientboundTeleportEntityPacket teleportEntityPacket = new ClientboundTeleportEntityPacket(this);
             for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
                 ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
@@ -115,7 +88,6 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
             }
             return;
         }
-        handleUpdate(UpdateType);
         finishUpdate();
     }
 
@@ -123,6 +95,13 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         GHoloData defaultData = holoRow.getHolo().getDefaultData();
         GHoloData data = holoRow.getData();
         switch (UpdateType) {
+            case LOCATION:
+                Location location = holoRow.getHolo().getLocation();
+                Location position = holoRow.getPosition();
+                location.add(position);
+                setPos(location.getX(), location.getY(), location.getZ());
+                setRot(position.getYaw(), position.getPitch());
+                break;
             case RANGE:
                 double range = data.getRange() != null ? data.getRange() : (defaultData.getRange() != null ? defaultData.getRange() : GHoloData.DEFAULT_RANGE);
                 setViewRange((float) (range / 64));
@@ -152,8 +131,11 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
                 break;
             case SCALE:
                 Vector3f scale = data.getScale() != null ? data.getScale() : (defaultData.getScale() != null ? defaultData.getScale() : GHoloData.DEFAULT_SCALE);
-                setScale(scale);
+                entityData.set(HOLO_SCALE_DATA, scale);
                 break;
+            case BRIGHTNESS:
+                Byte brigthness = data.getBrightness() != null ? data.getBrightness() : (defaultData.getBrightness() != null ? defaultData.getBrightness() : GHoloData.DEFAULT_BRIGHTNESS);
+                setBrightnessOverride(brigthness != null ? new Brightness(brigthness, Brightness.FULL_BRIGHT.sky()) : null);
         }
     }
 
@@ -181,8 +163,6 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     private void setTextShadow(boolean Shadow) { setFlags((byte) (Shadow ? getFlags() | FLAG_SHADOW : getFlags() & ~FLAG_SHADOW)); }
 
     private void setSeeThrough(boolean SeeThrough) { setFlags((byte) (SeeThrough ? getFlags() | FLAG_SEE_THROUGH : getFlags() & ~FLAG_SEE_THROUGH)); }
-
-    private void setScale(Vector3f Scale) { entityData.set(HOLO_SCALE_DATA, Scale); }
 
     private void finishUpdate() {
         for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {

@@ -488,6 +488,16 @@ public class GHoloCommand implements CommandExecutor {
                             return true;
                         }
                         break;
+                    case "brightness":
+                        try {
+                            if(Args[arg + 1].equalsIgnoreCase("*")) data.setBrightness(GHoloData.DEFAULT_TEXT_OPACITY);
+                            else data.setBrightness(Byte.parseByte(Args[arg + 1]));
+                            updateType = GHoloRowUpdateType.BRIGHTNESS;
+                        } catch (NumberFormatException e) {
+                            GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-value-error", "%Data%", option, "%Value%", Args[arg + 1]);
+                            return true;
+                        }
+                        break;
                 }
                 if(holoRow == null) {
                     GPM.getHoloManager().updateHoloData(holo, data);
