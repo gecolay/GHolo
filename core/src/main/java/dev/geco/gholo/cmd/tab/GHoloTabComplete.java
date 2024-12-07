@@ -96,7 +96,7 @@ public class GHoloTabComplete implements TabCompleter {
             if(Args[0].equalsIgnoreCase("data")) {
 
                 if(Args[2].equalsIgnoreCase("default")) {
-                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "billboard", "see_through", "scale"));
+                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "text_alignment", "billboard", "see_through", "scale"));
                 }
 
                 if(Args[2].equalsIgnoreCase("row")) {
@@ -131,13 +131,16 @@ public class GHoloTabComplete implements TabCompleter {
                     if(Args[3].equalsIgnoreCase("text_shadow") || Args[3].equalsIgnoreCase("see_through")) {
                         complete.addAll(List.of("true", "false"));
                     }
+                    if(Args[3].equalsIgnoreCase("text_alignment")) {
+                        complete.addAll(Arrays.stream(TextDisplay.TextAlignment.values()).map(ta -> ta.name().toLowerCase()).toList());
+                    }
                     if(Args[3].equalsIgnoreCase("billboard")) {
                         complete.addAll(Arrays.stream(Display.Billboard.values()).map(b -> b.name().toLowerCase()).toList());
                     }
                 }
 
                 if(Args[2].equalsIgnoreCase("row")) {
-                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "billboard", "see_through", "scale"));
+                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "text_alignment", "billboard", "see_through", "scale"));
                 }
             }
 
@@ -154,6 +157,9 @@ public class GHoloTabComplete implements TabCompleter {
                 if(Args[2].equalsIgnoreCase("row")) {
                     if(Args[4].equalsIgnoreCase("text_shadow") || Args[4].equalsIgnoreCase("see_through")) {
                         complete.addAll(List.of("true", "false"));
+                    }
+                    if(Args[4].equalsIgnoreCase("text_alignment")) {
+                        complete.addAll(Arrays.stream(TextDisplay.TextAlignment.values()).map(ta -> ta.name().toLowerCase()).toList());
                     }
                     if(Args[4].equalsIgnoreCase("billboard")) {
                         complete.addAll(Arrays.stream(Display.Billboard.values()).map(b -> b.name().toLowerCase()).toList());

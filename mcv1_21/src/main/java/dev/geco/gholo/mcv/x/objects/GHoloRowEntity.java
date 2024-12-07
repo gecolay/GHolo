@@ -65,13 +65,10 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         } catch (Throwable ignored) { }
         HOLO_SCALE_DATA = scaleAccessor;
 
-        handleUpdate(GHoloRowUpdateType.RANGE);
-        handleUpdate(GHoloRowUpdateType.BACKGROUND_COLOR);
-        handleUpdate(GHoloRowUpdateType.TEXT_OPACITY);
-        handleUpdate(GHoloRowUpdateType.TEXT_SHADOW);
-        handleUpdate(GHoloRowUpdateType.BILLBOARD);
-        handleUpdate(GHoloRowUpdateType.SEE_THROUGH);
-        handleUpdate(GHoloRowUpdateType.SCALE);
+        for(GHoloRowUpdateType updateType : GHoloRowUpdateType.values()) {
+            if(updateType == GHoloRowUpdateType.CONTENT || updateType == GHoloRowUpdateType.LOCATION) continue;
+            handleUpdate(updateType);
+        }
     }
 
     @Override
@@ -142,6 +139,9 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
                 boolean textShadow = data.getTextShadow() != null ? data.getTextShadow() : (defaultData.getTextShadow() != null ? defaultData.getTextShadow() : GHoloData.DEFAULT_TEXT_SHADOW);
                 setTextShadow(textShadow);
                 break;
+            case TEXT_ALIGNMENT:
+                String textAlignment = data.getTextAlignment() != null ? data.getTextAlignment() : (defaultData.getTextAlignment() != null ? defaultData.getTextAlignment() : GHoloData.DEFAULT_TEXT_ALIGNMENT);
+                setTextAlignment(textAlignment);
             case BILLBOARD:
                 String billboard = data.getBillboard() != null ? data.getBillboard() : (defaultData.getBillboard() != null ? defaultData.getBillboard() : GHoloData.DEFAULT_BILLBOARD);
                 setBillboard(billboard);
@@ -171,19 +171,16 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         setTextOpacity(signedAlphaValue);
     }
 
+    private void setTextAlignment(String TextAlignment) {
+        setFlags((byte) (TextAlignment.equalsIgnoreCase(Align.LEFT.name()) ? getFlags() | FLAG_ALIGN_LEFT : getFlags() & ~FLAG_ALIGN_LEFT));
+        setFlags((byte) (TextAlignment.equalsIgnoreCase(Align.RIGHT.name()) ? getFlags() | FLAG_ALIGN_RIGHT : getFlags() & ~FLAG_ALIGN_RIGHT));
+    }
+
     private void setBillboard(String Billboard) { setBillboardConstraints(BillboardConstraints.valueOf(Billboard.toUpperCase())); }
 
-    private void setTextShadow(boolean Shadow) {
-        byte currentFlags = getFlags();
-        if(Shadow) setFlags((byte) (currentFlags | 1));
-        else setFlags((byte) (currentFlags & ~1));
-    }
+    private void setTextShadow(boolean Shadow) { setFlags((byte) (Shadow ? getFlags() | FLAG_SHADOW : getFlags() & ~FLAG_SHADOW)); }
 
-    private void setSeeThrough(boolean SeeThrough) {
-        byte currentFlags = getFlags();
-        if(SeeThrough) setFlags((byte) (currentFlags | 2));
-        else setFlags((byte) (currentFlags & ~2));
-    }
+    private void setSeeThrough(boolean SeeThrough) { setFlags((byte) (SeeThrough ? getFlags() | FLAG_SEE_THROUGH : getFlags() & ~FLAG_SEE_THROUGH)); }
 
     private void setScale(Vector3f Scale) { entityData.set(HOLO_SCALE_DATA, Scale); }
 

@@ -10,6 +10,7 @@ public class GHoloData implements Cloneable {
     public static final String DEFAULT_BACKGROUND_COLOR = "#000000";
     public static final byte DEFAULT_TEXT_OPACITY = 0;
     public static final boolean DEFAULT_TEXT_SHADOW = false;
+    public static final String DEFAULT_TEXT_ALIGNMENT = "center";
     public static final String DEFAULT_BILLBOARD = "center";
     public static final boolean DEFAULT_SEE_THROUGH = false;
     public static final Vector3f DEFAULT_SCALE = new Vector3f(1f, 1f, 1f);
@@ -18,6 +19,7 @@ public class GHoloData implements Cloneable {
     private String backgroundColor;
     private Byte textOpacity;
     private Boolean textShadow;
+    private String textAlignment;
     private String billboard;
     private Boolean seeThrough;
     private Vector3f scale;
@@ -29,6 +31,7 @@ public class GHoloData implements Cloneable {
         if(backgroundColor != null) stringMap.put("background_color", backgroundColor);
         if(textOpacity != null) stringMap.put("text_opacity", textOpacity);
         if(textShadow != null) stringMap.put("text_shadow", textShadow);
+        if(textAlignment != null) stringMap.put("text_alignment", textAlignment);
         if(billboard != null) stringMap.put("billboard", billboard);
         if(seeThrough != null) stringMap.put("see_through", seeThrough);
         if(scale != null) stringMap.put("scale", scale.toString());
@@ -55,6 +58,9 @@ public class GHoloData implements Cloneable {
                     break;
                 case "text_shadow":
                     textShadow = Boolean.parseBoolean(dataSplit[1]);
+                    break;
+                case "text_alignment":
+                    textAlignment = dataSplit[1];
                     break;
                 case "billboard":
                     billboard = dataSplit[1];
@@ -85,6 +91,10 @@ public class GHoloData implements Cloneable {
     public Boolean getTextShadow() { return textShadow; }
 
     public void setTextShadow(Boolean TextShadow) { textShadow = TextShadow; }
+
+    public String getTextAlignment() { return textAlignment; }
+
+    public void setTextAlignment(String TextAlignment) { textAlignment = TextAlignment; }
 
     public String getBillboard() { return billboard; }
 

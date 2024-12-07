@@ -8,6 +8,7 @@ public enum GHoloRowUpdateType {
     BACKGROUND_COLOR,
     TEXT_OPACITY,
     TEXT_SHADOW,
+    TEXT_ALIGNMENT,
     BILLBOARD,
     SEE_THROUGH,
     SCALE

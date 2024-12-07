@@ -172,6 +172,9 @@ public class HoloImportManager {
                 float scaleZ = (float) fileContent.getDouble("holograms." + hologram + ".scale_z", defaultScale.z);
                 if(scaleX != defaultScale.x || scaleY != defaultScale.y || scaleZ != defaultScale.z) data.setScale(new Vector3f(scaleX, scaleY, scaleZ));
 
+                String textAlignment = fileContent.getString("holograms." + hologram + ".text_alignment", GHoloData.DEFAULT_TEXT_ALIGNMENT);
+                if(!GHoloData.DEFAULT_TEXT_ALIGNMENT.equalsIgnoreCase(textAlignment)) data.setTextAlignment(textAlignment);
+
                 String billboard = fileContent.getString("holograms." + hologram + ".billboard", GHoloData.DEFAULT_BILLBOARD);
                 if(!GHoloData.DEFAULT_BILLBOARD.equalsIgnoreCase(billboard)) data.setBillboard(billboard);
 

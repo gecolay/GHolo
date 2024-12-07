@@ -448,6 +448,16 @@ public class GHoloCommand implements CommandExecutor {
                             return true;
                         }
                         break;
+                    case "text_alignment":
+                        try {
+                            if(Args[arg + 1].equalsIgnoreCase("*")) data.setTextAlignment(GHoloData.DEFAULT_TEXT_ALIGNMENT);
+                            else data.setTextAlignment(TextDisplay.TextAlignment.valueOf(Args[arg + 1].toUpperCase()).name().toLowerCase());
+                            updateType = GHoloRowUpdateType.TEXT_ALIGNMENT;
+                        } catch (IllegalArgumentException e) {
+                            GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-value-error", "%Data%", option, "%Value%", Args[arg + 1].toUpperCase());
+                            return true;
+                        }
+                        break;
                     case "billboard":
                         try {
                             if(Args[arg + 1].equalsIgnoreCase("*")) data.setBillboard(GHoloData.DEFAULT_BILLBOARD);
