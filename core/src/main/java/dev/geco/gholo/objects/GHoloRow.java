@@ -27,9 +27,9 @@ public class GHoloRow {
 
     public void setPosition(Location Position) { position = Position.clone(); }
 
-    public GHoloData getData() { return data; }
+    public GHoloData getData() { return data.clone(); }
 
-    public void setData(GHoloData Data) { data = Data; }
+    public void setData(GHoloData Data) { data = Data.clone(); }
 
     public IGHoloRowEntity getHoloRowEntity() { return holoRowEntity; }
 

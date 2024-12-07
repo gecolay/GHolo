@@ -6,6 +6,8 @@ import java.util.*;
 
 import org.jetbrains.annotations.*;
 
+import org.joml.*;
+
 import org.bukkit.*;
 import org.bukkit.event.player.*;
 import org.bukkit.command.*;
@@ -166,7 +168,7 @@ public class GHoloCommand implements CommandExecutor {
                     GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-exist-error", "%Holo%", Args[1].toLowerCase());
                     break;
                 }
-                player.teleport(holo.getLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
+                player.teleport(holo.getRawLocation(), PlayerTeleportEvent.TeleportCause.COMMAND);
                 GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-tpto", "%Holo%", holo.getId());
                 break;
             case "align":
@@ -186,7 +188,7 @@ public class GHoloCommand implements CommandExecutor {
                 }
                 String axis = Args[3].toLowerCase();
                 Location holoLocation = holo.getLocation();
-                Location alignOnHoloLocation = alignOnHolo.getLocation();
+                Location alignOnHoloLocation = alignOnHolo.getRawLocation();
                 String appliedAxis = "";
                 if(axis.contains("x")) {
                     holoLocation.setX(alignOnHoloLocation.getX());
@@ -402,7 +404,6 @@ public class GHoloCommand implements CommandExecutor {
                     GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-use-error");
                     break;
                 }
-                data = data.clone();
                 GHoloRowUpdateType updateType = null;
                 String option = Args[arg].toLowerCase();
                 switch (option) {
@@ -467,11 +468,11 @@ public class GHoloCommand implements CommandExecutor {
                             return true;
                         }
                         break;
-                    case "size":
+                    case "scale":
                         try {
-                            if(Args[arg + 1].equalsIgnoreCase("*")) data.setSize(GHoloData.DEFAULT_SIZE);
-                            else data.setSize(Float.parseFloat(Args[arg + 1]));
-                            updateType = GHoloRowUpdateType.SIZE;
+                            if(Args[arg + 1].equalsIgnoreCase("*")) data.setScale(GHoloData.DEFAULT_SCALE);
+                            else data.setScale(new Vector3f(Float.parseFloat(Args[arg + 1]), Float.parseFloat(Args[arg + 1]), Float.parseFloat(Args[arg + 1])));
+                            updateType = GHoloRowUpdateType.SCALE;
                         } catch (NumberFormatException e) {
                             GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-value-error", "%Data%", option, "%Value%", Args[arg + 1]);
                             return true;

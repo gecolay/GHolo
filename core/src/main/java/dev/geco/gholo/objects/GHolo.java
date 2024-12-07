@@ -40,8 +40,8 @@ public class GHolo {
 
     public void removeRow(int Row) { rows.remove(Row); }
 
-    public GHoloData getDefaultData() { return defaultData; }
+    public GHoloData getDefaultData() { return defaultData.clone(); }
 
-    public void setDefaultData(GHoloData DefaultData) { defaultData = DefaultData; }
+    public void setDefaultData(GHoloData DefaultData) { defaultData = DefaultData.clone(); }
 
 }

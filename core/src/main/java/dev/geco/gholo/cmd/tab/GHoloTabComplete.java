@@ -96,7 +96,7 @@ public class GHoloTabComplete implements TabCompleter {
             if(Args[0].equalsIgnoreCase("data")) {
 
                 if(Args[2].equalsIgnoreCase("default")) {
-                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "billboard", "see_through", "size"));
+                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "billboard", "see_through", "scale"));
                 }
 
                 if(Args[2].equalsIgnoreCase("row")) {
@@ -137,7 +137,7 @@ public class GHoloTabComplete implements TabCompleter {
                 }
 
                 if(Args[2].equalsIgnoreCase("row")) {
-                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "billboard", "see_through", "size"));
+                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "billboard", "see_through", "scale"));
                 }
             }
 

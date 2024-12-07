@@ -3,7 +3,7 @@ package dev.geco.gholo.mcv.x.objects;
 import java.lang.reflect.*;
 import java.util.*;
 
-import org.joml.Vector3f;
+import org.joml.*;
 
 import org.bukkit.*;
 import org.bukkit.craftbukkit.v1_21_R2.*;
@@ -26,10 +26,10 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     protected final GHoloRow holoRow;
     protected final GHoloMain GPM;
     protected final EntityDataAccessor<Component> HOLO_TEXT_DATA;
-    protected final EntityDataAccessor<Vector3f> HOLO_SIZE_DATA;
+    protected final EntityDataAccessor<Vector3f> HOLO_SCALE_DATA;
 
     public GHoloRowEntity(GHoloRow HoloRow) {
-        super(EntityType.TEXT_DISPLAY, ((CraftWorld) HoloRow.getHolo().getLocation().getWorld()).getHandle());
+        super(EntityType.TEXT_DISPLAY, ((CraftWorld) HoloRow.getHolo().getRawLocation().getWorld()).getHandle());
 
         holoRow = HoloRow;
         GPM = GHoloMain.getInstance();
@@ -55,15 +55,15 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         } catch (Throwable ignored) { }
         HOLO_TEXT_DATA = textAccessor;
 
-        EntityDataAccessor<Vector3f> sizeAccessor = null;
+        EntityDataAccessor<Vector3f> scaleAccessor = null;
         try {
             List<Field> textFieldList = new ArrayList<>();
             for(Field field : Display.class.getDeclaredFields()) if(field.getType().equals(EntityDataAccessor.class)) textFieldList.add(field);
             Field textField = textFieldList.get(4);
             textField.setAccessible(true);
-            sizeAccessor = (EntityDataAccessor<Vector3f>) textField.get(this);
+            scaleAccessor = (EntityDataAccessor<Vector3f>) textField.get(this);
         } catch (Throwable ignored) { }
-        HOLO_SIZE_DATA = sizeAccessor;
+        HOLO_SCALE_DATA = scaleAccessor;
 
         handleUpdate(GHoloRowUpdateType.RANGE);
         handleUpdate(GHoloRowUpdateType.BACKGROUND_COLOR);
@@ -71,7 +71,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         handleUpdate(GHoloRowUpdateType.TEXT_SHADOW);
         handleUpdate(GHoloRowUpdateType.BILLBOARD);
         handleUpdate(GHoloRowUpdateType.SEE_THROUGH);
-        handleUpdate(GHoloRowUpdateType.SIZE);
+        handleUpdate(GHoloRowUpdateType.SCALE);
     }
 
     @Override
@@ -150,9 +150,9 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
                 boolean seeThrough = data.getSeeThrough() != null ? data.getSeeThrough() : (defaultData.getSeeThrough() != null ? defaultData.getSeeThrough() : GHoloData.DEFAULT_SEE_THROUGH);
                 setSeeThrough(seeThrough);
                 break;
-            case SIZE:
-                float size = data.getSize() != null ? data.getSize() : (defaultData.getSize() != null ? defaultData.getSize() : GHoloData.DEFAULT_SIZE);
-                setSize(size);
+            case SCALE:
+                Vector3f scale = data.getScale() != null ? data.getScale() : (defaultData.getScale() != null ? defaultData.getScale() : GHoloData.DEFAULT_SCALE);
+                setScale(scale);
                 break;
         }
     }
@@ -165,7 +165,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     }
 
     private void setRealTextOpacity(byte TextOpacity) {
-        int clampedPercent = Math.max(0, Math.min(TextOpacity, 100));
+        int clampedPercent = java.lang.Math.max(0, java.lang.Math.min(TextOpacity, 100));
         int valueInRange26To255 = 255 - (clampedPercent * 231 / 100);
         byte signedAlphaValue = (byte) (valueInRange26To255 > 127 ? valueInRange26To255 - 256 : valueInRange26To255);
         setTextOpacity(signedAlphaValue);
@@ -185,7 +185,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         else setFlags((byte) (currentFlags & ~2));
     }
 
-    private void setSize(float Size) { entityData.set(HOLO_SIZE_DATA, new Vector3f(Size)); }
+    private void setScale(Vector3f Scale) { entityData.set(HOLO_SCALE_DATA, Scale); }
 
     private void finishUpdate() {
         for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {

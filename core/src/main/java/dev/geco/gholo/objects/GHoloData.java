@@ -2,6 +2,8 @@ package dev.geco.gholo.objects;
 
 import java.util.*;
 
+import org.joml.*;
+
 public class GHoloData implements Cloneable {
 
     public static final double DEFAULT_RANGE = 120d;
@@ -10,7 +12,7 @@ public class GHoloData implements Cloneable {
     public static final boolean DEFAULT_TEXT_SHADOW = false;
     public static final String DEFAULT_BILLBOARD = "center";
     public static final boolean DEFAULT_SEE_THROUGH = false;
-    public static final float DEFAULT_SIZE = 1f;
+    public static final Vector3f DEFAULT_SCALE = new Vector3f(1f, 1f, 1f);
 
     private Double range;
     private String backgroundColor;
@@ -18,7 +20,7 @@ public class GHoloData implements Cloneable {
     private Boolean textShadow;
     private String billboard;
     private Boolean seeThrough;
-    private Float size;
+    private Vector3f scale;
 
     @Override
     public String toString() {
@@ -29,7 +31,7 @@ public class GHoloData implements Cloneable {
         if(textShadow != null) stringMap.put("text_shadow", textShadow);
         if(billboard != null) stringMap.put("billboard", billboard);
         if(seeThrough != null) stringMap.put("see_through", seeThrough);
-        if(size != null) stringMap.put("size", size);
+        if(scale != null) stringMap.put("scale", scale.toString());
         StringBuilder dataString = new StringBuilder();
         for (HashMap.Entry<String, Object> entry : stringMap.entrySet()) {
             if(!dataString.isEmpty()) dataString.append("§§");
@@ -60,8 +62,9 @@ public class GHoloData implements Cloneable {
                 case "see_through":
                     seeThrough = Boolean.parseBoolean(dataSplit[1]);
                     break;
-                case "size":
-                    size = Float.parseFloat(dataSplit[1]);
+                case "scale":
+                    String[] scaleSplit = dataSplit[1].split(",");
+                    scale = new Vector3f(Float.parseFloat(scaleSplit[0]), Float.parseFloat(scaleSplit[1]), Float.parseFloat(scaleSplit[2]));
                     break;
             }
         }
@@ -91,9 +94,9 @@ public class GHoloData implements Cloneable {
 
     public void setSeeThrough(Boolean SeeThrough) { seeThrough = SeeThrough; }
 
-    public Float getSize() { return size; }
+    public Vector3f getScale() { return scale; }
 
-    public void setSize(Float Size) { size = Size; }
+    public void setScale(Vector3f Scale) { scale = Scale; }
 
     @Override
     public GHoloData clone() { try { return (GHoloData) super.clone(); } catch (CloneNotSupportedException e) { throw new Error(e); } }

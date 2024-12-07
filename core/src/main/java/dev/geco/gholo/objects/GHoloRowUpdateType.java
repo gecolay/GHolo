@@ -10,6 +10,6 @@ public enum GHoloRowUpdateType {
     TEXT_SHADOW,
     BILLBOARD,
     SEE_THROUGH,
-    SIZE
+    SCALE
 
 }
