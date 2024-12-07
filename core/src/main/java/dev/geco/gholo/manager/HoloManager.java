@@ -49,7 +49,7 @@ public class HoloManager {
                         GHolo holo = new GHolo(id, location);
 
                         String defaultDataString = resultSet.getString("default_data");
-                        holo.getDefaultData().loadString(defaultDataString);
+                        holo.getRawDefaultData().loadString(defaultDataString);
 
                         holos.add(holo);
 
@@ -71,7 +71,7 @@ public class HoloManager {
                                 holoRow.setPosition(position);
 
                                 String rowDataString = rowResultSet.getString("data");
-                                holoRow.getData().loadString(rowDataString);
+                                holoRow.getRawData().loadString(rowDataString);
 
                                 holoRowMap.put(row, holoRow);
                             }
@@ -118,7 +118,7 @@ public class HoloManager {
                     Location.getX(),
                     Location.getY(),
                     Location.getZ(),
-                    holo.getDefaultData().toString()
+                    holo.getRawDefaultData().toString()
             );
 
             holos.add(holo);
@@ -147,7 +147,7 @@ public class HoloManager {
                     position.getZ(),
                     position.getYaw(),
                     position.getPitch(),
-                    holoRow.getData().toString()
+                    holoRow.getRawData().toString()
             );
 
             Holo.addRow(holoRow);
@@ -190,7 +190,7 @@ public class HoloManager {
                     position.getZ(),
                     position.getYaw(),
                     position.getPitch(),
-                    holoRow.getData().toString()
+                    holoRow.getRawData().toString()
             );
 
             Holo.insertRow(holoRow, Row);
@@ -332,7 +332,7 @@ public class HoloManager {
                     GHoloRow holoRow = new GHoloRow(CopyToHolo, GPM.getFormatUtil().formatBase(content));
                     holoRow.setPosition(position);
 
-                    holoRow.getData().loadString(rowDataString);
+                    holoRow.getRawData().loadString(rowDataString);
 
                     holoRowMap.put(rowNumber, holoRow);
                 }

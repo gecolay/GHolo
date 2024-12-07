@@ -36,7 +36,7 @@ public class GHoloData implements Cloneable {
         if(textAlignment != null) stringMap.put("text_alignment", textAlignment);
         if(billboard != null) stringMap.put("billboard", billboard);
         if(seeThrough != null) stringMap.put("see_through", seeThrough);
-        if(scale != null) stringMap.put("scale", scale.toString());
+        if(scale != null) stringMap.put("scale", scale.x + "," + scale.y + "," + scale.z);
         if(brightness != null) stringMap.put("brightness", brightness);
         StringBuilder dataString = new StringBuilder();
         for (HashMap.Entry<String, Object> entry : stringMap.entrySet()) {
@@ -48,37 +48,39 @@ public class GHoloData implements Cloneable {
 
     public void loadString(String DataString) {
         for(String dataPart : DataString.split("§§")) {
-            String[] dataSplit = dataPart.split("§");
-            switch (dataSplit[0]) {
-                case "range":
-                    range = Double.parseDouble(dataSplit[1]);
-                    break;
-                case "background_color":
-                    backgroundColor = dataSplit[1];
-                    break;
-                case "text_opacity":
-                    textOpacity = Byte.parseByte(dataSplit[1]);
-                    break;
-                case "text_shadow":
-                    textShadow = Boolean.parseBoolean(dataSplit[1]);
-                    break;
-                case "text_alignment":
-                    textAlignment = dataSplit[1];
-                    break;
-                case "billboard":
-                    billboard = dataSplit[1];
-                    break;
-                case "see_through":
-                    seeThrough = Boolean.parseBoolean(dataSplit[1]);
-                    break;
-                case "scale":
-                    String[] scaleSplit = dataSplit[1].split(",");
-                    scale = new Vector3f(Float.parseFloat(scaleSplit[0]), Float.parseFloat(scaleSplit[1]), Float.parseFloat(scaleSplit[2]));
-                    break;
-                case "brightness":
-                    brightness = Byte.parseByte(dataSplit[1]);
-                    break;
-            }
+            try {
+                String[] dataSplit = dataPart.split("§");
+                switch (dataSplit[0]) {
+                    case "range":
+                        range = Double.parseDouble(dataSplit[1]);
+                        break;
+                    case "background_color":
+                        backgroundColor = dataSplit[1];
+                        break;
+                    case "text_opacity":
+                        textOpacity = Byte.parseByte(dataSplit[1]);
+                        break;
+                    case "text_shadow":
+                        textShadow = Boolean.parseBoolean(dataSplit[1]);
+                        break;
+                    case "text_alignment":
+                        textAlignment = dataSplit[1];
+                        break;
+                    case "billboard":
+                        billboard = dataSplit[1];
+                        break;
+                    case "see_through":
+                        seeThrough = Boolean.parseBoolean(dataSplit[1]);
+                        break;
+                    case "scale":
+                        String[] scaleSplit = dataSplit[1].split(",");
+                        scale = new Vector3f(Float.parseFloat(scaleSplit[0]), Float.parseFloat(scaleSplit[1]), Float.parseFloat(scaleSplit[2]));
+                        break;
+                    case "brightness":
+                        brightness = Byte.parseByte(dataSplit[1]);
+                        break;
+                }
+            } catch (Throwable e) { e.printStackTrace(); }
         }
     }
 

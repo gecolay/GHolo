@@ -25,9 +25,13 @@ public class GHoloRow {
 
     public Location getPosition() { return position.clone(); }
 
+    public Location getRawPosition() { return position; }
+
     public void setPosition(Location Position) { position = Position.clone(); }
 
     public GHoloData getData() { return data.clone(); }
+
+    public GHoloData getRawData() { return data; }
 
     public void setData(GHoloData Data) { data = Data.clone(); }
 

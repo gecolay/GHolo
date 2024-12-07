@@ -42,6 +42,8 @@ public class GHolo {
 
     public GHoloData getDefaultData() { return defaultData.clone(); }
 
+    public GHoloData getRawDefaultData() { return defaultData; }
+
     public void setDefaultData(GHoloData DefaultData) { defaultData = DefaultData.clone(); }
 
 }

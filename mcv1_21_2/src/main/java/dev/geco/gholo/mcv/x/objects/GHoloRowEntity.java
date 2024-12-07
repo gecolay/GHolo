@@ -92,12 +92,12 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     }
 
     private void handleUpdate(GHoloRowUpdateType UpdateType) {
-        GHoloData defaultData = holoRow.getHolo().getDefaultData();
-        GHoloData data = holoRow.getData();
+        GHoloData defaultData = holoRow.getHolo().getRawDefaultData();
+        GHoloData data = holoRow.getRawData();
         switch (UpdateType) {
             case LOCATION:
                 Location location = holoRow.getHolo().getLocation();
-                Location position = holoRow.getPosition();
+                Location position = holoRow.getRawPosition();
                 location.add(position);
                 setPos(location.getX(), location.getY(), location.getZ());
                 setRot(position.getYaw(), position.getPitch());
