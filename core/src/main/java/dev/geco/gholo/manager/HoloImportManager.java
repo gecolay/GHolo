@@ -166,11 +166,11 @@ public class HoloImportManager {
                 double range = fileContent.getDouble("holograms." + hologram + ".visibility_distance", GHoloData.DEFAULT_RANGE);
                 if(GHoloData.DEFAULT_RANGE != range) data.setRange(range);
 
-                Vector3f defaultScale = GHoloData.DEFAULT_SCALE;
-                float scaleX = (float) fileContent.getDouble("holograms." + hologram + ".scale_x", defaultScale.x);
-                float scaleY = (float) fileContent.getDouble("holograms." + hologram + ".scale_y", defaultScale.y);
-                float scaleZ = (float) fileContent.getDouble("holograms." + hologram + ".scale_z", defaultScale.z);
-                if(scaleX != defaultScale.x || scaleY != defaultScale.y || scaleZ != defaultScale.z) data.setScale(new Vector3f(scaleX, scaleY, scaleZ));
+                String backgroundColor = fileContent.getString("holograms." + hologram + ".background", GHoloData.DEFAULT_BACKGROUND_COLOR);
+                if(!GHoloData.DEFAULT_BACKGROUND_COLOR.equalsIgnoreCase(backgroundColor)) data.setBackgroundColor(backgroundColor);
+
+                boolean textShadow = fileContent.getBoolean("holograms." + hologram + ".text_shadow", GHoloData.DEFAULT_TEXT_SHADOW);
+                if(GHoloData.DEFAULT_TEXT_SHADOW != textShadow) data.setTextShadow(textShadow);
 
                 String textAlignment = fileContent.getString("holograms." + hologram + ".text_alignment", GHoloData.DEFAULT_TEXT_ALIGNMENT);
                 if(!GHoloData.DEFAULT_TEXT_ALIGNMENT.equalsIgnoreCase(textAlignment)) data.setTextAlignment(textAlignment);
@@ -178,14 +178,17 @@ public class HoloImportManager {
                 String billboard = fileContent.getString("holograms." + hologram + ".billboard", GHoloData.DEFAULT_BILLBOARD);
                 if(!GHoloData.DEFAULT_BILLBOARD.equalsIgnoreCase(billboard)) data.setBillboard(billboard);
 
-                String backgroundColor = fileContent.getString("holograms." + hologram + ".background", GHoloData.DEFAULT_BACKGROUND_COLOR);
-                if(!GHoloData.DEFAULT_BACKGROUND_COLOR.equalsIgnoreCase(backgroundColor)) data.setBackgroundColor(backgroundColor);
-
-                boolean textShadow = fileContent.getBoolean("holograms." + hologram + ".text_shadow", GHoloData.DEFAULT_TEXT_SHADOW);
-                if(GHoloData.DEFAULT_TEXT_SHADOW != textShadow) data.setTextShadow(textShadow);
-
                 boolean seeThrough = fileContent.getBoolean("holograms." + hologram + ".see_through", GHoloData.DEFAULT_SEE_THROUGH);
                 if(GHoloData.DEFAULT_SEE_THROUGH != seeThrough) data.setSeeThrough(seeThrough);
+
+                Vector3f defaultScale = GHoloData.DEFAULT_SCALE;
+                float scaleX = (float) fileContent.getDouble("holograms." + hologram + ".scale_x", defaultScale.x);
+                float scaleY = (float) fileContent.getDouble("holograms." + hologram + ".scale_y", defaultScale.y);
+                float scaleZ = (float) fileContent.getDouble("holograms." + hologram + ".scale_z", defaultScale.z);
+                if(scaleX != defaultScale.x || scaleY != defaultScale.y || scaleZ != defaultScale.z) data.setScale(new Vector3f(scaleX, scaleY, scaleZ));
+
+                String brightness = fileContent.getString("holograms." + hologram + ".brightness");
+                if(brightness != null) data.setBrightness(Byte.parseByte(brightness));
 
                 GPM.getHoloManager().updateHoloData(holo, data);
 
