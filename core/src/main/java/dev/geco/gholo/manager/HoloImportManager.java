@@ -3,6 +3,8 @@ package dev.geco.gholo.manager;
 import java.io.*;
 import java.util.*;
 
+import org.joml.*;
+
 import org.bukkit.*;
 import org.bukkit.configuration.file.*;
 
@@ -14,6 +16,7 @@ public class HoloImportManager {
     public List<String> AVAILABLE_PLUGIN_IMPORTS = new ArrayList<>(); {
         AVAILABLE_PLUGIN_IMPORTS.add("holographic_displays");
         AVAILABLE_PLUGIN_IMPORTS.add("decent_holograms");
+        AVAILABLE_PLUGIN_IMPORTS.add("fancy_holograms");
     }
 
     private final GHoloMain GPM;
@@ -25,6 +28,7 @@ public class HoloImportManager {
             switch(Plugin.toLowerCase()) {
                 case "holographic_displays": return importHolographicDisplays();
                 case "decent_holograms": return importDecentHolograms();
+                case "fancy_holograms": return importFancyHolograms();
                 default: return -1;
             }
         } catch (Throwable e) { e.printStackTrace(); }
@@ -90,8 +94,6 @@ public class HoloImportManager {
             FileConfiguration fileContent = YamlConfiguration.loadConfiguration(file);
             if(!fileContent.getBoolean("enabled", false)) continue;
 
-            int range = fileContent.getInt("display-range", 128);
-
             String[] args = fileContent.getString("location", "").split(":");
 
             World world = Bukkit.getWorld(args[0]);
@@ -100,10 +102,12 @@ public class HoloImportManager {
             Location location = new Location(world, Double.parseDouble(args[1].replace(",", ".")), Double.parseDouble(args[2].replace(",", ".")) - 0.41, Double.parseDouble(args[3].replace(",", ".")));
 
             GHolo holo = GPM.getHoloManager().createHolo(name, location);
-            GHoloData rowData = new GHoloData();
-            rowData.setRange((double) range);
-            holo.setDefaultData(rowData);
-            GPM.getHoloManager().updateHoloData(holo, null);
+            GHoloData data = holo.getDefaultData();
+
+            double range = fileContent.getDouble("display-range", GHoloData.DEFAULT_RANGE);
+            if(GHoloData.DEFAULT_RANGE != range) data.setRange(range);
+
+            GPM.getHoloManager().updateHoloData(holo, data);
 
             for(Object section : Objects.requireNonNull(fileContent.getList("pages"))) {
 
@@ -122,6 +126,71 @@ public class HoloImportManager {
             }
 
             imported++;
+        }
+
+        return imported;
+    }
+
+    private int importFancyHolograms() {
+
+        int imported = 0;
+
+        File contentFile = new File("plugins/FancyHolograms/holograms.yml");
+        if(!contentFile.exists()) return imported;
+
+        FileConfiguration fileContent = YamlConfiguration.loadConfiguration(contentFile);
+
+        int version = fileContent.getInt("version");
+        if(version == 2) {
+
+            for(String hologram : Objects.requireNonNull(fileContent.getConfigurationSection("holograms")).getKeys(false)) {
+
+                String type = fileContent.getString("holograms." + hologram + ".type", "");
+                if(!type.equalsIgnoreCase("TEXT")) continue;
+
+                String locationPath = "holograms." + hologram + ".location.";
+
+                String worldString = fileContent.getString(locationPath + "world");
+                World world = Bukkit.getWorld(worldString);
+                if(world == null) continue;
+                double x = fileContent.getDouble(locationPath + "x");
+                double y = fileContent.getDouble(locationPath + "y");
+                double z = fileContent.getDouble(locationPath + "z");
+                float yaw = (float) fileContent.getDouble(locationPath + "yaw");
+                float pitch = (float) fileContent.getDouble(locationPath + "pitch");
+                Location location = new Location(world, x, y ,z, yaw, pitch);
+
+                GHolo holo = GPM.getHoloManager().createHolo(hologram, location);
+                GHoloData data = holo.getDefaultData();
+
+                double range = fileContent.getDouble("holograms." + hologram + ".visibility_distance", GHoloData.DEFAULT_RANGE);
+                if(GHoloData.DEFAULT_RANGE != range) data.setRange(range);
+
+                Vector3f defaultScale = GHoloData.DEFAULT_SCALE;
+                float scaleX = (float) fileContent.getDouble("holograms." + hologram + ".scale_x", defaultScale.x);
+                float scaleY = (float) fileContent.getDouble("holograms." + hologram + ".scale_y", defaultScale.y);
+                float scaleZ = (float) fileContent.getDouble("holograms." + hologram + ".scale_z", defaultScale.z);
+                if(scaleX != defaultScale.x || scaleY != defaultScale.y || scaleZ != defaultScale.z) data.setScale(new Vector3f(scaleX, scaleY, scaleZ));
+
+                String billboard = fileContent.getString("holograms." + hologram + ".billboard", GHoloData.DEFAULT_BILLBOARD);
+                if(!GHoloData.DEFAULT_BILLBOARD.equalsIgnoreCase(billboard)) data.setBillboard(billboard);
+
+                String backgroundColor = fileContent.getString("holograms." + hologram + ".background", GHoloData.DEFAULT_BACKGROUND_COLOR);
+                if(!GHoloData.DEFAULT_BACKGROUND_COLOR.equalsIgnoreCase(backgroundColor)) data.setBackgroundColor(backgroundColor);
+
+                boolean textShadow = fileContent.getBoolean("holograms." + hologram + ".text_shadow", GHoloData.DEFAULT_TEXT_SHADOW);
+                if(GHoloData.DEFAULT_TEXT_SHADOW != textShadow) data.setTextShadow(textShadow);
+
+                boolean seeThrough = fileContent.getBoolean("holograms." + hologram + ".see_through", GHoloData.DEFAULT_SEE_THROUGH);
+                if(GHoloData.DEFAULT_SEE_THROUGH != seeThrough) data.setSeeThrough(seeThrough);
+
+                GPM.getHoloManager().updateHoloData(holo, data);
+
+                List<String> rows = fileContent.getStringList("holograms." + hologram + ".text");
+                GPM.getHoloManager().setHoloRows(holo, rows);
+
+                imported++;
+            }
         }
 
         return imported;
