@@ -15,8 +15,6 @@
     <properties>
         <maven.compiler.release>21</maven.compiler.release>
         <spigot.version>1.21.1-R0.1-SNAPSHOT</spigot.version>
-        <mcv.version>v1_21_R1</mcv.version>
-        <parentArtifactId>mcv1_20_5</parentArtifactId>
     </properties>
 
     <dependencies>
@@ -29,45 +27,13 @@
         </dependency>
         <dependency>
             <groupId>dev.geco.gholo</groupId>
-            <artifactId>${parentArtifactId}</artifactId>
+            <artifactId>core</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.6.0</version>
-                <configuration>
-                    <minimizeJar>false</minimizeJar>
-                    <createDependencyReducedPom>false</createDependencyReducedPom>
-                    <shadedArtifactAttached>false</shadedArtifactAttached>
-                    <outputDirectory>./target</outputDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <relocations>
-                                <relocation>
-                                    <pattern>${project.groupId}.mcv.x</pattern>
-                                    <shadedPattern>${project.groupId}.mcv.${project.artifactId}</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org/bukkit/craftbukkit/v1_[^/]+/</pattern>
-                                    <shadedPattern>org/bukkit/craftbukkit/${mcv.version}/</shadedPattern>
-                                    <rawString>true</rawString>
-                                </relocation>
-                            </relocations>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>net.md-5</groupId>
                 <artifactId>specialsource-maven-plugin</artifactId>
