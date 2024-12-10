@@ -18,7 +18,6 @@ import dev.geco.gholo.GHoloMain;
 abstract public class MManager {
 
     protected final GHoloMain GPM;
-
     protected final String PREFIX_PLACEHOLDER = "[P]";
     protected final String PREFIX_REPLACE = "&7[&6" + GHoloMain.getInstance().NAME + "&7]";
     protected final char AMPERSAND_CHAR = '&';
