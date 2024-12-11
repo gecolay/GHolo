@@ -9,8 +9,7 @@ import dev.geco.gholo.GHoloMain;
 public class SVManager {
 
     private final GHoloMain GPM;
-
-    private final String LATEST_VERSION = "v1_20_4";
+    private final String LATEST_VERSION = "v1_21_4";
     private final String SERVER_VERSION;
     private String PACKAGE_PATH;
     private boolean AVAILABLE;

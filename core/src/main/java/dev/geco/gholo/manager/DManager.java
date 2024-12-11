@@ -11,10 +11,8 @@ import dev.geco.gholo.GHoloMain;
 public class DManager {
 
     private final GHoloMain GPM;
-
     protected final int MAX_RETRIES = 3;
     protected boolean DEBUG = false;
-
     private Connection connection;
     private String type = null;
     private String host = null;
