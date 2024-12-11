@@ -78,7 +78,7 @@ HoloHelpCommand:
 
   header: "&7----------- [P]&7 ------------"
   help: "&7-&a /holo&6 help"
-  list: "&7-&a /holo&6 list"
+  list: "&7-&a /holo&6 list [<Page>]"
   create: "&7-&a /holo&6 create <Id>"
   info: "&7-&a /holo&6 info <Id>"
   remove: "&7-&a /holo&6 remove <Id>"
