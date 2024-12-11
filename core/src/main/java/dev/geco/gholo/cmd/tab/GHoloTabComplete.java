@@ -48,7 +48,7 @@ public class GHoloTabComplete implements TabCompleter {
                 complete.addAll(GPM.getHoloManager().getHolos().stream().map(GHolo::getId).toList());
             }
 
-            if(Args[0].equalsIgnoreCase("importdata")) {
+            if(Args[0].equalsIgnoreCase("import")) {
                 complete.addAll(GPM.getHoloImportManager().AVAILABLE_PLUGIN_IMPORTS);
             }
 

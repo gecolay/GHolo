@@ -2,11 +2,11 @@ package dev.geco.gholo.cmd;
 
 import java.awt.image.*;
 import java.io.*;
+import java.math.*;
 import java.util.*;
 
 import org.jetbrains.annotations.*;
 
-import org.joml.*;
 
 import org.bukkit.*;
 import org.bukkit.event.player.*;
@@ -23,7 +23,7 @@ public class GHoloCommand implements CommandExecutor {
 
     public GHoloCommand(GHoloMain GPluginMain) { GPM = GPluginMain; }
 
-    public static List<String> COMMAND_LIST = List.of("help", "list", "create", "info", "remove", "rename", "relocate", "tphere", "tpto", "align", "addrow", "insertrow", "setrow", "removerow", "positionrow", "copyrows", "data", "setimage", "importdata");
+    public static List<String> COMMAND_LIST = List.of("help", "list", "create", "info", "remove", "rename", "relocate", "tphere", "tpto", "align", "addrow", "insertrow", "setrow", "removerow", "positionrow", "copyrows", "data", "setimage", "import");
 
     @Override
     public boolean onCommand(@NotNull CommandSender Sender, @NotNull Command Command, @NotNull String Label, String[] Args) {
@@ -50,6 +50,33 @@ public class GHoloCommand implements CommandExecutor {
                 GPM.getMManager().sendMessage(Sender, "HoloHelpCommand.footer");
                 break;
             case "list":
+                List<GHolo> holos = GPM.getHoloManager().getHolos();
+                if(holos.isEmpty()) {
+                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-list-empty");
+                    break;
+                }
+                try {
+                    int pageSize = 10;
+                    int page = Args.length > 1 ? Integer.parseInt(Args[1]) : 1;
+                    int totalHoloCount = holos.size();
+                    int maxPage = (int) Math.ceil((double) totalHoloCount / pageSize);
+                    page = Math.max(Math.min(page, maxPage), 1);
+                    GPM.getMManager().sendMessage(Sender, "HoloListCommand.header", "%Page%", page, "%MaxPage%", maxPage);
+                    int startIndex = (page - 1) * pageSize;
+                    int endIndex = Math.min(startIndex + pageSize, totalHoloCount);
+                    for(int i = startIndex; i < endIndex; i++) {
+                        GHolo listHolo = holos.get(i);
+                        Location holoLocation = listHolo.getRawLocation();
+                        BigDecimal x = BigDecimal.valueOf(holoLocation.getX()).setScale(2, RoundingMode.HALF_UP);
+                        BigDecimal y = BigDecimal.valueOf(holoLocation.getY()).setScale(2, RoundingMode.HALF_UP);
+                        BigDecimal z = BigDecimal.valueOf(holoLocation.getZ()).setScale(2, RoundingMode.HALF_UP);
+                        GPM.getMManager().sendMessage(Sender, "HoloListCommand.holo", "%Holo%", listHolo.getId(), "%X%", x.stripTrailingZeros().toPlainString(), "%Y%", y.stripTrailingZeros().toPlainString(), "%Z%", z.stripTrailingZeros().toPlainString(), "%World%", holoLocation.getWorld().getName());
+                    }
+                    GPM.getMManager().sendMessage(Sender, "HoloListCommand.footer", "%Page%", page, "%MaxPage%", maxPage);
+                } catch (NumberFormatException e) {
+                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-list-page-error", "%Page%", Args[1]);
+                    break;
+                }
                 break;
             case "create":
                 if(!(Sender instanceof Player player)) {
@@ -79,6 +106,11 @@ public class GHoloCommand implements CommandExecutor {
                     break;
                 }
                 GPM.getMManager().sendMessage(Sender, "HoloInfoCommand.header", "%Holo%", holo.getId());
+                Location holoInfoLocation = holo.getRawLocation();
+                BigDecimal x = BigDecimal.valueOf(holoInfoLocation.getX()).setScale(2, RoundingMode.HALF_UP);
+                BigDecimal y = BigDecimal.valueOf(holoInfoLocation.getY()).setScale(2, RoundingMode.HALF_UP);
+                BigDecimal z = BigDecimal.valueOf(holoInfoLocation.getZ()).setScale(2, RoundingMode.HALF_UP);
+                GPM.getMManager().sendMessage(Sender, "HoloInfoCommand.location", "%X%", x.stripTrailingZeros().toPlainString(), "%Y%", y.stripTrailingZeros().toPlainString(), "%Z%", z.stripTrailingZeros().toPlainString(), "%World%", holoInfoLocation.getWorld().getName());
                 int row = 1;
                 for(GHoloRow holoRow : holo.getRows()) {
                     GPM.getMManager().sendMessage(Sender, "HoloInfoCommand.row", "%Row%", row, "%Content%", holoRow.getContent());
@@ -481,7 +513,7 @@ public class GHoloCommand implements CommandExecutor {
                     case "scale":
                         try {
                             if(Args[arg + 1].equalsIgnoreCase("*")) data.setScale(GHoloData.DEFAULT_SCALE);
-                            else data.setScale(new Vector3f(Float.parseFloat(Args[arg + 1]), Float.parseFloat(Args[arg + 1]), Float.parseFloat(Args[arg + 1])));
+                            else data.setScale(new org.joml.Vector3f(Float.parseFloat(Args[arg + 1]), Float.parseFloat(Args[arg + 1]), Float.parseFloat(Args[arg + 1])));
                             updateType = GHoloRowUpdateType.SCALE;
                         } catch (NumberFormatException e) {
                             GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-data-value-error", "%Data%", option, "%Value%", Args[arg + 1]);
@@ -561,22 +593,22 @@ public class GHoloCommand implements CommandExecutor {
                 GPM.getHoloManager().setHoloRows(holo, rows);
                 GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-setimage", "%Holo%", holo.getId(), "%Type%", Args[2].toLowerCase(), "%Source%", Args[3]);
                 break;
-            case "importdata":
+            case "import":
                 if(Args.length == 1) {
-                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-importdata-use-error");
+                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-import-use-error");
                     break;
                 }
                 String plugin = Args[1].toLowerCase();
                 if(!GPM.getHoloImportManager().AVAILABLE_PLUGIN_IMPORTS.contains(plugin)) {
-                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-importdata-exist-error", "%Plugin%", Args[1]);
+                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-import-exist-error", "%Plugin%", Args[1]);
                     break;
                 }
                 int imported = GPM.getHoloImportManager().importFromPlugin(plugin);
                 if(imported < 0) {
-                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-importdata-import-error", "%Plugin%", plugin);
+                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-import-import-error", "%Plugin%", plugin);
                     break;
                 }
-                GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-importdata", "%Plugin%", plugin, "%Imported%", imported);
+                GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-import", "%Plugin%", plugin, "%Imported%", imported);
                 break;
             default:
                 GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-use-error");

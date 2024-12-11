@@ -26,6 +26,8 @@ Messages:
   command-gholo-use-error: "[P]&c /holo help"
   command-gholo-exist-error: "[P]&c Kein Holo mit Id&6 %Holo%&c existiert!"
   command-gholo-row-error: "[P]&c Keine Zeilen mit Nummer&b %Row%&c existiert!"
+  command-gholo-list-page-error: "[P]&c Die Seite&b %Page%&c ist invalide!"
+  command-gholo-list-empty: "[P]&a Es gibt keine Holos."
   command-gholo-create-use-error: "[P]&c /holo create <Id>"
   command-gholo-create-exist-error: "[P]&c Holo mit Id&6 %Holo%&c existiert bereits!"
   command-gholo-create: "[P]&a Holo&6 %Holo%&a wurde erstellt."
@@ -65,10 +67,10 @@ Messages:
   command-gholo-setimage-image-error: "[P]&c Bild vom Typ&6 %Type%&a konnte nicht erstellt werden aus Quelle:&6 %Source%"
   command-gholo-setimage-size-error: "[P]&c Größe ist invalide!"
   command-gholo-setimage: "[P]&a Bild vom Typ&6 %Type%&a für Holo&6 %Holo%&a gesetzt aus Quelle:&6 %Source%"
-  command-gholo-importdata-use-error: "[P]&c /holo importdata <Plugin>"
-  command-gholo-importdata-exist-error: "[P]&c Kein Plugin-Import mit Id&6 %Plugin%&c existiert!"
-  command-gholo-importdata-import-error: "[P]&c Beim Importieren der Daten ist ein Fehler aufgetreten! Weitere Informationen findest du in der Konsole."
-  command-gholo-importdata: "[P]&b %Imported%&a Holos importiert von&6 %Plugin%&a."
+  command-gholo-import-use-error: "[P]&c /holo import <Plugin>"
+  command-gholo-import-exist-error: "[P]&c Kein Plugin-Import mit Id&6 %Plugin%&c existiert!"
+  command-gholo-import-import-error: "[P]&c Beim Importieren der Daten ist ein Fehler aufgetreten! Weitere Informationen findest du in der Konsole."
+  command-gholo-import: "[P]&b %Imported%&a Holos von&6 %Plugin%&a importiert."
 
 
 
@@ -93,7 +95,15 @@ HoloHelpCommand:
   copyrows: "&7-&a /holo&6 copyrows <Id> <KopierenZuId>"
   data: "&7-&a /holo&6 data <Id> <default/row> (<Option> <Wert>)/(<Zeile> <Option> <Wert>)"
   setimage: "&7-&a /holo&6 setimage <Id> <file/url/avatar/helm> <Quelle> [<Breite:Höhe>]"
-  importdata: "&7-&a /holo&6 importdata <Plugin>"
+  import: "&7-&a /holo&6 import <Plugin>"
+  footer: "&7-----------------------------"
+
+
+
+HoloListCommand:
+
+  header: "&7-------- [&aSeite&b %Page%&7 /&b %MaxPage%&7] ---------"
+  holo: "&7-&6 %Holo%&7 (&aX&7:&b %X%&a Y&7:&b %Y%&a Z&7:&b %Z%&a Welt&7:&6 %World%&7)"
   footer: "&7-----------------------------"
 
 
@@ -101,5 +111,6 @@ HoloHelpCommand:
 HoloInfoCommand:
 
   header: "&7----------- [&6%Holo%&7] ------------"
-  row: "&b%Row%&7.&r %Content%"
+  location: "&7- (&aX&7:&b %X%&a Y&7:&b %Y%&a Z&7:&b %Z%&a Welt&7:&6 %World%&7)"
+  row: "&7-&b %Row%&7.&r %Content%"
   footer: "&7-----------------------------"

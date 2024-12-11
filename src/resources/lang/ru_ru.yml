@@ -26,6 +26,8 @@ Messages:
   command-gholo-use-error: "[P]&c /holo help"
   command-gholo-exist-error: "[P]&c Голограммы с именем&6 %Holo%&c не существует!"
   command-gholo-row-error: "[P]&c Ряд с номером&b %Row%&c не сущаствует!"
+  command-gholo-list-page-error: "[P]&c The page&b %Page%&c is invalid!"
+  command-gholo-list-empty: "[P]&a There are no holos."
   command-gholo-create-use-error: "[P]&c /holo create <Имя>"
   command-gholo-create-exist-error: "[P]&c Голограмма с именем&6 %Holo%&c уже существует!"
   command-gholo-create: "[P]&a Голограмма&6 %Holo%&a создана."
@@ -65,10 +67,10 @@ Messages:
   command-gholo-setimage-image-error: "[P]&c Не удалость создать изображение типа&6 %Type%&a из ресурса:&6 %Source%"
   command-gholo-setimage-size-error: "[P]&c Неверный размер!"
   command-gholo-setimage: "[P]&a Установить изображение тирп&6 %Type%&a для голограммы&6 %Holo%&a из ресурса:&6 %Source%"
-  command-gholo-importdata-use-error: "[P]&c /holo importdata <Плагин>"
-  command-gholo-importdata-exist-error: "[P]&c Импорт из выбранного плагина&6 %Plugin%&c недоступен!"
-  command-gholo-importdata-import-error: "[P]&c При импорте произошла ошибка, проверьте консоль!"
-  command-gholo-importdata: "[P]&a Импортировано&b %Imported%&a голограмм из&6 %Plugin%&a."
+  command-gholo-import-use-error: "[P]&c /holo import <Плагин>"
+  command-gholo-import-exist-error: "[P]&c Импорт из выбранного плагина&6 %Plugin%&c недоступен!"
+  command-gholo-import-import-error: "[P]&c При импорте произошла ошибка, проверьте консоль!"
+  command-gholo-import: "[P]&a Импортировано&b %Imported%&a голограмм из&6 %Plugin%&a."
 
 
 
@@ -93,7 +95,15 @@ HoloHelpCommand:
   copyrows: "&7-&a /holo&6 copyrows <Имя> <ИмяДляКопирования>"
   data: "&7-&a /holo&6 data <Имя> <default/row> (<Опция> <Значение>)/(<Ряд> <Опция> <Значение>)"
   setimage: "&7-&a /holo&6 setimage <Имя> <file/url/avatar/helm> <Источник> [<Ширина:Высота>]"
-  importdata: "&7-&a /holo&6 importdata <Плагин>"
+  import: "&7-&a /holo&6 import <Плагин>"
+  footer: "&7-----------------------------"
+
+
+
+HoloListCommand:
+
+  header: "&7-------- [&6Page&b %Page%&7 /&b %MaxPage%&7] ---------"
+  holo: "&7-&6 %Holo%&7 (&aX&7:&b %X%&a Y&7:&b %Y%&a Z&7:&b %Z%&a World&7:&6 %World%&7)"
   footer: "&7-----------------------------"
 
 
@@ -101,5 +111,6 @@ HoloHelpCommand:
 HoloInfoCommand:
 
   header: "&7----------- [&6%Holo%&7] ------------"
-  row: "&b%Row%&7.&r %Content%"
+  location: "&7- (&aX&7:&b %X%&a Y&7:&b %Y%&a Z&7:&b %Z%&a World&7:&6 %World%&7)"
+  row: "&7-&b %Row%&7.&r %Content%"
   footer: "&7-----------------------------"
