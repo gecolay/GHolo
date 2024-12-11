@@ -7,7 +7,7 @@
     <groupId>dev.geco.gholo</groupId>
     <artifactId>GHolo</artifactId>
     <name>GHolo</name>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <description>Create modern &amp; lightweight holograms!</description>
     <url>https://www.spigotmc.org/resources/121144</url>
     <inceptionYear>2024</inceptionYear>
