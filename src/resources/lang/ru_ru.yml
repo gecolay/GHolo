@@ -1,5 +1,5 @@
 #
-# Language-File created by:		Антон
+# Language-File created by:		SPY_me
 #
 
 
@@ -25,9 +25,9 @@ Messages:
 
   command-gholo-use-error: "[P]&c /holo help"
   command-gholo-exist-error: "[P]&c Голограммы с именем&6 %Holo%&c не существует!"
-  command-gholo-row-error: "[P]&c Ряд с номером&b %Row%&c не сущаствует!"
-  command-gholo-list-page-error: "[P]&c The page&b %Page%&c is invalid!"
-  command-gholo-list-empty: "[P]&a There are no holos."
+  command-gholo-row-error: "[P]&c Ряд с номером&b %Row%&c не существует!"
+  command-gholo-list-page-error: "[P]&c Страница&b %Page%&c указана неверно!"
+  command-gholo-list-empty: "[P]&a Голограмм нет."
   command-gholo-create-use-error: "[P]&c /holo create <Имя>"
   command-gholo-create-exist-error: "[P]&c Голограмма с именем&6 %Holo%&c уже существует!"
   command-gholo-create: "[P]&a Голограмма&6 %Holo%&a создана."
@@ -78,7 +78,7 @@ HoloHelpCommand:
 
   header: "&7----------- [P]&7 ------------"
   help: "&7-&a /holo&6 help"
-  list: "&7-&a /holo&6 list [<Page>]"
+  list: "&7-&a /holo&6 list [<Страница>]"
   create: "&7-&a /holo&6 create <Имя>"
   info: "&7-&a /holo&6 info <Имя>"
   remove: "&7-&a /holo&6 remove <Имя>"
@@ -86,7 +86,7 @@ HoloHelpCommand:
   relocate: "&7-&a /holo&6 relocate <Имя> <X> <Y> <Z>"
   tphere: "&7-&a /holo&6 tphere <Имя>"
   tpto: "&7-&a /holo&6 tpto <Имя>"
-  align: "&7-&a /holo&6 align <Имя> <AlignOnId> <x/y/z/xy/xz/yz/xyz>"
+  align: "&7-&a /holo&6 align <Имя> <ВыровнятьПо> <x/y/z/xy/xz/yz/xyz>"
   addrow: "&7-&a /holo&6 addrow <Имя> [<Контент>]"
   insertrow: "&7-&a /holo&6 insertrow <Имя> <Ряд> [<Контент>]"
   setrow: "&7-&a /holo&6 setrow <Имя> <Ряд> [<Контент>]"
@@ -103,7 +103,7 @@ HoloHelpCommand:
 HoloListCommand:
 
   header: "&7-------- [&6Page&b %Page%&7 /&b %MaxPage%&7] ---------"
-  holo: "&7-&6 %Holo%&7 (&aX&7:&b %X%&a Y&7:&b %Y%&a Z&7:&b %Z%&a World&7:&6 %World%&7)"
+  holo: "&7-&6 %Holo%&7 (&aX&7:&b %X%&a Y&7:&b %Y%&a Z&7:&b %Z%&a Мир&7:&6 %World%&7)"
   footer: "&7-----------------------------"
 
 
@@ -111,6 +111,6 @@ HoloListCommand:
 HoloInfoCommand:
 
   header: "&7----------- [&6%Holo%&7] ------------"
-  location: "&7- (&aX&7:&b %X%&a Y&7:&b %Y%&a Z&7:&b %Z%&a World&7:&6 %World%&7)"
+  location: "&7- (&aX&7:&b %X%&a Y&7:&b %Y%&a Z&7:&b %Z%&a Мир&7:&6 %World%&7)"
   row: "&7-&b %Row%&7.&r %Content%"
   footer: "&7-----------------------------"
