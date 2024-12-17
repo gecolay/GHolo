@@ -39,7 +39,7 @@ public class GHoloData implements Cloneable {
         if(scale != null) stringMap.put("scale", scale.x + "," + scale.y + "," + scale.z);
         if(brightness != null) stringMap.put("brightness", brightness);
         StringBuilder dataString = new StringBuilder();
-        for (HashMap.Entry<String, Object> entry : stringMap.entrySet()) {
+        for(HashMap.Entry<String, Object> entry : stringMap.entrySet()) {
             if(!dataString.isEmpty()) dataString.append("§§");
             dataString.append(entry.getKey()).append("§").append(entry.getValue());
         }

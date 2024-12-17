@@ -420,7 +420,7 @@ public class GHoloCommand implements CommandExecutor {
                     case "row":
                         try {
                             holoRow = holo.getRow(Integer.parseInt(Args[3]) - 1);
-                            if (holoRow == null) {
+                            if(holoRow == null) {
                                 GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-row-error", "%Row%", Args[3]);
                                 return true;
                             }
