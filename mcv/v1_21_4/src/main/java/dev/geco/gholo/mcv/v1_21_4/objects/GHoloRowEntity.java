@@ -6,9 +6,9 @@ import java.util.*;
 import org.joml.*;
 
 import org.bukkit.*;
-import org.bukkit.craftbukkit.v1_21_R3.*;
-import org.bukkit.craftbukkit.v1_21_R3.entity.*;
-import org.bukkit.craftbukkit.v1_21_R3.util.*;
+import org.bukkit.craftbukkit.*;
+import org.bukkit.craftbukkit.entity.*;
+import org.bukkit.craftbukkit.util.*;
 import org.bukkit.entity.Player;
 
 import net.minecraft.network.chat.*;
