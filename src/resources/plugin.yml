@@ -1,9 +1,9 @@
-name: ${project.parent.name}
-version: ${project.parent.version}
-description: ${project.description}
+name: ${name}
+version: ${version}
+description: ${description}
 authors: [Gecolay]
 website: https://www.spigotmc.org/resources/121144
-main: ${project.parent.groupId}.${project.parent.artifactId}Main
+main: ${main}
 api-version: 1.19
 folia-supported: true
 softdepend: [PlaceholderAPI]

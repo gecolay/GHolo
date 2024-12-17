@@ -1,5 +1,7 @@
 package dev.geco.gholo;
 
+import java.util.*;
+
 import org.bukkit.*;
 import org.bukkit.command.*;
 import org.bukkit.plugin.*;
@@ -16,77 +18,57 @@ import dev.geco.gholo.util.*;
 
 public class GHoloMain extends JavaPlugin {
 
-    private SVManager svManager;
-    public SVManager getSVManager() { return svManager; }
-
-    private CManager cManager;
-    public CManager getCManager() { return cManager; }
-
-    private DManager dManager;
-    public DManager getDManager() { return dManager; }
-
-    private HoloManager holoManager;
-    public HoloManager getHoloManager() { return holoManager; }
-
-    private HoloAnimationManager holoAnimationManager;
-    public HoloAnimationManager getHoloAnimationManager() { return holoAnimationManager; }
-
-    private HoloImportManager holoImportManager;
-    public HoloImportManager getHoloImportManager() { return holoImportManager; }
-
-    private UManager uManager;
-    public UManager getUManager() { return uManager; }
-
-    private PManager pManager;
-    public PManager getPManager() { return pManager; }
-
-    private TManager tManager;
-    public TManager getTManager() { return tManager; }
-
-    private MManager mManager;
-    public MManager getMManager() { return mManager; }
-
-    private FormatUtil formatUtil;
-    public FormatUtil getFormatUtil() { return formatUtil; }
-
-    private IEntityUtil entityUtil;
-    public IEntityUtil getEntityUtil() { return entityUtil; }
-
-    private boolean placeholderAPILink;
-    public boolean hasPlaceholderAPILink() { return placeholderAPILink; }
-
-    private boolean supportsPaperFeature = false;
-    public boolean supportsPaperFeature() { return supportsPaperFeature; }
-
-    private boolean supportsTaskFeature = false;
-    public boolean supportsTaskFeature() { return supportsTaskFeature; }
-
-    public final String NAME = "GHolo";
-
-    public final String RESOURCE = "121144";
+    public static final String NAME = "GHolo";
+    public static final String RESOURCE = "121144";
 
     private static GHoloMain GPM;
+    private CManager cManager;
+    private MManager mManager;
+    private UManager uManager;
+    private PManager pManager;
+    private TManager tManager;
+    private DManager dManager;
+    private SVManager svManager;
+    private HoloManager holoManager;
+    private HoloAnimationManager holoAnimationManager;
+    private HoloImportManager holoImportManager;
+    private FormatUtil formatUtil;
+    private IEntityUtil entityUtil;
+    private boolean placeholderAPILink;
+    private boolean supportsPaperFeature = false;
+    private boolean supportsTaskFeature = false;
 
     public static GHoloMain getInstance() { return GPM; }
 
-    private void loadSettings(CommandSender Sender) {
+    public CManager getCManager() { return cManager; }
 
-        if(!connectDatabase(Sender)) return;
+    public MManager getMManager() { return mManager; }
 
-        getHoloAnimationManager().loadHoloAnimations();
-        getHoloManager().createTables();
-        getHoloManager().loadHolos();
-        ImageUtil.generateFolder();
-    }
+    public UManager getUManager() { return uManager; }
 
-    private void linkBStats() {
+    public PManager getPManager() { return pManager; }
 
-        BStatsLink bstats = new BStatsLink(getInstance(), 24075);
+    public TManager getTManager() { return tManager; }
 
-        bstats.addCustomChart(new BStatsLink.SimplePie("plugin_language", () -> getCManager().L_LANG));
-        bstats.addCustomChart(new BStatsLink.SingleLineChart("holo_count", () -> getHoloManager().getHoloCount()));
-        bstats.addCustomChart(new BStatsLink.SingleLineChart("holo_row_count", () -> getHoloManager().getHoloRowCount()));
-    }
+    public DManager getDManager() { return dManager; }
+
+    public SVManager getSVManager() { return svManager; }
+
+    public HoloManager getHoloManager() { return holoManager; }
+
+    public HoloAnimationManager getHoloAnimationManager() { return holoAnimationManager; }
+
+    public HoloImportManager getHoloImportManager() { return holoImportManager; }
+
+    public FormatUtil getFormatUtil() { return formatUtil; }
+
+    public IEntityUtil getEntityUtil() { return entityUtil; }
+
+    public boolean hasPlaceholderAPILink() { return placeholderAPILink; }
+
+    public boolean supportsPaperFeature() { return supportsPaperFeature; }
+
+    public boolean supportsTaskFeature() { return supportsTaskFeature; }
 
     public void onLoad() {
 
@@ -136,6 +118,30 @@ public class GHoloMain extends JavaPlugin {
         getMManager().sendMessage(Bukkit.getConsoleSender(), "Plugin.plugin-disabled");
     }
 
+    private void loadSettings(CommandSender Sender) {
+
+        if(!connectDatabase(Sender)) return;
+
+        getHoloAnimationManager().loadHoloAnimations();
+        getHoloManager().createTables();
+        getHoloManager().loadHolos();
+        ImageUtil.generateFolder();
+    }
+
+    public void reload(CommandSender Sender) {
+        GHoloReloadEvent reloadEvent = new GHoloReloadEvent(getInstance());
+        Bukkit.getPluginManager().callEvent(reloadEvent);
+        if(reloadEvent.isCancelled()) return;
+        unload();
+        getCManager().reload();
+        getMManager().loadMessages();
+        loadPluginDependencies();
+        loadSettings(Sender);
+        printPluginLinks(Sender);
+        getUManager().checkForUpdates();
+        Bukkit.getPluginManager().callEvent(new GHoloLoadedEvent(getInstance()));
+    }
+
     private void unload() {
 
         getDManager().close();
@@ -156,6 +162,22 @@ public class GHoloMain extends JavaPlugin {
     private void setupEvents() {
 
         getServer().getPluginManager().registerEvents(new PlayerEvents(getInstance()), getInstance());
+    }
+
+    private boolean versionCheck() {
+        if(getSVManager().isNewerOrVersion(19, 4) && getSVManager().isAvailable()) return true;
+        getMManager().sendMessage(Bukkit.getConsoleSender(), "Plugin.plugin-version", "%Version%", getSVManager().getServerVersion());
+        getUManager().checkForUpdates();
+        Bukkit.getPluginManager().disablePlugin(getInstance());
+        return false;
+    }
+
+    private boolean connectDatabase(CommandSender Sender) {
+        boolean connect = getDManager().connect();
+        if(connect) return true;
+        getMManager().sendMessage(Sender, "Plugin.plugin-data");
+        Bukkit.getPluginManager().disablePlugin(getInstance());
+        return false;
     }
 
     private void loadFeatures() {
@@ -180,34 +202,14 @@ public class GHoloMain extends JavaPlugin {
         if(placeholderAPILink) getMManager().sendMessage(Sender, "Plugin.plugin-link", "%Link%", Bukkit.getPluginManager().getPlugin("PlaceholderAPI").getName());
     }
 
-    public void reload(CommandSender Sender) {
-        GHoloReloadEvent reloadEvent = new GHoloReloadEvent(getInstance());
-        Bukkit.getPluginManager().callEvent(reloadEvent);
-        if(reloadEvent.isCancelled()) return;
-        unload();
-        getCManager().reload();
-        getMManager().loadMessages();
-        loadPluginDependencies();
-        loadSettings(Sender);
-        printPluginLinks(Sender);
-        getUManager().checkForUpdates();
-        Bukkit.getPluginManager().callEvent(new GHoloLoadedEvent(getInstance()));
-    }
+    private void linkBStats() {
 
-    private boolean connectDatabase(CommandSender Sender) {
-        boolean connect = getDManager().connect();
-        if(connect) return true;
-        getMManager().sendMessage(Sender, "Plugin.plugin-data");
-        Bukkit.getPluginManager().disablePlugin(getInstance());
-        return false;
-    }
+        BStatsLink bstats = new BStatsLink(getInstance(), 24075);
 
-    private boolean versionCheck() {
-        if(getSVManager().isNewerOrVersion(19, 4) && getSVManager().isAvailable()) return true;
-        getMManager().sendMessage(Bukkit.getConsoleSender(), "Plugin.plugin-version", "%Version%", getSVManager().getServerVersion());
-        getUManager().checkForUpdates();
-        Bukkit.getPluginManager().disablePlugin(getInstance());
-        return false;
+        bstats.addCustomChart(new BStatsLink.SimplePie("plugin_language", () -> getCManager().L_LANG));
+        bstats.addCustomChart(new BStatsLink.AdvancedPie("minecraft_version_player", () -> Map.of(GPM.getSVManager().getServerVersion(), Bukkit.getOnlinePlayers().size())));
+        bstats.addCustomChart(new BStatsLink.SingleLineChart("holo_count", () -> getHoloManager().getHoloCount()));
+        bstats.addCustomChart(new BStatsLink.SingleLineChart("holo_row_count", () -> getHoloManager().getHoloRowCount()));
     }
 
 }

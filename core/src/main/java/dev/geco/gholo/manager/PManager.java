@@ -17,11 +17,11 @@ public class PManager {
 
         for(String permission : Permissions) {
 
-            if(Permissible.isPermissionSet(GPM.NAME + "." + permission)) return Permissible.hasPermission(GPM.NAME + "." + permission);
-            if(Permissible.hasPermission(GPM.NAME + "." + permission)) return true;
+            if(Permissible.isPermissionSet(GHoloMain.NAME + "." + permission)) return Permissible.hasPermission(GHoloMain.NAME + "." + permission);
+            if(Permissible.hasPermission(GHoloMain.NAME + "." + permission)) return true;
         }
 
-        return Permissible.hasPermission(GPM.NAME + ".*");
+        return Permissible.hasPermission(GHoloMain.NAME + ".*");
     }
 
 }
