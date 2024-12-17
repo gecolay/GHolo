@@ -207,7 +207,7 @@ public class GHoloMain extends JavaPlugin {
         BStatsLink bstats = new BStatsLink(getInstance(), 24075);
 
         bstats.addCustomChart(new BStatsLink.SimplePie("plugin_language", () -> getCManager().L_LANG));
-        bstats.addCustomChart(new BStatsLink.AdvancedPie("minecraft_version_player", () -> Map.of(GPM.getSVManager().getServerVersion(), Bukkit.getOnlinePlayers().size())));
+        bstats.addCustomChart(new BStatsLink.AdvancedPie("minecraft_version_player_amount", () -> Map.of(GPM.getSVManager().getServerVersion(), Bukkit.getOnlinePlayers().size())));
         bstats.addCustomChart(new BStatsLink.SingleLineChart("holo_count", () -> getHoloManager().getHoloCount()));
         bstats.addCustomChart(new BStatsLink.SingleLineChart("holo_row_count", () -> getHoloManager().getHoloRowCount()));
     }
