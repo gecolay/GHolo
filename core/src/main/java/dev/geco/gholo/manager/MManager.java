@@ -66,6 +66,8 @@ abstract public class MManager {
 
     abstract public void sendMessage(@NotNull CommandSender Target, String Message, Object... ReplaceList);
 
+    public @NotNull Object toFormattedComponent(String Text, Object... RawReplaceList) { return new Object(); }
+
     public String getMessage(String Message, Object... ReplaceList) { return getMessage(Message, null, ReplaceList); }
 
     public String getMessage(String Message, Entity Entity, Object... ReplaceList) { return getMessageByLanguage(Message, getLanguage(Entity), ReplaceList); }

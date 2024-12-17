@@ -59,9 +59,9 @@ public class MPaperManager extends MManager {
         Target.sendMessage(message);
     }
 
-    private @NotNull Component getLanguageComponent(String Message, String LanguageCode, Object... ReplaceList) { return toFormattedComponent(getRawMessageByLanguage(Message, LanguageCode, ReplaceList)); }
+    private @NotNull Component getLanguageComponent(String Message, String LanguageCode, Object... ReplaceList) { return (Component) toFormattedComponent(getRawMessageByLanguage(Message, LanguageCode, ReplaceList)); }
 
-    private @NotNull Component toFormattedComponent(String Text, Object... RawReplaceList) { return miniMessage.deserialize(replaceLegacyColors(replaceText(Text, RawReplaceList))); }
+    public @NotNull Object toFormattedComponent(String Text, Object... RawReplaceList) { return miniMessage.deserialize(replaceLegacyColors(replaceText(Text, RawReplaceList))); }
 
     private String replaceLegacyColors(String Text) {
         Matcher matcher = HEX_PATTERN.matcher(Text);

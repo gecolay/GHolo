@@ -11,6 +11,8 @@ import org.bukkit.craftbukkit.v1_20_R3.entity.*;
 import org.bukkit.craftbukkit.v1_20_R3.util.*;
 import org.bukkit.entity.Player;
 
+import io.papermc.paper.adventure.*;
+
 import net.minecraft.network.chat.*;
 import net.minecraft.network.protocol.game.*;
 import net.minecraft.network.syncher.*;
@@ -173,8 +175,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
 
     private ClientboundSetEntityDataPacket getDataPacket(Player Player) {
         String content = holoRow.getContent();
-        content = GPM.getFormatUtil().formatPlaceholders(content, Player);
-        Component contentComponent = CraftChatMessage.fromString(content, false, true)[0];
+        Component contentComponent = GPM.supportsPaperFeature() ? PaperAdventure.asVanilla((net.kyori.adventure.text.Component) GPM.getFormatUtil().formatPlaceholdersComponent(content, Player)) : CraftChatMessage.fromString(GPM.getFormatUtil().formatPlaceholders(content, Player), false, true)[0];
         List<SynchedEntityData.DataValue<?>> data = getEntityData().getNonDefaultValues();
         if(data == null) data = new ArrayList<>();
         else data.removeIf(dataValue -> dataValue.id() == HOLO_TEXT_DATA.getId());
