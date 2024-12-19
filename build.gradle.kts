@@ -25,6 +25,11 @@ allprojects {
     }
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
 dependencies {
     api(project(":core"))
     api(project(":v1_19_4"))
@@ -48,10 +53,6 @@ tasks {
 
     build {
         dependsOn(shadowJar)
-    }
-
-    compileJava {
-        options.release = 17
     }
 
     processResources {
