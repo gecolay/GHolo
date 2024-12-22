@@ -63,8 +63,8 @@ public class HoloAnimationManager {
         }
         if(!GPM.getCManager().L_PLACEHOLDER_API || !GPM.hasPlaceholderAPILink()) return;
         UUID placeholderAPITaskId = GPM.getTManager().runAtFixedRate(() -> {
-            for(GHoloRow holoRow : placeholderAPISubscriber) {
-                holoRow.getHoloRowEntity().publishUpdate(GHoloRowUpdateType.CONTENT);
+            for(Iterator<GHoloRow> it = placeholderAPISubscriber.iterator(); it.hasNext(); ) {
+                it.next().getHoloRowEntity().publishUpdate(GHoloRowUpdateType.CONTENT);
             }
         }, false, 0, 10);
         taskIds.add(placeholderAPITaskId);
