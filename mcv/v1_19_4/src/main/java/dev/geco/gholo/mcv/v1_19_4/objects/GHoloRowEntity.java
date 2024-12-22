@@ -75,6 +75,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     @Override
     public void loadHoloRow(Player Player) {
         ServerPlayer serverPlayer = ((CraftPlayer) Player).getHandle();
+        if(!serverPlayer.level.equals(level)) return;
         serverPlayer.connection.send(new ClientboundAddEntityPacket(getId(), getUUID(), getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYHeadRot()));
         serverPlayer.connection.send(getDataPacket(Player));
     }
