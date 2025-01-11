@@ -26,8 +26,10 @@ Messages:
   command-gholo-use-error: "[P]&c /holo help"
   command-gholo-exist-error: "[P]&c Голограммы с именем&6 %Holo%&c не существует!"
   command-gholo-row-error: "[P]&c Ряд с номером&b %Row%&c не существует!"
+  command-gholo-none: "[P]&a Голограмм нет."
   command-gholo-list-page-error: "[P]&c Страница&b %Page%&c указана неверно!"
-  command-gholo-list-empty: "[P]&a Голограмм нет."
+  command-gholo-near-range-error: "[P]&c Диапазон&b %Range%&c неверен!"
+  command-gholo-near-none: "[P]&c Голограмм поблизости нет."
   command-gholo-create-use-error: "[P]&c /holo create <Имя>"
   command-gholo-create-exist-error: "[P]&c Голограмма с именем&6 %Holo%&c уже существует!"
   command-gholo-create: "[P]&a Голограмма&6 %Holo%&a создана."
@@ -79,6 +81,7 @@ HoloHelpCommand:
   header: "&7----------- [P]&7 ------------"
   help: "&7-&a /holo&6 help"
   list: "&7-&a /holo&6 list [<Страница>]"
+  near: "&7-&a /holo&6 near [<достигать>]"
   create: "&7-&a /holo&6 create <Имя>"
   info: "&7-&a /holo&6 info <Имя>"
   remove: "&7-&a /holo&6 remove <Имя>"
@@ -102,7 +105,15 @@ HoloHelpCommand:
 
 HoloListCommand:
 
-  header: "&7-------- [&6Page&b %Page%&7 /&b %MaxPage%&7] ---------"
+  header: "&7-------- [&6Страница&b %Page%&7 /&b %MaxPage%&7] ---------"
+  holo: "&7-&6 %Holo%&7 (&aX&7:&b %X%&a Y&7:&b %Y%&a Z&7:&b %Z%&a Мир&7:&6 %World%&7)"
+  footer: "&7-----------------------------"
+
+
+
+HoloNearCommand:
+
+  header: "&7-------- [&6Голограммы в пределах досягаемости&b %Range%&7] ---------"
   holo: "&7-&6 %Holo%&7 (&aX&7:&b %X%&a Y&7:&b %Y%&a Z&7:&b %Z%&a Мир&7:&6 %World%&7)"
   footer: "&7-----------------------------"
 

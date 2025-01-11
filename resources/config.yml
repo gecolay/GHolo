@@ -16,6 +16,12 @@ Options:
   # Defines the default size between the top parts of rows
   default-size-between-rows: 0.26
 
+  # Defines the size of a single page of the list subcommand
+  list-page-size: 10
+
+  # Defines the range of the near subcommand
+  near-range: 20
+
   # Defines a list of Unicode symbols to be converted within holo rows
   Symbols:
 

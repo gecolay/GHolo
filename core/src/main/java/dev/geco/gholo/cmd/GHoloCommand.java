@@ -23,7 +23,7 @@ public class GHoloCommand implements CommandExecutor {
 
     public GHoloCommand(GHoloMain GPluginMain) { GPM = GPluginMain; }
 
-    public static List<String> COMMAND_LIST = List.of("help", "list", "create", "info", "remove", "rename", "relocate", "tphere", "tpto", "align", "addrow", "insertrow", "setrow", "removerow", "positionrow", "copyrows", "data", "setimage", "import");
+    public static List<String> COMMAND_LIST = List.of("help", "list", "near", "create", "info", "remove", "rename", "relocate", "tphere", "tpto", "align", "addrow", "insertrow", "setrow", "removerow", "positionrow", "copyrows", "data", "setimage", "import");
 
     @Override
     public boolean onCommand(@NotNull CommandSender Sender, @NotNull Command Command, @NotNull String Label, String[] Args) {
@@ -50,22 +50,22 @@ public class GHoloCommand implements CommandExecutor {
                 GPM.getMManager().sendMessage(Sender, "HoloHelpCommand.footer");
                 break;
             case "list":
-                List<GHolo> holos = GPM.getHoloManager().getHolos();
-                if(holos.isEmpty()) {
-                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-list-empty");
+                List<GHolo> holoList = GPM.getHoloManager().getHolos();
+                if(holoList.isEmpty()) {
+                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-none");
                     break;
                 }
                 try {
-                    int pageSize = 10;
+                    int pageSize = GPM.getCManager().LIST_PAGE_SIZE;
                     int page = Args.length > 1 ? Integer.parseInt(Args[1]) : 1;
-                    int totalHoloCount = holos.size();
+                    int totalHoloCount = holoList.size();
                     int maxPage = (int) Math.ceil((double) totalHoloCount / pageSize);
                     page = Math.max(Math.min(page, maxPage), 1);
                     GPM.getMManager().sendMessage(Sender, "HoloListCommand.header", "%Page%", page, "%MaxPage%", maxPage);
                     int startIndex = (page - 1) * pageSize;
                     int endIndex = Math.min(startIndex + pageSize, totalHoloCount);
                     for(int i = startIndex; i < endIndex; i++) {
-                        GHolo listHolo = holos.get(i);
+                        GHolo listHolo = holoList.get(i);
                         Location holoLocation = listHolo.getRawLocation();
                         BigDecimal x = BigDecimal.valueOf(holoLocation.getX()).setScale(2, RoundingMode.HALF_UP);
                         BigDecimal y = BigDecimal.valueOf(holoLocation.getY()).setScale(2, RoundingMode.HALF_UP);
@@ -75,6 +75,37 @@ public class GHoloCommand implements CommandExecutor {
                     GPM.getMManager().sendMessage(Sender, "HoloListCommand.footer", "%Page%", page, "%MaxPage%", maxPage);
                 } catch (NumberFormatException e) {
                     GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-list-page-error", "%Page%", Args[1]);
+                    break;
+                }
+                break;
+            case "near":
+                if(!(Sender instanceof Player player)) {
+                    GPM.getMManager().sendMessage(Sender, "Messages.command-sender-error");
+                    break;
+                }
+                List<GHolo> allHoloList = GPM.getHoloManager().getHolos();
+                if(allHoloList.isEmpty()) {
+                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-none");
+                    break;
+                }
+                try {
+                    double range = Args.length > 1 ? Double.parseDouble(Args[1]) : GPM.getCManager().NEAR_RANGE;
+                    List<GHolo> nearHoloList = GPM.getHoloManager().getNearHolos(player.getLocation(), range);
+                    if(nearHoloList.isEmpty()) {
+                        GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-near-none");
+                        break;
+                    }
+                    GPM.getMManager().sendMessage(Sender, "HoloNearCommand.header", "%Range%", range);
+                    for(GHolo nearHolo : nearHoloList) {
+                        Location holoLocation = nearHolo.getRawLocation();
+                        BigDecimal x = BigDecimal.valueOf(holoLocation.getX()).setScale(2, RoundingMode.HALF_UP);
+                        BigDecimal y = BigDecimal.valueOf(holoLocation.getY()).setScale(2, RoundingMode.HALF_UP);
+                        BigDecimal z = BigDecimal.valueOf(holoLocation.getZ()).setScale(2, RoundingMode.HALF_UP);
+                        GPM.getMManager().sendMessage(Sender, "HoloNearCommand.holo", "%Holo%", nearHolo.getId(), "%X%", x.stripTrailingZeros().toPlainString(), "%Y%", y.stripTrailingZeros().toPlainString(), "%Z%", z.stripTrailingZeros().toPlainString(), "%World%", holoLocation.getWorld().getName());
+                    }
+                    GPM.getMManager().sendMessage(Sender, "HoloNearCommand.footer", "%Range%", range);
+                } catch (NumberFormatException e) {
+                    GPM.getMManager().sendMessage(Sender, "Messages.command-gholo-near-range-error", "%Range%", Args[1]);
                     break;
                 }
                 break;

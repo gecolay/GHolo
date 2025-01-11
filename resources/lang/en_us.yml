@@ -26,8 +26,10 @@ Messages:
   command-gholo-use-error: "[P]&c /holo help"
   command-gholo-exist-error: "[P]&c No holo with id&6 %Holo%&c exist!"
   command-gholo-row-error: "[P]&c No row with number&b %Row%&c exist!"
+  command-gholo-none: "[P]&a There are no holos."
   command-gholo-list-page-error: "[P]&c The page&b %Page%&c is invalid!"
-  command-gholo-list-empty: "[P]&a There are no holos."
+  command-gholo-near-range-error: "[P]&c The range&b %Range%&c is invalid!"
+  command-gholo-near-none: "[P]&a There are no holos nearby."
   command-gholo-create-use-error: "[P]&c /holo create <Id>"
   command-gholo-create-exist-error: "[P]&c Holo with id&6 %Holo%&c already exist!"
   command-gholo-create: "[P]&a Holo&6 %Holo%&a was created."
@@ -79,6 +81,7 @@ HoloHelpCommand:
   header: "&7----------- [P]&7 ------------"
   help: "&7-&a /holo&6 help"
   list: "&7-&a /holo&6 list [<Page>]"
+  near: "&7-&a /holo&6 near [<Range>]"
   create: "&7-&a /holo&6 create <Id>"
   info: "&7-&a /holo&6 info <Id>"
   remove: "&7-&a /holo&6 remove <Id>"
@@ -103,6 +106,14 @@ HoloHelpCommand:
 HoloListCommand:
 
   header: "&7-------- [&6Page&b %Page%&7 /&b %MaxPage%&7] ---------"
+  holo: "&7-&6 %Holo%&7 (&aX&7:&b %X%&a Y&7:&b %Y%&a Z&7:&b %Z%&a World&7:&6 %World%&7)"
+  footer: "&7-----------------------------"
+
+
+
+HoloNearCommand:
+
+  header: "&7-------- [&6Holos in range&b %Range%&7] ---------"
   holo: "&7-&6 %Holo%&7 (&aX&7:&b %X%&a Y&7:&b %Y%&a Z&7:&b %Z%&a World&7:&6 %World%&7)"
   footer: "&7-----------------------------"
 

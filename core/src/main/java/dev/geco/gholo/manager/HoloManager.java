@@ -25,6 +25,8 @@ public class HoloManager {
 
     public List<GHolo> getHolos() { return new ArrayList<>(holos); }
 
+    public List<GHolo> getNearHolos(Location Location, double Range) { return holos.stream().filter(holo -> holo.getRawLocation().getWorld().equals(Location.getWorld()) && holo.getRawLocation().distance(Location) <= Range).toList(); }
+
     public GHolo getHolo(String Id) { return holos.stream().filter(holo -> holo.getId().equalsIgnoreCase(Id)).findFirst().orElse(null); }
 
     public int getHoloCount() { return holos.size(); }
