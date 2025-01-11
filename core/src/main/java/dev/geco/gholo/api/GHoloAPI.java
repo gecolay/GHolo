@@ -31,6 +31,18 @@ public class GHoloAPI {
     }
 
     /**
+     * Returns all nearby holos
+     * @author Gecolay
+     * @since 1.1.1
+     * @param Location Location
+     * @param Range Range
+     * @return Holos
+     */
+    public static List<GHolo> getNearHolos(Location Location, double Range) {
+        return getInstance().getHoloManager().getNearHolos(Location, Range);
+    }
+
+    /**
      * Checks if a holo is present
      * @author Gecolay
      * @since 1.0.0
