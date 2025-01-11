@@ -17,7 +17,7 @@ Options:
   # Defines the size of a single page of the list subcommand
   list-page-size: 10
 
-  # Defines the range of the near subcommand
+  # Defines the default range of the near subcommand
   near-range: 20
 
   # Defines a list of Unicode symbols to be converted within holo rows
