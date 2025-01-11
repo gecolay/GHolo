@@ -55,7 +55,7 @@ tasks {
     }
 
     processResources {
-        from("src/resources")
+        from("resources")
         expand(
             "name" to project.name,
             "version" to project.version,
