@@ -23,8 +23,6 @@ commands:
     description: Plugin reload command
     permission: GHolo.Reload
 
-
-
 permissions:
 
   GHolo.*:

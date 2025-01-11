@@ -2,8 +2,6 @@
 # Language-File created by:		Gecolay
 #
 
-
-
 Plugin:
 
   plugin-enabled: "[P]&a The plugin was successfully enabled."
@@ -14,8 +12,6 @@ Plugin:
   plugin-reload: "[P]&a The plugin was successfully reloaded."
   plugin-disabled: "[P]&a The plugin was successfully disabled."
   plugin-prefix: "&7[&6GHolo&7]"
-
-
 
 Messages:
 
@@ -74,8 +70,6 @@ Messages:
   command-gholo-import-import-error: "[P]&c An error occurred while importing the data! Check the console for more information!"
   command-gholo-import: "[P]&a Imported&b %Imported%&a holos from&6 %Plugin%&a."
 
-
-
 HoloHelpCommand:
 
   header: "&7----------- [P]&7 ------------"
@@ -101,23 +95,17 @@ HoloHelpCommand:
   import: "&7-&a /holo&6 import <Plugin>"
   footer: "&7-----------------------------"
 
-
-
 HoloListCommand:
 
   header: "&7-------- [&6Page&b %Page%&7 /&b %MaxPage%&7] ---------"
   holo: "&7-&6 %Holo%&7 (&aX&7:&b %X%&a Y&7:&b %Y%&a Z&7:&b %Z%&a World&7:&6 %World%&7)"
   footer: "&7-----------------------------"
 
-
-
 HoloNearCommand:
 
   header: "&7-------- [&6Holos in range&b %Range%&7] ---------"
   holo: "&7-&6 %Holo%&7 (&aX&7:&b %X%&a Y&7:&b %Y%&a Z&7:&b %Z%&a World&7:&6 %World%&7)"
   footer: "&7-----------------------------"
-
-
 
 HoloInfoCommand:
 

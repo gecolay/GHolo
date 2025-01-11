@@ -2,8 +2,6 @@
 # Language-File created by:		SPY_me
 #
 
-
-
 Plugin:
 
   plugin-enabled: "[P]&a Плагин успешно загрузился."
@@ -14,8 +12,6 @@ Plugin:
   plugin-reload: "[P]&a Плагин успешно перезагружен."
   plugin-disabled: "[P]&a Плагин успешно выключен."
   plugin-prefix: "&7[&6GHolo&7]"
-
-
 
 Messages:
 
@@ -74,8 +70,6 @@ Messages:
   command-gholo-import-import-error: "[P]&c При импорте произошла ошибка, проверьте консоль!"
   command-gholo-import: "[P]&a Импортировано&b %Imported%&a голограмм из&6 %Plugin%&a."
 
-
-
 HoloHelpCommand:
 
   header: "&7----------- [P]&7 ------------"
@@ -101,23 +95,17 @@ HoloHelpCommand:
   import: "&7-&a /holo&6 import <Плагин>"
   footer: "&7-----------------------------"
 
-
-
 HoloListCommand:
 
   header: "&7-------- [&6Страница&b %Page%&7 /&b %MaxPage%&7] ---------"
   holo: "&7-&6 %Holo%&7 (&aX&7:&b %X%&a Y&7:&b %Y%&a Z&7:&b %Z%&a Мир&7:&6 %World%&7)"
   footer: "&7-----------------------------"
 
-
-
 HoloNearCommand:
 
   header: "&7-------- [&6Голограммы в пределах досягаемости&b %Range%&7] ---------"
   holo: "&7-&6 %Holo%&7 (&aX&7:&b %X%&a Y&7:&b %Y%&a Z&7:&b %Z%&a Мир&7:&6 %World%&7)"
   footer: "&7-----------------------------"
-
-
 
 HoloInfoCommand:
 

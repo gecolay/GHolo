@@ -16,17 +16,13 @@
 Animations:
 
   "test":
-
     ticks: 10
-
     content:
       - "Test"
       - "Animation"
 
   "test_2":
-
     ticks: 5
-
     content:
       - "&a%test%"
       - "&b%test%"

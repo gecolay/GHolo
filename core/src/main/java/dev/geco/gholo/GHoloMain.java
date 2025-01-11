@@ -74,28 +74,28 @@ public class GHoloMain extends JavaPlugin {
 
         GPM = this;
 
-        svManager = new SVManager(getInstance());
-        cManager = new CManager(getInstance());
-        dManager = new DManager(getInstance());
-        uManager = new UManager(getInstance());
-        pManager = new PManager(getInstance());
-        tManager = new TManager(getInstance());
-        holoManager = new HoloManager(getInstance());
-        holoAnimationManager = new HoloAnimationManager(getInstance());
-        holoImportManager = new HoloImportManager(getInstance());
+        svManager = new SVManager(this);
+        cManager = new CManager(this);
+        dManager = new DManager(this);
+        uManager = new UManager(this);
+        pManager = new PManager(this);
+        tManager = new TManager(this);
+        holoManager = new HoloManager(this);
+        holoAnimationManager = new HoloAnimationManager(this);
+        holoImportManager = new HoloImportManager(this);
 
-        formatUtil = new FormatUtil(getInstance());
+        formatUtil = new FormatUtil(this);
 
         loadFeatures();
 
-        mManager = supportsPaperFeature() ? new MPaperManager(getInstance()) : new MSpigotManager(getInstance());
+        mManager = supportsPaperFeature ? new MPaperManager(this) : new MSpigotManager(this);
     }
 
     public void onEnable() {
 
         if(!versionCheck()) return;
 
-        entityUtil = (IEntityUtil) getSVManager().getPackageObject("util.EntityUtil", getInstance());
+        entityUtil = (IEntityUtil) svManager.getPackageObject("util.EntityUtil", this);
 
         loadPluginDependencies();
         loadSettings(Bukkit.getConsoleSender());
@@ -104,79 +104,79 @@ public class GHoloMain extends JavaPlugin {
         setupEvents();
         linkBStats();
 
-        Bukkit.getPluginManager().callEvent(new GHoloLoadedEvent(getInstance()));
+        Bukkit.getPluginManager().callEvent(new GHoloLoadedEvent(this));
 
-        getMManager().sendMessage(Bukkit.getConsoleSender(), "Plugin.plugin-enabled");
+        mManager.sendMessage(Bukkit.getConsoleSender(), "Plugin.plugin-enabled");
 
         printPluginLinks(Bukkit.getConsoleSender());
-        getUManager().checkForUpdates();
+        uManager.checkForUpdates();
     }
 
     public void onDisable() {
 
         unload();
-        getMManager().sendMessage(Bukkit.getConsoleSender(), "Plugin.plugin-disabled");
+        mManager.sendMessage(Bukkit.getConsoleSender(), "Plugin.plugin-disabled");
     }
 
     private void loadSettings(CommandSender Sender) {
 
         if(!connectDatabase(Sender)) return;
 
-        getHoloAnimationManager().loadHoloAnimations();
-        getHoloManager().createTables();
-        getHoloManager().loadHolos();
+        holoAnimationManager.loadHoloAnimations();
+        holoManager.createTables();
+        holoManager.loadHolos();
         ImageUtil.generateFolder();
     }
 
     public void reload(CommandSender Sender) {
-        GHoloReloadEvent reloadEvent = new GHoloReloadEvent(getInstance());
+        GHoloReloadEvent reloadEvent = new GHoloReloadEvent(this);
         Bukkit.getPluginManager().callEvent(reloadEvent);
         if(reloadEvent.isCancelled()) return;
         unload();
-        getCManager().reload();
-        getMManager().loadMessages();
+        cManager.reload();
+        mManager.loadMessages();
         loadPluginDependencies();
         loadSettings(Sender);
         printPluginLinks(Sender);
-        getUManager().checkForUpdates();
-        Bukkit.getPluginManager().callEvent(new GHoloLoadedEvent(getInstance()));
+        uManager.checkForUpdates();
+        Bukkit.getPluginManager().callEvent(new GHoloLoadedEvent(this));
     }
 
     private void unload() {
 
-        getDManager().close();
-        getHoloManager().unloadHolos();
-        getHoloAnimationManager().stopHoloAnimations();
+        dManager.close();
+        holoManager.unloadHolos();
+        holoAnimationManager.stopHoloAnimations();
     }
 
     private void setupCommands() {
 
-        getCommand("gholo").setExecutor(new GHoloCommand(getInstance()));
-        getCommand("gholo").setTabCompleter(new GHoloTabComplete(getInstance()));
-        getCommand("gholo").setPermissionMessage(getMManager().getMessage("Messages.command-permission-error"));
-        getCommand("gholoreload").setExecutor(new GHoloReloadCommand(getInstance()));
+        getCommand("gholo").setExecutor(new GHoloCommand(this));
+        getCommand("gholo").setTabCompleter(new GHoloTabComplete(this));
+        getCommand("gholo").setPermissionMessage(mManager.getMessage("Messages.command-permission-error"));
+        getCommand("gholoreload").setExecutor(new GHoloReloadCommand(this));
         getCommand("gholoreload").setTabCompleter(new EmptyTabComplete());
-        getCommand("gholoreload").setPermissionMessage(getMManager().getMessage("Messages.command-permission-error"));
+        getCommand("gholoreload").setPermissionMessage(mManager.getMessage("Messages.command-permission-error"));
     }
 
     private void setupEvents() {
 
-        getServer().getPluginManager().registerEvents(new PlayerEvents(getInstance()), getInstance());
+        getServer().getPluginManager().registerEvents(new PlayerEvents(this), this);
     }
 
     private boolean versionCheck() {
-        if(getSVManager().isNewerOrVersion(19, 4) && getSVManager().isAvailable()) return true;
-        getMManager().sendMessage(Bukkit.getConsoleSender(), "Plugin.plugin-version", "%Version%", getSVManager().getServerVersion());
-        getUManager().checkForUpdates();
-        Bukkit.getPluginManager().disablePlugin(getInstance());
+        if(svManager.isNewerOrVersion(19, 4) && svManager.isAvailable()) return true;
+        mManager.sendMessage(Bukkit.getConsoleSender(), "Plugin.plugin-version", "%Version%", svManager.getServerVersion());
+        uManager.checkForUpdates();
+        Bukkit.getPluginManager().disablePlugin(this);
         return false;
     }
 
     private boolean connectDatabase(CommandSender Sender) {
-        boolean connect = getDManager().connect();
+        boolean connect = dManager.connect();
         if(connect) return true;
-        getMManager().sendMessage(Sender, "Plugin.plugin-data");
-        Bukkit.getPluginManager().disablePlugin(getInstance());
+        mManager.sendMessage(Sender, "Plugin.plugin-data");
+        Bukkit.getPluginManager().disablePlugin(this);
         return false;
     }
 
@@ -199,17 +199,17 @@ public class GHoloMain extends JavaPlugin {
     }
 
     private void printPluginLinks(CommandSender Sender) {
-        if(placeholderAPILink) getMManager().sendMessage(Sender, "Plugin.plugin-link", "%Link%", Bukkit.getPluginManager().getPlugin("PlaceholderAPI").getName());
+        if(placeholderAPILink) mManager.sendMessage(Sender, "Plugin.plugin-link", "%Link%", Bukkit.getPluginManager().getPlugin("PlaceholderAPI").getName());
     }
 
     private void linkBStats() {
 
         BStatsLink bstats = new BStatsLink(getInstance(), 24075);
 
-        bstats.addCustomChart(new BStatsLink.SimplePie("plugin_language", () -> getCManager().L_LANG));
-        bstats.addCustomChart(new BStatsLink.AdvancedPie("minecraft_version_player_amount", () -> Map.of(GPM.getSVManager().getServerVersion(), Bukkit.getOnlinePlayers().size())));
-        bstats.addCustomChart(new BStatsLink.SingleLineChart("holo_count", () -> getHoloManager().getHoloCount()));
-        bstats.addCustomChart(new BStatsLink.SingleLineChart("holo_row_count", () -> getHoloManager().getHoloRowCount()));
+        bstats.addCustomChart(new BStatsLink.SimplePie("plugin_language", () -> cManager.L_LANG));
+        bstats.addCustomChart(new BStatsLink.AdvancedPie("minecraft_version_player_amount", () -> Map.of(svManager.getServerVersion(), Bukkit.getOnlinePlayers().size())));
+        bstats.addCustomChart(new BStatsLink.SingleLineChart("holo_count", () -> holoManager.getHoloCount()));
+        bstats.addCustomChart(new BStatsLink.SingleLineChart("holo_row_count", () -> holoManager.getHoloRowCount()));
     }
 
 }
