@@ -64,8 +64,10 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
 
     @Override
     public void loadHoloRow() {
-        ClientboundAddEntityPacket addEntityPacket = new ClientboundAddEntityPacket(getId(), getUUID(), getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYHeadRot());
+        ClientboundAddEntityPacket addEntityPacket = new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYHeadRot());
+        String permission = getPermission();
         for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
+            if(permission != null && !GPM.getPManager().hasPermission(player, permission)) continue;
             ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
             serverPlayer.connection.send(addEntityPacket);
             serverPlayer.connection.send(getDataPacket(player));
@@ -76,7 +78,9 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     public void loadHoloRow(Player Player) {
         ServerPlayer serverPlayer = ((CraftPlayer) Player).getHandle();
         if(!serverPlayer.level.equals(level)) return;
-        serverPlayer.connection.send(new ClientboundAddEntityPacket(getId(), getUUID(), getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYHeadRot()));
+        String permission = getPermission();
+        if(permission != null && !GPM.getPManager().hasPermission(Player, permission)) return;
+        serverPlayer.connection.send(new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYHeadRot()));
         serverPlayer.connection.send(getDataPacket(Player));
     }
 
@@ -85,10 +89,16 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         handleUpdate(UpdateType);
         if(UpdateType == GHoloRowUpdateType.LOCATION) {
             ClientboundTeleportEntityPacket teleportEntityPacket = new ClientboundTeleportEntityPacket(this);
+            String permission = getPermission();
             for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
+                if(permission != null && !GPM.getPManager().hasPermission(player, permission)) continue;
                 ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
                 serverPlayer.connection.send(teleportEntityPacket);
             }
+            return;
+        } else if(UpdateType == GHoloRowUpdateType.PERMISSION) {
+            unloadHoloRow();
+            loadHoloRow();
             return;
         }
         finishUpdate();
@@ -168,10 +178,18 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     private void setSeeThrough(boolean SeeThrough) { setFlags((byte) (SeeThrough ? getFlags() | FLAG_SEE_THROUGH : getFlags() & ~FLAG_SEE_THROUGH)); }
 
     private void finishUpdate() {
+        String permission = getPermission();
         for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
+            if(permission != null && !GPM.getPManager().hasPermission(player, permission)) continue;
             ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
             serverPlayer.connection.send(getDataPacket(player));
         }
+    }
+
+    private String getPermission() {
+        GHoloData defaultData = holoRow.getHolo().getRawDefaultData();
+        GHoloData data = holoRow.getRawData();
+        return data.getPermission() != null ? data.getPermission() : (defaultData.getPermission() != null ? defaultData.getPermission() : GHoloData.DEFAULT_PERMISSION);
     }
 
     private ClientboundSetEntityDataPacket getDataPacket(Player Player) {
@@ -180,10 +198,8 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         List<SynchedEntityData.DataValue<?>> data = getEntityData().getNonDefaultValues();
         if(data == null) data = new ArrayList<>();
         else data.removeIf(dataValue -> dataValue.id() == HOLO_TEXT_DATA.getId());
-        // TODO: Currently only required for the reset of e.g. the billboard to "fixed"
-        List<SynchedEntityData.DataValue<?>> defaultData = getEntityData().packDirty();
-        if(defaultData != null) data.addAll(defaultData);
-        //
+        List<SynchedEntityData.DataValue<?>> defaultResetData = getEntityData().packDirty();
+        if(defaultResetData != null) data.addAll(defaultResetData);
         data.add(new SynchedEntityData.DataValue<>(HOLO_TEXT_DATA.getId(), HOLO_TEXT_DATA.getSerializer(), contentComponent));
         return new ClientboundSetEntityDataPacket(getId(), data);
     }

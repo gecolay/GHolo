@@ -12,6 +12,7 @@ public enum GHoloRowUpdateType {
     BILLBOARD,
     SEE_THROUGH,
     SCALE,
-    BRIGHTNESS
+    BRIGHTNESS,
+    PERMISSION
 
 }

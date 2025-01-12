@@ -561,6 +561,11 @@ public class GHoloCommand implements CommandExecutor {
                             return true;
                         }
                         break;
+                    case "permission":
+                        if(Args[arg + 1].equalsIgnoreCase("*")) data.setPermission(GHoloData.DEFAULT_PERMISSION);
+                        else data.setPermission(Args[arg + 1]);
+                        updateType = GHoloRowUpdateType.PERMISSION;
+                        break;
                 }
                 if(holoRow == null) {
                     GPM.getHoloManager().updateHoloData(holo, data);
