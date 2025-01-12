@@ -60,7 +60,7 @@ Messages:
   command-gholo-copyrows: "[P]&a Copied all rows from holo&6 %Holo%&a to holo&6 %CopyToHolo%&a."
   command-gholo-data-use-error: "[P]&c /holo data <Id> default/row (<Option> <Value>)/(<Row> <Option> <Value>)"
   command-gholo-data-value-error: "[P]&c Value&6 %Value%&c is invalid for option&6 %Option%&c!"
-  command-gholo-data: "[P]&a Value&6 %Value%&a set for data&6 %Data%&a."
+  command-gholo-data: "[P]&a Value&6 %Value%&a set for option&6 %Data%&a."
   command-gholo-setimage-use-error: "[P]&c /holo setimage <Id> <file/url/avatar/helm> <Source> [<Width:Height>]"
   command-gholo-setimage-image-error: "[P]&c Couldn't create a image of type&6 %Type%&a from source:&6 %Source%"
   command-gholo-setimage-size-error: "[P]&c Size is invalid!"

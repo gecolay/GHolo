@@ -60,7 +60,7 @@ Messages:
   command-gholo-copyrows: "[P]&a Alle Zeilen von Holo&6 %Holo%&a zu Holo&6 %CopyToHolo%&a kopiert."
   command-gholo-data-use-error: "[P]&c /holo data <Id> default/row (<Option> <Wert>)/(<Zeile> <Option> <Wert>)"
   command-gholo-data-value-error: "[P]&c Wert&6 %Value%&c ist invalide für Option&6 %Option%&c!"
-  command-gholo-data: "[P]&a Wert&6 %Value%&a wurde für Date&6 %Data%&a gesetzt."
+  command-gholo-data: "[P]&a Wert&6 %Value%&a wurde für Option&6 %Data%&a gesetzt."
   command-gholo-setimage-use-error: "[P]&c /holo setimage <Id> <file/url/avatar/helm> <Quelle> [<Breite:Höhe>]"
   command-gholo-setimage-image-error: "[P]&c Bild vom Typ&6 %Type%&a konnte nicht erstellt werden aus Quelle:&6 %Source%"
   command-gholo-setimage-size-error: "[P]&c Größe ist invalide!"
