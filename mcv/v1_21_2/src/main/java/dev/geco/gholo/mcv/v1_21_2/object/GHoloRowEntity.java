@@ -50,7 +50,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
             Field textField = textFieldList.getFirst();
             textField.setAccessible(true);
             textAccessor = (EntityDataAccessor<Component>) textField.get(this);
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
         holoTextData = textAccessor;
         EntityDataAccessor<Vector3f> scaleAccessor = null;
         try {
@@ -59,7 +59,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
             Field textField = textFieldList.get(4);
             textField.setAccessible(true);
             scaleAccessor = (EntityDataAccessor<Vector3f>) textField.get(this);
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
         holoScaleData = scaleAccessor;
         for(GHoloRowUpdateType updateType : GHoloRowUpdateType.values()) handleUpdate(updateType);
     }

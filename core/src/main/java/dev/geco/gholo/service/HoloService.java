@@ -30,7 +30,7 @@ public class HoloService {
         try {
             gHoloMain.getDataService().execute("CREATE TABLE IF NOT EXISTS holo (id TEXT, l_world TEXT, l_x REAL, l_y REAL, l_z REAL, default_data TEXT);");
             gHoloMain.getDataService().execute("CREATE TABLE IF NOT EXISTS holo_row (`row_number` INTEGER, holo_id TEXT, content TEXT, o_x REAL, o_y REAL, o_z REAL, l_yaw REAL, l_pitch REAL, data TEXT);");
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch(SQLException e) { e.printStackTrace(); }
     }
 
     public List<GHolo> getHolos() { return new ArrayList<>(holos); }
@@ -93,10 +93,10 @@ public class HoloService {
                                 gHoloMain.getHoloAnimationService().updateSubscriptionStatus(holoRow);
                             }
                         }
-                    } catch (Throwable e) { e.printStackTrace(); }
+                    } catch(Throwable e) { e.printStackTrace(); }
                 }
             }
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
     }
 
     public void loadHolosForPlayer(Player player) { for(GHolo holo : holos) loadHoloForPlayer(holo, player); }
@@ -125,7 +125,7 @@ public class HoloService {
             holos.add(holo);
 
             return holo;
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
         return null;
     }
 
@@ -157,7 +157,7 @@ public class HoloService {
             gHoloMain.getHoloAnimationService().updateSubscriptionStatus(holoRow);
 
             return holoRow;
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
         return null;
     }
 
@@ -200,7 +200,7 @@ public class HoloService {
             gHoloMain.getHoloAnimationService().updateSubscriptionStatus(holoRow);
 
             return holoRow;
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
         return null;
     }
 
@@ -210,7 +210,7 @@ public class HoloService {
             holoRow.setContent(gHoloMain.getFormatUtil().formatBase(content));
             holoRow.getHoloRowEntity().publishUpdate(GHoloRowUpdateType.CONTENT);
             gHoloMain.getHoloAnimationService().updateSubscriptionStatus(holoRow);
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
     }
 
     public void updateHoloRowPosition(GHoloRow holoRow, Location position) {
@@ -226,14 +226,14 @@ public class HoloService {
             );
             holoRow.setPosition(position);
             holoRow.getHoloRowEntity().publishUpdate(GHoloRowUpdateType.LOCATION);
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
     }
 
     public void updateHoloRowData(GHoloRow holoRow, GHoloData rowData) {
         try {
             gHoloMain.getDataService().execute("UPDATE holo_row SET data = ? WHERE `row_number` = ? AND holo_id = ?", rowData.toString(), holoRow.getRowId(), holoRow.getHolo().getId());
             holoRow.setData(rowData);
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
     }
 
     public void removeHoloRow(GHoloRow holoRow, boolean updateOffset) {
@@ -255,7 +255,7 @@ public class HoloService {
             holo.removeRow(row);
             holoRow.getHoloRowEntity().unloadHoloRow();
             gHoloMain.getHoloAnimationService().unsubscribe(holoRow);
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
     }
 
     public void updateHoloId(GHolo holo, String holoId) {
@@ -263,7 +263,7 @@ public class HoloService {
             gHoloMain.getDataService().execute("UPDATE holo SET id = ? WHERE id = ?", holoId, holo.getId());
             gHoloMain.getDataService().execute("UPDATE holo_row SET holo_id = ? WHERE holo_id = ?", holoId, holo.getId());
             holo.setId(holoId);
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
     }
 
     public void updateHoloLocation(GHolo holo, Location location) {
@@ -277,14 +277,14 @@ public class HoloService {
             );
             holo.setLocation(location);
             for(GHoloRow holoRow : holo.getRows()) holoRow.getHoloRowEntity().publishUpdate(GHoloRowUpdateType.LOCATION);
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
     }
 
     public void updateHoloData(GHolo holo, GHoloData rowData) {
         try {
             gHoloMain.getDataService().execute("UPDATE holo SET default_data = ? WHERE id = ?", rowData.toString(), holo.getId());
             holo.setDefaultData(rowData);
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
     }
 
     public void setHoloRows(GHolo holo, List<String> rows) {
@@ -293,7 +293,7 @@ public class HoloService {
         try {
             gHoloMain.getDataService().execute("DELETE FROM holo_row where holo_id = ?", holo.getId());
             for(String row : rows) createHoloRow(holo, row);
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
     }
 
     public void copyHoloRows(GHolo holo, GHolo copyToHolo) {
@@ -343,7 +343,7 @@ public class HoloService {
                     gHoloMain.getHoloAnimationService().updateSubscriptionStatus(holoRow);
                 }
             }
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
     }
 
     public void removeHolo(GHolo holo) {
@@ -353,7 +353,7 @@ public class HoloService {
             holos.remove(holo);
             for(GHoloRow holoRow : holo.getRows()) gHoloMain.getHoloAnimationService().unsubscribe(holoRow);
             unloadHolo(holo);
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
     }
 
     public void unloadHolos() {

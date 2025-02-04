@@ -27,11 +27,11 @@ public class ImageUtil {
 
     public static void generateFolder() { if(!IMAGE_FOLDER.exists()) IMAGE_FOLDER.mkdir(); }
 
-    public static BufferedImage getBufferedImage(String url) { try { return ImageIO.read(new URL(url)); } catch (Throwable e) { return null; } }
+    public static BufferedImage getBufferedImage(String url) { try { return ImageIO.read(new URL(url)); } catch(Throwable e) { return null; } }
 
-    public static BufferedImage getBufferedImage(org.bukkit.OfflinePlayer offlinePlayer, boolean useOverlay) { try { return ImageIO.read(new URL((useOverlay ? AVATAR_URL_WITH_OVERLAY : AVATAR_URL_WITHOUT_OVERLAY) + offlinePlayer.getName() + "/" + DEFAULT_AVATAR_SIZE)); } catch (Throwable e) { return null; } }
+    public static BufferedImage getBufferedImage(org.bukkit.OfflinePlayer offlinePlayer, boolean useOverlay) { try { return ImageIO.read(new URL((useOverlay ? AVATAR_URL_WITH_OVERLAY : AVATAR_URL_WITHOUT_OVERLAY) + offlinePlayer.getName() + "/" + DEFAULT_AVATAR_SIZE)); } catch(Throwable e) { return null; } }
 
-    public static BufferedImage getBufferedImage(File file) { try { return ImageIO.read(file); } catch (Throwable e) { return null; } }
+    public static BufferedImage getBufferedImage(File file) { try { return ImageIO.read(file); } catch(Throwable e) { return null; } }
 
     public ImageUtil(BufferedImage image) { lines = toLines(toColorArray(image, image.getWidth(), image.getHeight())); }
 

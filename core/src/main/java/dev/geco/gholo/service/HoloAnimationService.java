@@ -42,7 +42,7 @@ public class HoloAnimationService {
                 animationSubscriber.put(id.toLowerCase(), new ArrayList<>());
             }
             startHoloAnimations();
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
     }
 
     public void updateSubscriptionStatus(GHoloRow holoRow) {

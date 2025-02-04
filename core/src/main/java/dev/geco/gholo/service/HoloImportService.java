@@ -37,7 +37,7 @@ public class HoloImportService {
                 case "fancy_holograms": return importFancyHolograms();
                 default: return -1;
             }
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
         return -1;
     }
 

@@ -69,7 +69,7 @@ public class BStatsMetric {
                     .copyDefaults(true);
             try {
                 config.save(configFile);
-            } catch (IOException ignored) {
+            } catch(IOException ignored) {
             }
         }
         // Load the data
@@ -81,7 +81,7 @@ public class BStatsMetric {
         boolean isFolia = false;
         try {
             isFolia = Class.forName("io.papermc.paper.threadedregions.RegionizedServer") != null;
-        } catch (Exception e) {
+        } catch(Exception e) {
         }
         metricsBase =
                 new // See https://github.com/Bastian/bstats-metrics/pull/126
@@ -149,7 +149,7 @@ public class BStatsMetric {
             return onlinePlayersMethod.getReturnType().equals(Collection.class)
                     ? ((Collection<?>) onlinePlayersMethod.invoke(Bukkit.getServer())).size()
                     : ((Player[]) onlinePlayersMethod.invoke(Bukkit.getServer())).length;
-        } catch (Exception e) {
+        } catch(Exception e) {
             // Just use the new method if the reflection failed
             return Bukkit.getOnlinePlayers().size();
         }
@@ -324,7 +324,7 @@ public class BStatsMetric {
                         try {
                             // Send the data
                             sendData(data);
-                        } catch (Exception e) {
+                        } catch(Exception e) {
                             // Something went wrong! :(
                             if (logErrors) {
                                 errorLogger.accept("Could not submit bStats metrics data", e);
@@ -641,7 +641,7 @@ public class BStatsMetric {
                     return null;
                 }
                 builder.appendField("data", data);
-            } catch (Throwable t) {
+            } catch(Throwable t) {
                 if (logErrors) {
                     errorLogger.accept("Failed to get data for custom chart with id " + chartId, t);
                 }

@@ -46,7 +46,7 @@ public class ConfigService {
                     config.save(configFile);
                 }
             } else gHoloMain.saveDefaultConfig();
-        } catch (Throwable e) { gHoloMain.saveDefaultConfig(); }
+        } catch(Throwable e) { gHoloMain.saveDefaultConfig(); }
 
         reload();
     }
@@ -69,7 +69,7 @@ public class ConfigService {
                     SYMBOLS.put(symbol, String.valueOf(gHoloMain.getConfig().getString("Options.Symbols." + symbol).toCharArray()[0]));
                 }
             }
-        } catch (Throwable ignored) { }
+        } catch(Throwable ignored) { }
         L_PLACEHOLDER_API = gHoloMain.getConfig().getBoolean("Options.Link.placeholder-api", true);
         FEATUREFLAGS = gHoloMain.getConfig().getStringList("Options.FeatureFlags");
     }

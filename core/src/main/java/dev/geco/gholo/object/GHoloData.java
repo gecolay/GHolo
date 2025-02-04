@@ -86,7 +86,7 @@ public class GHoloData implements Cloneable {
                         permission = dataSplit[1];
                         break;
                 }
-            } catch (Throwable e) { e.printStackTrace(); }
+            } catch(Throwable e) { e.printStackTrace(); }
         }
     }
 
@@ -161,6 +161,6 @@ public class GHoloData implements Cloneable {
     }
 
     @Override
-    public GHoloData clone() { try { return (GHoloData) super.clone(); } catch (CloneNotSupportedException e) { throw new Error(e); } }
+    public GHoloData clone() { try { return (GHoloData) super.clone(); } catch(CloneNotSupportedException e) { throw new Error(e); } }
 
 }
