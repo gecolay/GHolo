@@ -1,20 +1,15 @@
 package dev.geco.gholo.mcv.v1_21_2.util;
 
-import dev.geco.gholo.GHoloMain;
-import dev.geco.gholo.mcv.v1_21_2.objects.*;
-import dev.geco.gholo.objects.*;
-import dev.geco.gholo.util.*;
+import dev.geco.gholo.mcv.v1_21_2.object.GHoloRowEntity;
+import dev.geco.gholo.object.GHoloRow;
+import dev.geco.gholo.util.IEntityUtil;
 
 public class EntityUtil implements IEntityUtil {
 
-    private final GHoloMain GPM;
-
-    public EntityUtil(GHoloMain GPluginMain) { GPM = GPluginMain; }
-
     @Override
-    public void loadHoloRowEntity(GHoloRow HoloRow) {
-        GHoloRowEntity holoRowEntity = new GHoloRowEntity(HoloRow);
-        HoloRow.setHoloRowEntity(holoRowEntity);
+    public void loadHoloRowEntity(GHoloRow holoRow) {
+        GHoloRowEntity holoRowEntity = new GHoloRowEntity(holoRow);
+        holoRow.setHoloRowEntity(holoRowEntity);
         holoRowEntity.loadHoloRow();
     }
 

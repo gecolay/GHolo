@@ -1,9 +1,9 @@
 package dev.geco.gholo.util;
 
-import dev.geco.gholo.objects.*;
+import dev.geco.gholo.object.GHoloRow;
 
 public interface IEntityUtil {
 
-    void loadHoloRowEntity(GHoloRow HoloRow);
+    void loadHoloRowEntity(GHoloRow holoRow);
 
 }

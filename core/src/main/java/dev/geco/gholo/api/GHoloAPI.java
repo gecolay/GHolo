@@ -1,106 +1,111 @@
 package dev.geco.gholo.api;
 
-import java.util.*;
-
-import org.jetbrains.annotations.*;
-
-import org.bukkit.*;
-import org.bukkit.entity.*;
-
 import dev.geco.gholo.GHoloMain;
-import dev.geco.gholo.objects.*;
+import dev.geco.gholo.object.GHolo;
+import dev.geco.gholo.object.GHoloData;
+import dev.geco.gholo.object.GHoloRow;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class GHoloAPI {
 
     /**
-     * Returns the Plugin-Instance for GHolo
+     * Returns the plugin instance for GHolo
      * @author Gecolay
      * @since 1.0.0
-     * @return Plugin-Instance
+     * @return Plugin instance
      */
-    public static GHoloMain getInstance() { return GHoloMain.getInstance(); }
-
-    /**
-     * Returns all available holos
-     * @author Gecolay
-     * @since 1.0.0
-     * @return Holos
-     */
-    public static List<GHolo> getHolos() {
-        return getInstance().getHoloManager().getHolos();
+    public static @NotNull GHoloMain getInstance() {
+        return GHoloMain.getInstance();
     }
 
     /**
-     * Returns all nearby holos
+     * Gets all holos
+     * @author Gecolay
+     * @since 1.0.0
+     * @return List of all holos
+     */
+    public static @NotNull List<GHolo> getHolos() {
+        return getInstance().getHoloService().getHolos();
+    }
+
+    /**
+     * Gets all near holos
      * @author Gecolay
      * @since 1.1.1
-     * @param Location Location
-     * @param Range Range
-     * @return Holos
+     * @param location Location
+     * @param range Range
+     * @return List of holos
      */
-    public static List<GHolo> getNearHolos(Location Location, double Range) {
-        return getInstance().getHoloManager().getNearHolos(Location, Range);
+    public static @NotNull List<GHolo> getNearHolos(@NotNull Location location, double range) {
+        return getInstance().getHoloService().getNearHolos(location, range);
     }
 
     /**
-     * Checks if a holo is present
+     * Checks if a holo exists
      * @author Gecolay
      * @since 1.0.0
-     * @param Id Holo-Id
+     * @param holoId Holo id
      * @return <code>true</code> if the holo exists, <code>false</code> if not
      */
-    public static boolean checkHolo(String Id) {
-        return getInstance().getHoloManager().getHolo(Id) != null;
+    public static boolean checkHolo(@NotNull String holoId) {
+        return getInstance().getHoloService().getHolo(holoId) != null;
     }
 
     /**
      * Gets a holo by id
      * @author Gecolay
      * @since 1.0.0
-     * @param Id Holo-Id
-     * @return Holo
+     * @param holoId Holo id
+     * @return Holo or <code>null</code> if there was no holo
      */
-    public static GHolo getHolo(String Id) {
-        return getInstance().getHoloManager().getHolo(Id);
+    public static @Nullable GHolo getHolo(@NotNull String holoId) {
+        return getInstance().getHoloService().getHolo(holoId);
     }
 
     /**
      * Creates a new holo
      * @author Gecolay
      * @since 1.0.0
-     * @param Id Holo-Id
-     * @param Location Holo-Location
-     * @return New holo
+     * @param holoId Holo id
+     * @param location Location
+     * @return Holo or <code>null</code> if the creation failed
      */
-    public static GHolo createHolo(String Id, Location Location) {
-        return getInstance().getHoloManager().createHolo(Id, Location);
+    public static @Nullable GHolo createHolo(@NotNull String holoId, @NotNull Location location) {
+        return getInstance().getHoloService().createHolo(holoId, location);
     }
 
     /**
      * Creates a new holo row for a holo
      * @author Gecolay
      * @since 1.0.0
-     * @param Holo Holo
-     * @param Content Content
-     * @return New added holo row
+     * @param holo Holo
+     * @param content Content
+     * @return Holo row or <code>null</code> if the creation failed
      */
-    public static GHoloRow createHoloRow(@NotNull GHolo Holo, @NotNull String Content) {
-        return getInstance().getHoloManager().createHoloRow(Holo, Content);
+    public static @Nullable GHoloRow createHoloRow(@NotNull GHolo holo, @NotNull String content) {
+        return getInstance().getHoloService().createHoloRow(holo, content);
     }
 
     /**
      * Inserts a new holo row into a holo
      * @author Gecolay
      * @since 1.0.0
-     * @param Holo Holo
-     * @param Row Row-Number (0-indexed)
-     * @param Content Content
-     * @param UpdateOffset Should the offset of all rows with a higher row number be updated to move them down
-     * @return New inserted holo row
+     * @param holo Holo
+     * @param rowId Row id (0-indexed)
+     * @param content Content
+     * @param updateOffset Should the offset of all rows with a higher row id be updated
+     * @return Holo row or <code>null</code> if the creation failed
      */
-    public static GHoloRow insertHoloRow(@NotNull GHolo Holo, int Row, @NotNull String Content, boolean UpdateOffset) {
-        return getInstance().getHoloManager().insertHoloRow(Holo, Row, Content, UpdateOffset);
+    public static GHoloRow insertHoloRow(@NotNull GHolo holo, int rowId, @NotNull String content, boolean updateOffset) {
+        return getInstance().getHoloService().insertHoloRow(holo, rowId, content, updateOffset);
     }
+
+    //TODO
 
     /**
      * Updates the content of a holo row
@@ -110,7 +115,7 @@ public class GHoloAPI {
      * @param Content HoloRow-Content
      */
     public static void updateHoloRowContent(@NotNull GHoloRow HoloRow, @NotNull String Content) {
-        getInstance().getHoloManager().updateHoloRowContent(HoloRow, Content);
+        getInstance().getHoloService().updateHoloRowContent(HoloRow, Content);
     }
 
     /**
@@ -123,7 +128,7 @@ public class GHoloAPI {
      * @param Position HoloRow-Position
      */
     public static void updateHoloRowPosition(@NotNull GHoloRow HoloRow, @NotNull Location Position) {
-        getInstance().getHoloManager().updateHoloRowPosition(HoloRow, Position);
+        getInstance().getHoloService().updateHoloRowPosition(HoloRow, Position);
     }
 
     /**
@@ -134,7 +139,7 @@ public class GHoloAPI {
      * @param Data HoloRow-Data
      */
     public static void updateHoloRowData(@NotNull GHoloRow HoloRow, @NotNull GHoloData Data) {
-        getInstance().getHoloManager().updateHoloRowData(HoloRow, Data);
+        getInstance().getHoloService().updateHoloRowData(HoloRow, Data);
     }
 
     /**
@@ -145,7 +150,7 @@ public class GHoloAPI {
      * @param UpdateOffset Should the offset of all rows with a higher row number be updated to move them down
      */
     public static void removeHoloRow(@NotNull GHoloRow HoloRow, boolean UpdateOffset) {
-        getInstance().getHoloManager().removeHoloRow(HoloRow, UpdateOffset);
+        getInstance().getHoloService().removeHoloRow(HoloRow, UpdateOffset);
     }
 
     /**
@@ -156,7 +161,7 @@ public class GHoloAPI {
      * @param Id Holo-Id
      */
     public static void updateHoloId(@NotNull GHolo Holo, @NotNull String Id) {
-        getInstance().getHoloManager().updateHoloId(Holo, Id);
+        getInstance().getHoloService().updateHoloId(Holo, Id);
     }
 
     /**
@@ -167,7 +172,7 @@ public class GHoloAPI {
      * @param Location Holo-Location
      */
     public static void updateHoloLocation(@NotNull GHolo Holo, @NotNull Location Location) {
-        getInstance().getHoloManager().updateHoloLocation(Holo, Location);
+        getInstance().getHoloService().updateHoloLocation(Holo, Location);
     }
 
     /**
@@ -178,7 +183,7 @@ public class GHoloAPI {
      * @param Data Default Holo-Data
      */
     public static void updateHoloData(@NotNull GHolo Holo, @NotNull GHoloData Data) {
-        getInstance().getHoloManager().updateHoloData(Holo, Data);
+        getInstance().getHoloService().updateHoloData(Holo, Data);
     }
 
     /**
@@ -189,7 +194,7 @@ public class GHoloAPI {
      * @param Rows Text-Rows
      */
     public static void setHoloRows(@NotNull GHolo Holo, @NotNull List<String> Rows) {
-        getInstance().getHoloManager().setHoloRows(Holo, Rows);
+        getInstance().getHoloService().setHoloRows(Holo, Rows);
     }
 
     /**
@@ -200,7 +205,7 @@ public class GHoloAPI {
      * @param CopyToHolo CopyToHolo
      */
     public static void copyHoloRows(@NotNull GHolo Holo, @NotNull GHolo CopyToHolo) {
-        getInstance().getHoloManager().copyHoloRows(Holo, CopyToHolo);
+        getInstance().getHoloService().copyHoloRows(Holo, CopyToHolo);
     }
 
     /**
@@ -212,7 +217,7 @@ public class GHoloAPI {
      * @param Holo Holo
      */
     public static void removeHolo(@NotNull GHolo Holo) {
-        getInstance().getHoloManager().removeHolo(Holo);
+        getInstance().getHoloService().removeHolo(Holo);
     }
 
     /**
@@ -224,7 +229,7 @@ public class GHoloAPI {
      * @param Player Player
      */
     public static void loadHolosForPlayer(@NotNull Player Player) {
-        getInstance().getHoloManager().loadHolosForPlayer(Player);
+        getInstance().getHoloService().loadHolosForPlayer(Player);
     }
 
     /**
@@ -236,7 +241,7 @@ public class GHoloAPI {
      * @param Holo Holo
      */
     public static void loadHolo(@NotNull GHolo Holo) {
-        getInstance().getHoloManager().loadHolo(Holo);
+        getInstance().getHoloService().loadHolo(Holo);
     }
 
     /**
@@ -249,7 +254,7 @@ public class GHoloAPI {
      * @param Player Player
      */
     public static void loadHoloForPlayer(@NotNull GHolo Holo, @NotNull Player Player) {
-        getInstance().getHoloManager().unloadHoloForPlayer(Holo, Player);
+        getInstance().getHoloService().unloadHoloForPlayer(Holo, Player);
     }
 
     /**
@@ -259,7 +264,7 @@ public class GHoloAPI {
      * @param Holo Holo
      */
     public static void unloadHolo(@NotNull GHolo Holo) {
-        getInstance().getHoloManager().unloadHolo(Holo);
+        getInstance().getHoloService().unloadHolo(Holo);
     }
 
     /**
@@ -270,7 +275,7 @@ public class GHoloAPI {
      * @param Player Player
      */
     public static void unloadHoloForPlayer(@NotNull GHolo Holo, @NotNull Player Player) {
-        getInstance().getHoloManager().unloadHoloForPlayer(Holo, Player);
+        getInstance().getHoloService().unloadHoloForPlayer(Holo, Player);
     }
 
 }

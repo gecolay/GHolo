@@ -1,51 +1,51 @@
 package dev.geco.gholo.util;
 
-import java.util.*;
-import java.util.Map.*;
-
-import org.bukkit.entity.*;
-
-import me.clip.placeholderapi.*;
-
 import dev.geco.gholo.GHoloMain;
-import dev.geco.gholo.manager.*;
-import dev.geco.gholo.objects.*;
+import dev.geco.gholo.object.GHoloAnimation;
+import dev.geco.gholo.service.HoloAnimationService;
+import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.entity.Player;
+
+import java.util.Collection;
+import java.util.Map;
 
 public class FormatUtil {
 
-    private final GHoloMain GPM;
+    private final GHoloMain gHoloMain;
 
-    public FormatUtil(GHoloMain GPluginMain) { GPM = GPluginMain; }
+    public FormatUtil(GHoloMain gHoloMain) {
+        this.gHoloMain = gHoloMain;
+    }
 
-    public String formatBase(String Text) {
-        for(Entry<String, String> symbol : GPM.getCManager().SYMBOLS.entrySet()) {
+    public String formatBase(String text) {
+        for(Map.Entry<String, String> symbol : gHoloMain.getConfigService().SYMBOLS.entrySet()) {
             String key = symbol.getKey();
             String value = symbol.getValue();
-            Text = Text.replace(key, value);
+            text = text.replace(key, value);
         }
-        return Text;
+        return text;
     }
 
-    public String formatPlaceholders(String Text, Player Player) {
-        if(HoloAnimationManager.countAnimationChars(Text) < 2) return GPM.getMManager().toFormattedMessage(Text);
-        String text = formatPlaceholdersWithAnimations(Text, Player, GPM.getHoloAnimationManager().getAnimations());
-        return GPM.getMManager().toFormattedMessage(formatBase(text));
+    public String formatPlaceholders(String text, Player player) {
+        if(HoloAnimationService.countAnimationChars(text) < 2) return gHoloMain.getMessageService().toFormattedMessage(text);
+        text = formatPlaceholdersWithAnimations(text, player, gHoloMain.getHoloAnimationService().getAnimations());
+        return gHoloMain.getMessageService().toFormattedMessage(formatBase(text));
     }
 
-    public Object formatPlaceholdersComponent(String Text, Player Player) {
-        if(HoloAnimationManager.countAnimationChars(Text) < 2) return GPM.getMManager().toFormattedComponent(Text);
-        String text = formatPlaceholdersWithAnimations(Text, Player, GPM.getHoloAnimationManager().getAnimations());
-        return GPM.getMManager().toFormattedComponent(formatBase(text));
+    public Object formatPlaceholdersComponent(String text, Player player) {
+        if(HoloAnimationService.countAnimationChars(text) < 2) return gHoloMain.getMessageService().toFormattedComponent(text);
+        text = formatPlaceholdersWithAnimations(text, player, gHoloMain.getHoloAnimationService().getAnimations());
+        return gHoloMain.getMessageService().toFormattedComponent(formatBase(text));
     }
 
-    private String formatPlaceholdersWithAnimations(String Text, Player Player, Collection<GHoloAnimation> Animations) {
-        for(GHoloAnimation animation : Animations) Text = Text.replace(HoloAnimationManager.AMIMATION_CHAR + animation.getId() + HoloAnimationManager.AMIMATION_CHAR, animation.getCurrentContent());
-        return formatPlaceholdersWithoutAnimations(Text, Player);
+    private String formatPlaceholdersWithAnimations(String text, Player player, Collection<GHoloAnimation> animations) {
+        for(GHoloAnimation animation : animations) text = text.replace(HoloAnimationService.AMIMATION_CHAR + animation.getId() + HoloAnimationService.AMIMATION_CHAR, animation.getCurrentContent());
+        return formatPlaceholdersWithoutAnimations(text, player);
     }
 
-    private String formatPlaceholdersWithoutAnimations(String Text, Player Player) {
-        if(GPM.getCManager().L_PLACEHOLDER_API && GPM.hasPlaceholderAPILink()) Text = PlaceholderAPI.setPlaceholders(Player, Text);
-        return Text;
+    private String formatPlaceholdersWithoutAnimations(String text, Player player) {
+        if(gHoloMain.getConfigService().L_PLACEHOLDER_API && gHoloMain.hasPlaceholderAPILink()) text = PlaceholderAPI.setPlaceholders(player, text);
+        return text;
     }
 
 }

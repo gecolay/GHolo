@@ -1,36 +1,37 @@
 package dev.geco.gholo.cmd;
 
-import org.jetbrains.annotations.*;
-
-import org.bukkit.command.*;
-import org.bukkit.entity.*;
-
 import dev.geco.gholo.GHoloMain;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.RemoteConsoleCommandSender;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class GHoloReloadCommand implements CommandExecutor {
 
-    private final GHoloMain GPM;
+    private final GHoloMain gHoloMain;
 
-    public GHoloReloadCommand(GHoloMain GPluginMain) { GPM = GPluginMain; }
+    public GHoloReloadCommand(GHoloMain gHoloMain) {
+        this.gHoloMain = gHoloMain;
+    }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender Sender, @NotNull Command Command, @NotNull String Label, String[] Args) {
-
-        if(!(Sender instanceof Player || Sender instanceof ConsoleCommandSender || Sender instanceof RemoteConsoleCommandSender)) {
-
-            GPM.getMManager().sendMessage(Sender, "Messages.command-sender-error");
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        if(!(sender instanceof Player || sender instanceof ConsoleCommandSender || sender instanceof RemoteConsoleCommandSender)) {
+            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-sender-error");
             return true;
         }
 
-        if(!GPM.getPManager().hasPermission(Sender, "Reload")) {
-
-            GPM.getMManager().sendMessage(Sender, "Messages.command-permission-error");
+        if(!gHoloMain.getPermissionService().hasPermission(sender, "Reload")) {
+            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-permission-error");
             return true;
         }
 
-        GPM.reload(Sender);
+        gHoloMain.reload(sender);
 
-        GPM.getMManager().sendMessage(Sender, "Plugin.plugin-reload");
+        gHoloMain.getMessageService().sendMessage(sender, "Plugin.plugin-reload");
         return true;
     }
 

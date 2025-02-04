@@ -1,27 +1,24 @@
 package dev.geco.gholo.api.event;
 
-import org.jetbrains.annotations.*;
-
-import org.bukkit.event.*;
-import org.bukkit.event.server.*;
-
 import dev.geco.gholo.GHoloMain;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.server.PluginEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class GHoloLoadedEvent extends PluginEvent {
 
-    private static final HandlerList HANDLERS = new HandlerList();
+    private final GHoloMain gHoloMain;
+    private static final HandlerList handlers = new HandlerList();
 
-    private final GHoloMain GPM;
-
-    public GHoloLoadedEvent(GHoloMain GPluginMain) {
-        super(GPluginMain);
-        GPM = GPluginMain;
+    public GHoloLoadedEvent(@NotNull GHoloMain gHoloMain) {
+        super(gHoloMain);
+        this.gHoloMain = gHoloMain;
     }
 
-    public @NotNull GHoloMain getPlugin() { return GPM; }
+    public @NotNull GHoloMain getPlugin() { return gHoloMain; }
 
-    public @NotNull HandlerList getHandlers() { return HANDLERS; }
+    public @NotNull HandlerList getHandlers() { return handlers; }
 
-    public static HandlerList getHandlerList() { return HANDLERS; }
+    public static @NotNull HandlerList getHandlerList() { return handlers; }
 
 }

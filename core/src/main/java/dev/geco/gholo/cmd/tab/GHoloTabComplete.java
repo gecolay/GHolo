@@ -1,182 +1,148 @@
 package dev.geco.gholo.cmd.tab;
 
-import java.io.*;
-import java.util.*;
-
-import org.jetbrains.annotations.*;
-
-import org.bukkit.*;
-import org.bukkit.command.*;
-import org.bukkit.entity.*;
-
 import dev.geco.gholo.GHoloMain;
-import dev.geco.gholo.cmd.*;
-import dev.geco.gholo.objects.*;
-import dev.geco.gholo.util.*;
+import dev.geco.gholo.cmd.GHoloCommand;
+import dev.geco.gholo.object.GHolo;
+import dev.geco.gholo.util.ImageUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Display;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.TextDisplay;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class GHoloTabComplete implements TabCompleter {
 
-    private final GHoloMain GPM;
+    private final GHoloMain gHoloMain;
 
-    public GHoloTabComplete(GHoloMain GPluginMain) { GPM = GPluginMain; }
+    public GHoloTabComplete(GHoloMain gHoloMain) {
+        this.gHoloMain = gHoloMain;
+    }
 
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender Sender, @NotNull Command Command, @NotNull String Label, String[] Args) {
-
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         List<String> complete = new ArrayList<>(), completeStarted = new ArrayList<>();
 
         List<String> holoIdArg = new ArrayList<>(List.of("info", "remove", "rename", "relocate", "tphere", "tpto", "align", "addrow", "insertrow", "setrow", "removerow", "positionrow", "copyrows", "data", "setimage"));
+        if(!(sender instanceof Player)) holoIdArg.removeAll(List.of("tpto", "tphere"));
 
-        if(!(Sender instanceof Player)) holoIdArg.removeAll(List.of("tpto", "tphere"));
-
-        if(Args.length == 1) {
-
-            if(GPM.getPManager().hasPermission(Sender, "Holo")) {
+        if(args.length == 1) {
+            if(gHoloMain.getPermissionService().hasPermission(sender, "Holo")) {
                 complete.addAll(GHoloCommand.COMMAND_LIST);
-                if(!(Sender instanceof Player)) complete.removeAll(List.of("create", "tpto", "tphere"));
+                if(!(sender instanceof Player)) complete.removeAll(List.of("create", "tpto", "tphere"));
             }
-
-            if(!Args[Args.length - 1].isEmpty()) {
-
-                for(String entry : complete) if(entry.toLowerCase().startsWith(Args[Args.length - 1].toLowerCase())) completeStarted.add(entry);
-
+            if(!args[args.length - 1].isEmpty()) {
+                for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);
                 complete.clear();
             }
-        } else if(Args.length == 2) {
-
-            if(holoIdArg.contains(Args[0].toLowerCase())) {
-                complete.addAll(GPM.getHoloManager().getHolos().stream().map(GHolo::getId).toList());
+        } else if(args.length == 2) {
+            if(holoIdArg.contains(args[0].toLowerCase())) {
+                complete.addAll(gHoloMain.getHoloService().getHolos().stream().map(GHolo::getId).toList());
             }
-
-            if(Args[0].equalsIgnoreCase("import")) {
-                complete.addAll(GPM.getHoloImportManager().AVAILABLE_PLUGIN_IMPORTS);
+            if(args[0].equalsIgnoreCase("import")) {
+                complete.addAll(gHoloMain.getHoloImportService().AVAILABLE_PLUGIN_IMPORTS);
             }
-
-            if(!Args[Args.length - 1].isEmpty()) {
-
-                for(String entry : complete) if(entry.toLowerCase().startsWith(Args[Args.length - 1].toLowerCase())) completeStarted.add(entry);
-
+            if(!args[args.length - 1].isEmpty()) {
+                for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);
                 complete.clear();
             }
-        } else if(Args.length == 3) {
-
-            if(Args[0].equalsIgnoreCase("align") || Args[0].equalsIgnoreCase("copyrows")) {
-                complete.addAll(GPM.getHoloManager().getHolos().stream().map(GHolo::getId).filter(holoId -> !holoId.equalsIgnoreCase(Args[1])).toList());
+        } else if(args.length == 3) {
+            if(args[0].equalsIgnoreCase("align") || args[0].equalsIgnoreCase("copyrows")) {
+                complete.addAll(gHoloMain.getHoloService().getHolos().stream().map(GHolo::getId).filter(holoId -> !holoId.equalsIgnoreCase(args[1])).toList());
             }
-
-            if(Args[0].equalsIgnoreCase("insertrow") || Args[0].equalsIgnoreCase("setrow") || Args[0].equalsIgnoreCase("removerow") || Args[0].equalsIgnoreCase("positionrow")) {
-                GHolo holo = GPM.getHoloManager().getHolo(Args[1]);
+            if(args[0].equalsIgnoreCase("insertrow") || args[0].equalsIgnoreCase("setrow") || args[0].equalsIgnoreCase("removerow") || args[0].equalsIgnoreCase("positionrow")) {
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo != null) for(int row = 1; row <= holo.getRows().size(); row++) complete.add("" + row);
             }
-
-            if(Args[0].equalsIgnoreCase("data")) {
+            if(args[0].equalsIgnoreCase("data")) {
                 complete.addAll(List.of("default", "row"));
             }
-
-            if(Args[0].equalsIgnoreCase("setimage")) {
+            if(args[0].equalsIgnoreCase("setimage")) {
                 complete.addAll(ImageUtil.IMAGE_TYPES);
             }
-
-            if(!Args[Args.length - 1].isEmpty()) {
-
-                for(String entry : complete) if(entry.toLowerCase().startsWith(Args[Args.length - 1].toLowerCase())) completeStarted.add(entry);
-
+            if(!args[args.length - 1].isEmpty()) {
+                for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);
                 complete.clear();
             }
-        } else if(Args.length == 4) {
-
-            if(Args[0].equalsIgnoreCase("align")) {
+        } else if(args.length == 4) {
+            if(args[0].equalsIgnoreCase("align")) {
                 complete.addAll(List.of("x", "y", "z", "xy", "xz", "yz", "xyz"));
             }
-
-            if(Args[0].equalsIgnoreCase("positionrow")) {
+            if(args[0].equalsIgnoreCase("positionrow")) {
                 complete.addAll(List.of("xoffset", "yoffset", "zoffset", "yaw", "pitch"));
             }
-
-            if(Args[0].equalsIgnoreCase("data")) {
-
-                if(Args[2].equalsIgnoreCase("default")) {
+            if(args[0].equalsIgnoreCase("data")) {
+                if(args[2].equalsIgnoreCase("default")) {
                     complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "text_alignment", "billboard", "see_through", "scale", "brightness", "permission"));
                 }
-
-                if(Args[2].equalsIgnoreCase("row")) {
-                    GHolo holo = GPM.getHoloManager().getHolo(Args[1]);
+                if(args[2].equalsIgnoreCase("row")) {
+                    GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                     if(holo != null) for(int row = 1; row <= holo.getRows().size(); row++) complete.add("" + row);
                 }
             }
-
-            if(Args[0].equalsIgnoreCase("setimage")) {
-
-                if(Args[2].equalsIgnoreCase("file")) {
+            if(args[0].equalsIgnoreCase("setimage")) {
+                if(args[2].equalsIgnoreCase("file")) {
                     File[] files = ImageUtil.IMAGE_FOLDER.listFiles();
                     if(files != null) complete.addAll(Arrays.stream(files).map(File::getName).toList());
                 }
-
-                if(Args[2].equalsIgnoreCase("avatar") || Args[2].equalsIgnoreCase("helm")) {
+                if(args[2].equalsIgnoreCase("avatar") || args[2].equalsIgnoreCase("helm")) {
                     complete.addAll(Arrays.stream(Bukkit.getOfflinePlayers()).map(OfflinePlayer::getName).toList());
                 }
             }
-
-            if(!Args[Args.length - 1].isEmpty()) {
-
-                for(String entry : complete) if(entry.toLowerCase().startsWith(Args[Args.length - 1].toLowerCase())) completeStarted.add(entry);
-
+            if(!args[args.length - 1].isEmpty()) {
+                for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);
                 complete.clear();
             }
-        } else if(Args.length == 5) {
-
-            if(Args[0].equalsIgnoreCase("data")) {
-
-                if(Args[2].equalsIgnoreCase("default")) {
-                    if(Args[3].equalsIgnoreCase("text_shadow") || Args[3].equalsIgnoreCase("see_through")) {
+        } else if(args.length == 5) {
+            if(args[0].equalsIgnoreCase("data")) {
+                if(args[2].equalsIgnoreCase("default")) {
+                    if(args[3].equalsIgnoreCase("text_shadow") || args[3].equalsIgnoreCase("see_through")) {
                         complete.addAll(List.of("true", "false"));
                     }
-                    if(Args[3].equalsIgnoreCase("text_alignment")) {
+                    if(args[3].equalsIgnoreCase("text_alignment")) {
                         complete.addAll(Arrays.stream(TextDisplay.TextAlignment.values()).map(ta -> ta.name().toLowerCase()).toList());
                     }
-                    if(Args[3].equalsIgnoreCase("billboard")) {
+                    if(args[3].equalsIgnoreCase("billboard")) {
                         complete.addAll(Arrays.stream(Display.Billboard.values()).map(b -> b.name().toLowerCase()).toList());
                     }
                     complete.add("*");
                 }
-
-                if(Args[2].equalsIgnoreCase("row")) {
+                if(args[2].equalsIgnoreCase("row")) {
                     complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "text_alignment", "billboard", "see_through", "scale", "brightness", "permission"));
                 }
             }
-
-            if(!Args[Args.length - 1].isEmpty()) {
-
-                for(String entry : complete) if(entry.toLowerCase().startsWith(Args[Args.length - 1].toLowerCase())) completeStarted.add(entry);
-
+            if(!args[args.length - 1].isEmpty()) {
+                for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);
                 complete.clear();
             }
-        } else if(Args.length == 6) {
-
-            if(Args[0].equalsIgnoreCase("data")) {
-
-                if(Args[2].equalsIgnoreCase("row")) {
-                    if(Args[4].equalsIgnoreCase("text_shadow") || Args[4].equalsIgnoreCase("see_through")) {
+        } else if(args.length == 6) {
+            if(args[0].equalsIgnoreCase("data")) {
+                if(args[2].equalsIgnoreCase("row")) {
+                    if(args[4].equalsIgnoreCase("text_shadow") || args[4].equalsIgnoreCase("see_through")) {
                         complete.addAll(List.of("true", "false"));
                     }
-                    if(Args[4].equalsIgnoreCase("text_alignment")) {
+                    if(args[4].equalsIgnoreCase("text_alignment")) {
                         complete.addAll(Arrays.stream(TextDisplay.TextAlignment.values()).map(ta -> ta.name().toLowerCase()).toList());
                     }
-                    if(Args[4].equalsIgnoreCase("billboard")) {
+                    if(args[4].equalsIgnoreCase("billboard")) {
                         complete.addAll(Arrays.stream(Display.Billboard.values()).map(b -> b.name().toLowerCase()).toList());
                     }
                     complete.add("*");
                 }
             }
-
-            if(!Args[Args.length - 1].isEmpty()) {
-
-                for(String entry : complete) if(entry.toLowerCase().startsWith(Args[Args.length - 1].toLowerCase())) completeStarted.add(entry);
-
+            if(!args[args.length - 1].isEmpty()) {
+                for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);
                 complete.clear();
             }
         }
-
         return complete.isEmpty() ? completeStarted : complete;
     }
 
