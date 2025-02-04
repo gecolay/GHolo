@@ -55,6 +55,8 @@ public class HoloService {
                         try {
                             UUID worldUuid = UUID.fromString(worldString);
                             world = Bukkit.getWorld(worldUuid);
+                            if(world == null) continue;
+                            gHoloMain.getDataService().execute("UPDATE holo SET l_world = ? WHERE id = ?", world.getName(), id);
                         } catch (IllegalArgumentException e) {
                             world = Bukkit.getWorld(worldString);
                         }
