@@ -108,7 +108,7 @@ public class GHoloMain extends JavaPlugin {
     public void onEnable() {
         if(!versionCheck()) return;
 
-        entityUtil = (IEntityUtil) versionService.getPackageObjectInstance("util.EntityUtil", this);
+        entityUtil = (IEntityUtil) versionService.getPackageObjectInstance("util.EntityUtil");
 
         loadPluginDependencies();
         loadSettings(Bukkit.getConsoleSender());

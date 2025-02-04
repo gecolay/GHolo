@@ -50,9 +50,14 @@ public class HoloService {
                 while(resultSet.next()) {
                     try {
                         String id = resultSet.getString("id");
-
-                        UUID worldUuid = UUID.fromString(resultSet.getString("l_world"));
-                        World world = Bukkit.getWorld(worldUuid);
+                        String worldString = resultSet.getString("l_world");
+                        World world;
+                        try {
+                            UUID worldUuid = UUID.fromString(worldString);
+                            world = Bukkit.getWorld(worldUuid);
+                        } catch (IllegalArgumentException e) {
+                            world = Bukkit.getWorld(worldString);
+                        }
                         if(world == null) continue;
                         double locationX = resultSet.getDouble("l_x");
                         double locationY = resultSet.getDouble("l_y");
@@ -115,7 +120,7 @@ public class HoloService {
 
             gHoloMain.getDataService().execute("INSERT INTO holo (id, l_world, l_x, l_y, l_z, default_data) VALUES (?, ?, ?, ?, ?, ?)",
                     holoId,
-                    location.getWorld().getUID().toString(),
+                    location.getWorld().getName(),
                     location.getX(),
                     location.getY(),
                     location.getZ(),
@@ -269,7 +274,7 @@ public class HoloService {
     public void updateHoloLocation(GHolo holo, Location location) {
         try {
             gHoloMain.getDataService().execute("UPDATE holo SET l_world = ?, l_x = ?, l_y = ?, l_z = ? WHERE id = ?",
-                    location.getWorld().getUID().toString(),
+                    location.getWorld().getName(),
                     location.getX(),
                     location.getY(),
                     location.getZ(),
