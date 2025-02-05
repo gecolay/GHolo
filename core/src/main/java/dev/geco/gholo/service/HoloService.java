@@ -282,6 +282,15 @@ public class HoloService {
                     location.getZ(),
                     holo.getId()
             );
+            if(!holo.getRawLocation().getWorld().equals(location.getWorld())) {
+                unloadHolo(holo);
+                holo.setLocation(location);
+                for(GHoloRow holoRow : holo.getRows()) {
+                    holoRow.getRawPosition().setWorld(holo.getRawLocation().getWorld());
+                    gHoloMain.getEntityUtil().loadHoloRowEntity(holoRow);
+                }
+                return;
+            }
             holo.setLocation(location);
             for(GHoloRow holoRow : holo.getRows()) holoRow.getHoloRowEntity().publishUpdate(GHoloRowUpdateType.LOCATION);
         } catch(Throwable e) { e.printStackTrace(); }

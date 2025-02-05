@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 public class PaperMessageService extends MessageService {
 
     protected final Pattern PARSED_HEX_PATTERN = Pattern.compile("§x(§[0-9a-fA-F]){6}");
+    protected final Pattern HEX_PATTERN = Pattern.compile("(?<!:)(#[a-fA-F0-9]{6})");
     protected final LegacyComponentSerializer legacyComponentSerializer;
     protected final MiniMessage miniMessage;
     protected final Map<String, String> tags;
