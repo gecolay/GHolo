@@ -285,10 +285,7 @@ public class HoloService {
             if(!holo.getRawLocation().getWorld().equals(location.getWorld())) {
                 unloadHolo(holo);
                 holo.setLocation(location);
-                for(GHoloRow holoRow : holo.getRows()) {
-                    holoRow.getRawPosition().setWorld(holo.getRawLocation().getWorld());
-                    gHoloMain.getEntityUtil().loadHoloRowEntity(holoRow);
-                }
+                for(GHoloRow holoRow : holo.getRows()) gHoloMain.getEntityUtil().loadHoloRowEntity(holoRow);
                 return;
             }
             holo.setLocation(location);

@@ -1,6 +1,8 @@
 package dev.geco.gholo.object;
 
 import org.bukkit.Location;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class GHoloRow {
 
@@ -10,43 +12,43 @@ public class GHoloRow {
     private GHoloData data = new GHoloData();
     private IGHoloRowEntity holoRowEntity;
 
-    public GHoloRow(GHolo holo, String content) {
+    public GHoloRow(@NotNull GHolo holo, @NotNull String content) {
         this.holo = holo;
         this.content = content;
     }
 
-    public GHolo getHolo() { return holo; }
+    public @NotNull GHolo getHolo() { return holo; }
 
     public int getRowId() { return holo.getRows().indexOf(this); }
 
-    public String getContent() { return content; }
+    public @NotNull String getContent() { return content; }
 
-    public GHoloRow setContent(String content) {
+    public @NotNull GHoloRow setContent(@NotNull String content) {
         this.content = content;
         return this;
     }
 
-    public Location getPosition() { return position.clone(); }
+    public @NotNull Location getPosition() { return position.clone(); }
 
-    public Location getRawPosition() { return position; }
+    public @NotNull Location getRawPosition() { return position; }
 
-    public GHoloRow setPosition(Location position) {
+    public @NotNull GHoloRow setPosition(@NotNull Location position) {
         this.position = position.clone();
         return this;
     }
 
-    public GHoloData getData() { return data.clone(); }
+    public @NotNull GHoloData getData() { return data.clone(); }
 
-    public GHoloData getRawData() { return data; }
+    public @NotNull GHoloData getRawData() { return data; }
 
-    public GHoloRow setData(GHoloData data) {
+    public @NotNull GHoloRow setData(@NotNull GHoloData data) {
         this.data = data.clone();
         return this;
     }
 
-    public IGHoloRowEntity getHoloRowEntity() { return holoRowEntity; }
+    public @Nullable IGHoloRowEntity getHoloRowEntity() { return holoRowEntity; }
 
-    public GHoloRow setHoloRowEntity(IGHoloRowEntity holoRowEntity) {
+    public @NotNull GHoloRow setHoloRowEntity(@Nullable IGHoloRowEntity holoRowEntity) {
         this.holoRowEntity = holoRowEntity;
         return this;
     }

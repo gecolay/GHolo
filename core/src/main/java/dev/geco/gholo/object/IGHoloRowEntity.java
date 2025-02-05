@@ -1,17 +1,18 @@
 package dev.geco.gholo.object;
 
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public interface IGHoloRowEntity {
 
     void loadHoloRow();
 
-    void loadHoloRow(Player player);
+    void loadHoloRow(@NotNull Player player);
 
-    void publishUpdate(GHoloRowUpdateType updateType);
+    void publishUpdate(@NotNull GHoloRowUpdateType updateType);
 
     void unloadHoloRow();
 
-    void unloadHoloRow(Player player);
+    void unloadHoloRow(@NotNull Player player);
 
 }

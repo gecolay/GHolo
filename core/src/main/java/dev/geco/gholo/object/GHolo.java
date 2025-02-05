@@ -1,6 +1,9 @@
 package dev.geco.gholo.object;
 
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,53 +15,57 @@ public class GHolo {
     private final List<GHoloRow> rows = new ArrayList<>();
     private GHoloData defaultData = new GHoloData();
 
-    public GHolo(String id, Location location) {
+    public GHolo(@NotNull String id, @NotNull Location location) {
         this.id = id;
         setLocation(location);
     }
 
-    public String getId() { return id; }
+    public @NotNull String getId() { return id; }
 
-    public GHolo setId(String id) {
+    public @NotNull GHolo setId(@NotNull String id) {
         this.id = id;
         return this;
     }
 
-    public Location getLocation() { return location.clone(); }
+    public @NotNull Location getLocation() { return location.clone(); }
 
-    public Location getRawLocation() { return location; }
+    public @NotNull Location getRawLocation() { return location; }
 
-    public GHolo setLocation(Location location) {
+    public @NotNull GHolo setLocation(@NotNull Location location) {
+        World world = location.getWorld();
+        if(!this.location.getWorld().equals(world)) {
+            for(GHoloRow holoRow : rows) holoRow.getRawPosition().setWorld(world);
+        }
         this.location = location.clone();
         this.location.setYaw(0);
         this.location.setPitch(0);
         return this;
     }
 
-    public List<GHoloRow> getRows() { return rows; }
+    public @NotNull List<GHoloRow> getRows() { return rows; }
 
-    public GHoloRow getRow(int rowId) { return rows.get(rowId); }
+    public @Nullable GHoloRow getRow(int rowId) { return rows.get(rowId); }
 
-    public GHolo addRow(GHoloRow holoRow) {
+    public @NotNull GHolo addRow(@NotNull GHoloRow holoRow) {
         rows.add(holoRow);
         return this;
     }
 
-    public GHolo insertRow(GHoloRow holoRow, int rowId) {
+    public @NotNull GHolo insertRow(@NotNull GHoloRow holoRow, int rowId) {
         rows.add(rowId, holoRow);
         return this;
     }
 
-    public GHolo removeRow(int rowId) {
+    public @NotNull GHolo removeRow(int rowId) {
         rows.remove(rowId);
         return this;
     }
 
-    public GHoloData getDefaultData() { return defaultData.clone(); }
+    public @NotNull GHoloData getDefaultData() { return defaultData.clone(); }
 
-    public GHoloData getRawDefaultData() { return defaultData; }
+    public @NotNull GHoloData getRawDefaultData() { return defaultData; }
 
-    public GHolo setDefaultData(GHoloData defaultData) {
+    public @NotNull GHolo setDefaultData(@NotNull GHoloData defaultData) {
         this.defaultData = defaultData.clone();
         return this;
     }

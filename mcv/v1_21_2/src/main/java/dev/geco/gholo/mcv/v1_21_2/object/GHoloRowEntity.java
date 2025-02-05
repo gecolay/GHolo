@@ -23,6 +23,7 @@ import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.lang.reflect.Field;
@@ -77,7 +78,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     }
 
     @Override
-    public void loadHoloRow(Player player) {
+    public void loadHoloRow(@NotNull Player player) {
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
         if(!serverPlayer.level().equals(level())) return;
         String permission = getPermission();
@@ -87,7 +88,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     }
 
     @Override
-    public void publishUpdate(GHoloRowUpdateType updateType) {
+    public void publishUpdate(@NotNull GHoloRowUpdateType updateType) {
         handleUpdate(updateType);
         if(updateType == GHoloRowUpdateType.LOCATION) {
             ClientboundTeleportEntityPacket teleportEntityPacket = new ClientboundTeleportEntityPacket(getId(), PositionMoveRotation.of(this), Set.of(), false);
@@ -216,7 +217,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     }
 
     @Override
-    public void unloadHoloRow(Player player) {
+    public void unloadHoloRow(@NotNull Player player) {
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
         serverPlayer.connection.send(new ClientboundRemoveEntitiesPacket(getId()));
     }

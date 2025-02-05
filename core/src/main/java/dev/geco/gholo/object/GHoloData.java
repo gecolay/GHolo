@@ -1,5 +1,6 @@
 package dev.geco.gholo.object;
 
+import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.util.HashMap;
@@ -49,7 +50,7 @@ public class GHoloData implements Cloneable {
         return dataString.toString();
     }
 
-    public void loadString(String string) {
+    public void loadString(@NotNull String string) {
         for(String dataPart : string.split("§§")) {
             try {
                 String[] dataSplit = dataPart.split("§");
@@ -161,6 +162,6 @@ public class GHoloData implements Cloneable {
     }
 
     @Override
-    public GHoloData clone() { try { return (GHoloData) super.clone(); } catch(CloneNotSupportedException e) { throw new Error(e); } }
+    public @NotNull GHoloData clone() { try { return (GHoloData) super.clone(); } catch(CloneNotSupportedException e) { throw new Error(e); } }
 
 }
