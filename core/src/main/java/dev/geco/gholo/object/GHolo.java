@@ -33,7 +33,7 @@ public class GHolo {
 
     public @NotNull GHolo setLocation(@NotNull Location location) {
         World world = location.getWorld();
-        if(!this.location.getWorld().equals(world)) {
+        if(this.location == null || !this.location.getWorld().equals(world)) {
             for(GHoloRow holoRow : rows) holoRow.getRawPosition().setWorld(world);
         }
         this.location = location.clone();
