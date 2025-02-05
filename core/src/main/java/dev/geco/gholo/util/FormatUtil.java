@@ -44,7 +44,7 @@ public class FormatUtil {
     }
 
     private String formatPlaceholdersWithoutAnimations(String text, Player player) {
-        if(gHoloMain.getConfigService().L_PLACEHOLDER_API && gHoloMain.hasPlaceholderAPILink()) text = PlaceholderAPI.setPlaceholders(player, text);
+        if(gHoloMain.hasPlaceholderAPILink()) text = PlaceholderAPI.setPlaceholders(player, text);
         return text;
     }
 

@@ -51,7 +51,7 @@ public class HoloAnimationService {
             if(holoRow.getContent().contains(AMIMATION_CHAR + animation.getId() + AMIMATION_CHAR)) animationSubscriber.get(animation.getId()).add(holoRow);
             else animationSubscriber.get(animation.getId()).remove(holoRow);
         }
-        if(!gHoloMain.getConfigService().L_PLACEHOLDER_API || !gHoloMain.hasPlaceholderAPILink() || countAnimationChars(holoRow.getContent()) < 2) return;
+        if(!gHoloMain.hasPlaceholderAPILink() || countAnimationChars(holoRow.getContent()) < 2) return;
         placeholderAPISubscriber.add(holoRow);
     }
 
@@ -70,7 +70,7 @@ public class HoloAnimationService {
             }, false, 0, animation.getTicks());
             taskIds.add(taskId);
         }
-        if(!gHoloMain.getConfigService().L_PLACEHOLDER_API || !gHoloMain.hasPlaceholderAPILink()) return;
+        if(!gHoloMain.hasPlaceholderAPILink()) return;
         UUID placeholderAPITaskId = gHoloMain.getTaskService().runAtFixedRate(() -> {
             for(Iterator<GHoloRow> it = placeholderAPISubscriber.iterator(); it.hasNext(); ) {
                 it.next().getHoloRowEntity().publishUpdate(GHoloRowUpdateType.CONTENT);

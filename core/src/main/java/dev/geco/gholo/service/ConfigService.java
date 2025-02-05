@@ -23,7 +23,6 @@ public class ConfigService {
     public int LIST_PAGE_SIZE;
     public double NEAR_RANGE;
     public HashMap<String, String> SYMBOLS = new HashMap<>();
-    public boolean L_PLACEHOLDER_API;
     public List<String> FEATUREFLAGS = new ArrayList<>();
 
     private final GHoloMain gHoloMain;
@@ -70,7 +69,6 @@ public class ConfigService {
                 }
             }
         } catch(Throwable ignored) { }
-        L_PLACEHOLDER_API = gHoloMain.getConfig().getBoolean("Options.Link.placeholder-api", true);
         FEATUREFLAGS = gHoloMain.getConfig().getStringList("Options.FeatureFlags");
     }
 
