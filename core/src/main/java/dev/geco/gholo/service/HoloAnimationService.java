@@ -11,9 +11,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class HoloAnimationService {
 
@@ -21,8 +22,8 @@ public class HoloAnimationService {
 
     private final GHoloMain gHoloMain;
     private final HashMap<String, GHoloAnimation> animations = new HashMap<>();
-    private final HashMap<String, List<GHoloRow>> animationSubscriber = new HashMap<>();
-    private final List<GHoloRow> placeholderAPISubscriber = new ArrayList<>();
+    private final ConcurrentHashMap<String, ConcurrentLinkedQueue<GHoloRow>> animationSubscriber = new ConcurrentHashMap<>();
+    private final ConcurrentLinkedQueue<GHoloRow> placeholderAPISubscriber = new ConcurrentLinkedQueue<>();
     private final List<UUID> taskIds = new ArrayList<>();
 
     public HoloAnimationService(GHoloMain gHoloMain) {
@@ -39,7 +40,7 @@ public class HoloAnimationService {
         try {
             for(String id : animationsData.getConfigurationSection("Animations").getKeys(false)) {
                 animations.put(id.toLowerCase(), new GHoloAnimation(id.toLowerCase(), animationsData.getLong("Animations." + id + ".ticks", 20), animationsData.getStringList("Animations." + id + ".content")));
-                animationSubscriber.put(id.toLowerCase(), new ArrayList<>());
+                animationSubscriber.put(id.toLowerCase(), new ConcurrentLinkedQueue<>());
             }
             startHoloAnimations();
         } catch(Throwable e) { e.printStackTrace(); }
@@ -56,7 +57,7 @@ public class HoloAnimationService {
     }
 
     public void unsubscribe(GHoloRow holoRow) {
-        for(List<GHoloRow> holoRows : animationSubscriber.values()) holoRows.remove(holoRow);
+        for(ConcurrentLinkedQueue<GHoloRow> holoRows : animationSubscriber.values()) holoRows.remove(holoRow);
         placeholderAPISubscriber.remove(holoRow);
     }
 
@@ -72,8 +73,8 @@ public class HoloAnimationService {
         }
         if(!gHoloMain.hasPlaceholderAPILink()) return;
         UUID placeholderAPITaskId = gHoloMain.getTaskService().runAtFixedRate(() -> {
-            for(Iterator<GHoloRow> it = placeholderAPISubscriber.iterator(); it.hasNext(); ) {
-                it.next().getHoloRowEntity().publishUpdate(GHoloRowUpdateType.CONTENT);
+            for(GHoloRow holoRow : placeholderAPISubscriber) {
+                holoRow.getHoloRowEntity().publishUpdate(GHoloRowUpdateType.CONTENT);
             }
         }, false, 0, 10);
         taskIds.add(placeholderAPITaskId);
