@@ -3,9 +3,10 @@ package dev.geco.gholo.mcv.v1_21_4.object;
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.GHoloData;
 import dev.geco.gholo.object.GHoloRow;
-import dev.geco.gholo.object.GHoloRowUpdateType;
+import dev.geco.gholo.object.GHoloUpdateType;
 import dev.geco.gholo.object.IGHoloRowEntity;
 import io.papermc.paper.adventure.PaperAdventure;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
@@ -37,6 +38,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     protected final GHoloMain gHoloMain;
     protected final EntityDataAccessor<Component> holoTextData;
     protected final EntityDataAccessor<Vector3f> holoScaleData;
+    protected GHoloInteractEntity holoInteractEntity = null;
 
     public GHoloRowEntity(GHoloRow holoRow) {
         super(EntityType.TEXT_DISPLAY, ((CraftWorld) holoRow.getHolo().getRawLocation().getWorld()).getHandle());
@@ -62,7 +64,11 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
             scaleAccessor = (EntityDataAccessor<Vector3f>) textField.get(this);
         } catch(Throwable e) { e.printStackTrace(); }
         holoScaleData = scaleAccessor;
-        for(GHoloRowUpdateType updateType : GHoloRowUpdateType.values()) handleUpdate(updateType);
+        for(GHoloUpdateType updateType : GHoloUpdateType.values()) handleUpdate(updateType);
+        /*if(holoRow.getHoloInteraction().isEmpty()) return;
+        holoInteractEntity = new GHoloInteractEntity(level());
+        holoInteractEntity.setPos(getX(), getY(), getZ());
+        gHoloMain.getInteractService().addInteractionEntry(holoInteractEntity.getId(), holoRow);*/
     }
 
     @Override
@@ -72,8 +78,19 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
             if(permission != null && !gHoloMain.getPermissionService().hasPermission(player, permission)) continue;
             ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-            serverPlayer.connection.send(addEntityPacket);
-            serverPlayer.connection.send(getDataPacket(player));
+            showHoloRow(player, serverPlayer, addEntityPacket);
+            continue;
+
+            /*serverPlayer.connection.send(new ClientboundAddEntityPacket(holoInteractEntity.getId(), holoInteractEntity.getUUID(), holoInteractEntity.getX(), holoInteractEntity.getY(), holoInteractEntity.getZ(), holoInteractEntity.getXRot(), holoInteractEntity.getYRot(), holoInteractEntity.getType(), 0, holoInteractEntity.getDeltaMovement(), holoInteractEntity.getYHeadRot()));
+            serverPlayer.connection.send(new ClientboundSetEntityDataPacket(holoInteractEntity.getId(), holoInteractEntity.getEntityData().getNonDefaultValues()));
+
+            PlayerTeam pt = new PlayerTeam(new Scoreboard(), "hide");
+            pt. setCollisionRule(Team.CollisionRule.NEVER);
+            pt.setColor(ChatFormatting.AQUA);
+
+            serverPlayer.connection.send(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(pt, true));
+            serverPlayer.connection.send(ClientboundSetPlayerTeamPacket.createPlayerPacket(pt, holoInteractEntity.getUUID().toString(), ClientboundSetPlayerTeamPacket.Action.ADD));
+*/
         }
     }
 
@@ -83,14 +100,18 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         if(!serverPlayer.level().equals(level())) return;
         String permission = getPermission();
         if(permission != null && !gHoloMain.getPermissionService().hasPermission(player, permission)) return;
-        serverPlayer.connection.send(new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYHeadRot()));
+        showHoloRow(player, serverPlayer, new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYHeadRot()));
+    }
+
+    private void showHoloRow(Player player, ServerPlayer serverPlayer, ClientboundAddEntityPacket addEntityPacket) {
+        serverPlayer.connection.send(addEntityPacket);
         serverPlayer.connection.send(getDataPacket(player));
     }
 
     @Override
-    public void publishUpdate(@NotNull GHoloRowUpdateType updateType) {
+    public void publishUpdate(@NotNull GHoloUpdateType updateType) {
         handleUpdate(updateType);
-        if(updateType == GHoloRowUpdateType.LOCATION) {
+        if(updateType == GHoloUpdateType.LOCATION) {
             ClientboundTeleportEntityPacket teleportEntityPacket = new ClientboundTeleportEntityPacket(getId(), PositionMoveRotation.of(this), Set.of(), false);
             String permission = getPermission();
             for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
@@ -99,7 +120,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
                 serverPlayer.connection.send(teleportEntityPacket);
             }
             return;
-        } else if(updateType == GHoloRowUpdateType.PERMISSION) {
+        } else if(updateType == GHoloUpdateType.PERMISSION) {
             unloadHoloRow();
             loadHoloRow();
             return;
@@ -107,7 +128,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         finishUpdate();
     }
 
-    private void handleUpdate(GHoloRowUpdateType updateType) {
+    private void handleUpdate(GHoloUpdateType updateType) {
         GHoloData defaultData = holoRow.getHolo().getRawDefaultData();
         GHoloData data = holoRow.getRawData();
         switch (updateType) {
@@ -209,6 +230,9 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
 
     @Override
     public void unloadHoloRow() {
+        //gHoloMain.getHoloInteractService().removeInteraction(holoInteractEntity.getId());
+        /*IntArrayList ids = new IntArrayList(getId());
+        if(holoInteractEntity != null) ids.add(holoInteractEntity.getId());*/
         ClientboundRemoveEntitiesPacket removeEntityPacket = new ClientboundRemoveEntitiesPacket(getId());
         for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
             ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
@@ -219,6 +243,8 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     @Override
     public void unloadHoloRow(@NotNull Player player) {
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+        /*IntArrayList ids = new IntArrayList(getId());
+        if(holoInteractEntity != null) ids.add(holoInteractEntity.getId());*/
         serverPlayer.connection.send(new ClientboundRemoveEntitiesPacket(getId()));
     }
 

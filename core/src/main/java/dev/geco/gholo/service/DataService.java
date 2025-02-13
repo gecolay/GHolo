@@ -43,6 +43,8 @@ public class DataService {
         return reconnect();
     }
 
+    public String getType() { return type; }
+
     public boolean isConnected() {
         try {
             if(connection != null && !connection.isClosed()) return true;

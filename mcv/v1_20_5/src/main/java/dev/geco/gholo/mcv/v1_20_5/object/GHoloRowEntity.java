@@ -3,7 +3,7 @@ package dev.geco.gholo.mcv.v1_20_5.object;
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.GHoloData;
 import dev.geco.gholo.object.GHoloRow;
-import dev.geco.gholo.object.GHoloRowUpdateType;
+import dev.geco.gholo.object.GHoloUpdateType;
 import dev.geco.gholo.object.IGHoloRowEntity;
 import io.papermc.paper.adventure.PaperAdventure;
 import net.minecraft.network.chat.Component;
@@ -60,7 +60,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
             scaleAccessor = (EntityDataAccessor<Vector3f>) textField.get(this);
         } catch(Throwable e) { e.printStackTrace(); }
         holoScaleData = scaleAccessor;
-        for(GHoloRowUpdateType updateType : GHoloRowUpdateType.values()) handleUpdate(updateType);
+        for(GHoloUpdateType updateType : GHoloUpdateType.values()) handleUpdate(updateType);
     }
 
     @Override
@@ -86,9 +86,9 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     }
 
     @Override
-    public void publishUpdate(@NotNull GHoloRowUpdateType updateType) {
+    public void publishUpdate(@NotNull GHoloUpdateType updateType) {
         handleUpdate(updateType);
-        if(updateType == GHoloRowUpdateType.LOCATION) {
+        if(updateType == GHoloUpdateType.LOCATION) {
             ClientboundTeleportEntityPacket teleportEntityPacket = new ClientboundTeleportEntityPacket(this);
             String permission = getPermission();
             for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
@@ -97,7 +97,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
                 serverPlayer.connection.send(teleportEntityPacket);
             }
             return;
-        } else if(updateType == GHoloRowUpdateType.PERMISSION) {
+        } else if(updateType == GHoloUpdateType.PERMISSION) {
             unloadHoloRow();
             loadHoloRow();
             return;
@@ -105,7 +105,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         finishUpdate();
     }
 
-    private void handleUpdate(GHoloRowUpdateType updateType) {
+    private void handleUpdate(GHoloUpdateType updateType) {
         GHoloData defaultData = holoRow.getHolo().getRawDefaultData();
         GHoloData data = holoRow.getRawData();
         switch (updateType) {

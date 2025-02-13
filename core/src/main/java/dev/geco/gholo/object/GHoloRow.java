@@ -4,13 +4,16 @@ import org.bukkit.Location;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GHoloRow {
 
     private final GHolo holo;
     private String content;
     private Location position = new Location(null, 0, 0, 0);
     private GHoloData data = new GHoloData();
-    private IGHoloRowEntity holoRowEntity;
+    private IGHoloRowEntity holoRowEntity = null;
 
     public GHoloRow(@NotNull GHolo holo, @NotNull String content) {
         this.holo = holo;

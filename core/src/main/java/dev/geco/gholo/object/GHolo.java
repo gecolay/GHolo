@@ -10,15 +10,19 @@ import java.util.List;
 
 public class GHolo {
 
+    private final String internalId;
     private String id;
     private Location location;
     private final List<GHoloRow> rows = new ArrayList<>();
     private GHoloData defaultData = new GHoloData();
 
-    public GHolo(@NotNull String id, @NotNull Location location) {
+    public GHolo(@NotNull String internalId, @NotNull String id, @NotNull Location location) {
+        this.internalId = internalId;
         this.id = id;
         setLocation(location);
     }
+
+    public @NotNull String getInternalId() { return internalId; }
 
     public @NotNull String getId() { return id; }
 

@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 public class GHoloAPI {
@@ -29,7 +31,7 @@ public class GHoloAPI {
      * @since 1.0.0
      * @return List of all holos
      */
-    public static @NotNull List<GHolo> getHolos() {
+    public static @NotNull Collection<GHolo> getHolos() {
         return getInstance().getHoloService().getHolos();
     }
 

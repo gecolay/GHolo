@@ -4,7 +4,9 @@ import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.GHolo;
 import dev.geco.gholo.object.GHoloData;
 import dev.geco.gholo.object.GHoloRow;
-import dev.geco.gholo.object.GHoloRowUpdateType;
+import dev.geco.gholo.object.GHoloUpdateType;
+import dev.geco.gholo.object.importer.GHoloImporter;
+import dev.geco.gholo.object.importer.GHoloImporterResult;
 import dev.geco.gholo.util.ImageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -474,14 +476,14 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-data-use-error");
                     break;
                 }
-                GHoloRowUpdateType updateType = null;
+                GHoloUpdateType updateType = null;
                 String option = args[arg].toLowerCase();
                 switch (option) {
                     case "range":
                         try {
                             if(args[arg + 1].equalsIgnoreCase("*")) data.setRange(GHoloData.DEFAULT_RANGE);
                             else data.setRange(Double.parseDouble(args[arg + 1]));
-                            updateType = GHoloRowUpdateType.RANGE;
+                            updateType = GHoloUpdateType.RANGE;
                         } catch(NumberFormatException e) {
                             gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-data-value-error", "%Data%", option, "%Value%", args[arg + 1]);
                             return true;
@@ -496,13 +498,13 @@ public class GHoloCommand implements CommandExecutor {
                                 return true;
                             } else data.setBackgroundColor(backgroundColor);
                         }
-                        updateType = GHoloRowUpdateType.BACKGROUND_COLOR;
+                        updateType = GHoloUpdateType.BACKGROUND_COLOR;
                         break;
                     case "text_opacity":
                         try {
                             if(args[arg + 1].equalsIgnoreCase("*")) data.setTextOpacity(GHoloData.DEFAULT_TEXT_OPACITY);
                             else data.setTextOpacity(Byte.parseByte(args[arg + 1]));
-                            updateType = GHoloRowUpdateType.TEXT_OPACITY;
+                            updateType = GHoloUpdateType.TEXT_OPACITY;
                         } catch(NumberFormatException e) {
                             gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-data-value-error", "%Data%", option, "%Value%", args[arg + 1]);
                             return true;
@@ -512,7 +514,7 @@ public class GHoloCommand implements CommandExecutor {
                         try {
                             if(args[arg + 1].equalsIgnoreCase("*")) data.setTextShadow(GHoloData.DEFAULT_HAS_TEXT_SHADOW);
                             else data.setTextShadow(Boolean.parseBoolean(args[arg + 1]));
-                            updateType = GHoloRowUpdateType.TEXT_SHADOW;
+                            updateType = GHoloUpdateType.TEXT_SHADOW;
                         } catch(NumberFormatException e) {
                             gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-data-value-error", "%Data%", option, "%Value%", args[arg + 1]);
                             return true;
@@ -522,7 +524,7 @@ public class GHoloCommand implements CommandExecutor {
                         try {
                             if(args[arg + 1].equalsIgnoreCase("*")) data.setTextAlignment(GHoloData.DEFAULT_TEXT_ALIGNMENT);
                             else data.setTextAlignment(TextDisplay.TextAlignment.valueOf(args[arg + 1].toUpperCase()).name().toLowerCase());
-                            updateType = GHoloRowUpdateType.TEXT_ALIGNMENT;
+                            updateType = GHoloUpdateType.TEXT_ALIGNMENT;
                         } catch(IllegalArgumentException e) {
                             gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-data-value-error", "%Data%", option, "%Value%", args[arg + 1].toUpperCase());
                             return true;
@@ -532,7 +534,7 @@ public class GHoloCommand implements CommandExecutor {
                         try {
                             if(args[arg + 1].equalsIgnoreCase("*")) data.setBillboard(GHoloData.DEFAULT_BILLBOARD);
                             else data.setBillboard(Display.Billboard.valueOf(args[arg + 1].toUpperCase()).name().toLowerCase());
-                            updateType = GHoloRowUpdateType.BILLBOARD;
+                            updateType = GHoloUpdateType.BILLBOARD;
                         } catch(IllegalArgumentException e) {
                             gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-data-value-error", "%Data%", option, "%Value%", args[arg + 1].toUpperCase());
                             return true;
@@ -542,7 +544,7 @@ public class GHoloCommand implements CommandExecutor {
                         try {
                             if(args[arg + 1].equalsIgnoreCase("*")) data.setSeeThrough(GHoloData.DEFAULT_CAN_SEE_THROUGH);
                             else data.setSeeThrough(Boolean.parseBoolean(args[arg + 1]));
-                            updateType = GHoloRowUpdateType.SEE_THROUGH;
+                            updateType = GHoloUpdateType.SEE_THROUGH;
                         } catch(NumberFormatException e) {
                             gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-data-value-error", "%Data%", option, "%Value%", args[arg + 1]);
                             return true;
@@ -552,7 +554,7 @@ public class GHoloCommand implements CommandExecutor {
                         try {
                             if(args[arg + 1].equalsIgnoreCase("*")) data.setScale(GHoloData.DEFAULT_SCALE);
                             else data.setScale(new org.joml.Vector3f(Float.parseFloat(args[arg + 1]), Float.parseFloat(args[arg + 1]), Float.parseFloat(args[arg + 1])));
-                            updateType = GHoloRowUpdateType.SCALE;
+                            updateType = GHoloUpdateType.SCALE;
                         } catch(NumberFormatException e) {
                             gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-data-value-error", "%Data%", option, "%Value%", args[arg + 1]);
                             return true;
@@ -562,7 +564,7 @@ public class GHoloCommand implements CommandExecutor {
                         try {
                             if(args[arg + 1].equalsIgnoreCase("*")) data.setBrightness(GHoloData.DEFAULT_TEXT_OPACITY);
                             else data.setBrightness(Byte.parseByte(args[arg + 1]));
-                            updateType = GHoloRowUpdateType.BRIGHTNESS;
+                            updateType = GHoloUpdateType.BRIGHTNESS;
                         } catch(NumberFormatException e) {
                             gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-data-value-error", "%Data%", option, "%Value%", args[arg + 1]);
                             return true;
@@ -571,7 +573,7 @@ public class GHoloCommand implements CommandExecutor {
                     case "permission":
                         if(args[arg + 1].equalsIgnoreCase("*")) data.setPermission(GHoloData.DEFAULT_PERMISSION);
                         else data.setPermission(args[arg + 1]);
-                        updateType = GHoloRowUpdateType.PERMISSION;
+                        updateType = GHoloUpdateType.PERMISSION;
                         break;
                 }
                 if(holoRow == null) {
@@ -593,48 +595,50 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
                     break;
                 }
-                BufferedImage bufferedImage = null;
-                switch (args[2].toLowerCase()) {
-                    case "file":
-                        File imageFile = new File(ImageUtil.IMAGE_FOLDER, args[3]);
-                        if(!imageFile.exists()) break;
-                        bufferedImage = ImageUtil.getBufferedImage(imageFile);
-                        break;
-                    case "url":
-                        bufferedImage = ImageUtil.getBufferedImage(args[3]);
-                        break;
-                    case "avatar":
-                    case "helm":
-                        OfflinePlayer target;
-                        try {
-                            target = Bukkit.getOfflinePlayer(UUID.fromString(args[3]));
-                        } catch(Throwable e) {
-                            target = Bukkit.getOfflinePlayer(args[3]);
-                        }
-                        bufferedImage = ImageUtil.getBufferedImage(target, args[2].equalsIgnoreCase("helm"));
-                        break;
-                    default:
-                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-setimage-use-error");
-                        return true;
-                }
-                if(bufferedImage == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-setimage-image-error", "%Type%", args[2].toLowerCase(), "%Source%", args[3]);
-                    break;
-                }
-                List<String> rows;
-                if(args.length > 4) {
-                    try {
-                        if(args[4].contains(":")) {
-                            String[] sizes = args[4].split(":");
-                            rows = new ImageUtil(bufferedImage, Integer.parseInt(sizes[0]), Integer.parseInt(sizes[1])).getLines();
-                        } else rows = new ImageUtil(bufferedImage, Integer.parseInt(args[4])).getLines();
-                    } catch(Throwable e) {
-                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-setimage-size-error");
-                        return true;
+                gHoloMain.getTaskService().run(() -> {
+                    BufferedImage bufferedImage = null;
+                    switch (args[2].toLowerCase()) {
+                        case "file":
+                            File imageFile = new File(ImageUtil.IMAGE_FOLDER, args[3]);
+                            if(!imageFile.exists()) break;
+                            bufferedImage = ImageUtil.getBufferedImage(imageFile);
+                            break;
+                        case "url":
+                            bufferedImage = ImageUtil.getBufferedImage(args[3]);
+                            break;
+                        case "avatar":
+                        case "helm":
+                            OfflinePlayer target;
+                            try {
+                                target = Bukkit.getOfflinePlayer(UUID.fromString(args[3]));
+                            } catch(Throwable e) {
+                                target = Bukkit.getOfflinePlayer(args[3]);
+                            }
+                            bufferedImage = ImageUtil.getBufferedImage(target, args[2].equalsIgnoreCase("helm"));
+                            break;
+                        default:
+                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-setimage-use-error");
+                            return;
                     }
-                }  else rows = new ImageUtil(bufferedImage).getLines();
-                gHoloMain.getHoloService().setHoloRows(holo, rows);
-                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-setimage", "%Holo%", holo.getId(), "%Type%", args[2].toLowerCase(), "%Source%", args[3]);
+                    if(bufferedImage == null) {
+                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-setimage-image-error", "%Type%", args[2].toLowerCase(), "%Source%", args[3]);
+                        return;
+                    }
+                    List<String> rows;
+                    if(args.length > 4) {
+                        try {
+                            if(args[4].contains(":")) {
+                                String[] sizes = args[4].split(":");
+                                rows = new ImageUtil(bufferedImage, Integer.parseInt(sizes[0]), Integer.parseInt(sizes[1])).getLines();
+                            } else rows = new ImageUtil(bufferedImage, Integer.parseInt(args[4])).getLines();
+                        } catch(Throwable e) {
+                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-setimage-size-error");
+                            return;
+                        }
+                    }  else rows = new ImageUtil(bufferedImage).getLines();
+                    gHoloMain.getHoloService().setHoloRows(holo, rows);
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-setimage", "%Holo%", holo.getId(), "%Type%", args[2].toLowerCase(), "%Source%", args[3]);
+                }, false);
                 break;
             case "import":
                 if(args.length == 1) {
@@ -642,16 +646,17 @@ public class GHoloCommand implements CommandExecutor {
                     break;
                 }
                 String plugin = args[1].toLowerCase();
-                if(!gHoloMain.getHoloImportService().AVAILABLE_PLUGIN_IMPORTS.contains(plugin)) {
+                GHoloImporter holoImporter = gHoloMain.getHoloImportService().getHoloImporters().get(plugin);
+                if(holoImporter == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import-exist-error", "%Plugin%", args[1]);
                     break;
                 }
-                int imported = gHoloMain.getHoloImportService().importFromPlugin(plugin);
-                if(imported < 0) {
+                GHoloImporterResult importerResult = holoImporter.importHolos(gHoloMain);
+                if(!importerResult.hasSucceeded()) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import-import-error", "%Plugin%", plugin);
                     break;
                 }
-                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import", "%Plugin%", plugin, "%Imported%", imported);
+                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import", "%Plugin%", plugin, "%Imported%", importerResult.getCount());
                 break;
             default:
                 gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-use-error");

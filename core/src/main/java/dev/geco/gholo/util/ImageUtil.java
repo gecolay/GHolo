@@ -41,8 +41,8 @@ public class ImageUtil {
     }
 
     public ImageUtil(BufferedImage image, int width, int height) {
-        if(width <= 0 ) width = 1;
-        if(height <= 0 ) height = 1;
+        if(width <= 0) width = 1;
+        if(height <= 0) height = 1;
         lines = toLines(toColorArray(image, width, height));
     }
 
@@ -76,9 +76,9 @@ public class ImageUtil {
     }
 
     private String[][] toColorArray(BufferedImage image, int width, int height) {
-        BufferedImage resizedImage = width != image.getWidth() && height != image.getHeight() ? resizeImage(image, width, height) : image;
+        BufferedImage resizedImage = width != image.getWidth() || height != image.getHeight() ? resizeImage(image, width, height) : image;
         String[][] colorArray = new String[resizedImage.getWidth()][resizedImage.getHeight()];
-        for(int x = 0; x < resizedImage.getWidth(); x++) for(int y = 0; y < resizedImage.getHeight(); y++) colorArray[x][y] = getColor(new java.awt.Color(resizedImage.getRGB(x, y), true));
+        for(int x = 0; x < resizedImage.getWidth(); x++) for(int y = 0; y < resizedImage.getHeight(); y++) colorArray[x][y] = getHexColor(resizedImage.getRGB(x, y));
         return colorArray;
     }
 
@@ -89,9 +89,9 @@ public class ImageUtil {
         return operation.filter(image, null);
     }
 
-    private String getColor(java.awt.Color color) {
-        if(color.getAlpha() < 128) return null;
-        return net.md_5.bungee.api.ChatColor.of(color).toString();
+    private String getHexColor(int color) {
+        if(((color >> 24) & 0xff) < 128) return null;
+        return "#" + String.format("%08x", color).substring(2);
     }
 
 }

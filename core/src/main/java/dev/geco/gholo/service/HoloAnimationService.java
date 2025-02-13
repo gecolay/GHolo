@@ -3,15 +3,15 @@ package dev.geco.gholo.service;
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.GHoloAnimation;
 import dev.geco.gholo.object.GHoloRow;
-import dev.geco.gholo.object.GHoloRowUpdateType;
+import dev.geco.gholo.object.GHoloUpdateType;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -24,7 +24,7 @@ public class HoloAnimationService {
     private final HashMap<String, GHoloAnimation> animations = new HashMap<>();
     private final ConcurrentHashMap<String, ConcurrentLinkedQueue<GHoloRow>> animationSubscriber = new ConcurrentHashMap<>();
     private final ConcurrentLinkedQueue<GHoloRow> placeholderAPISubscriber = new ConcurrentLinkedQueue<>();
-    private final List<UUID> taskIds = new ArrayList<>();
+    private final Set<UUID> taskIds = new HashSet<>();
 
     public HoloAnimationService(GHoloMain gHoloMain) {
         this.gHoloMain = gHoloMain;
@@ -66,7 +66,7 @@ public class HoloAnimationService {
             UUID taskId = gHoloMain.getTaskService().runAtFixedRate(() -> {
                 animation.setRowId(animation.getRowId() + 1 >= animation.getSize() ? 0 : animation.getRowId() + 1);
                 for(GHoloRow holoRow : animationSubscriber.get(animation.getId().toLowerCase())) {
-                    holoRow.getHoloRowEntity().publishUpdate(GHoloRowUpdateType.CONTENT);
+                    holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.CONTENT);
                 }
             }, false, 0, animation.getTicks());
             taskIds.add(taskId);
@@ -74,7 +74,7 @@ public class HoloAnimationService {
         if(!gHoloMain.hasPlaceholderAPILink()) return;
         UUID placeholderAPITaskId = gHoloMain.getTaskService().runAtFixedRate(() -> {
             for(GHoloRow holoRow : placeholderAPISubscriber) {
-                holoRow.getHoloRowEntity().publishUpdate(GHoloRowUpdateType.CONTENT);
+                holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.CONTENT);
             }
         }, false, 0, 10);
         taskIds.add(placeholderAPITaskId);

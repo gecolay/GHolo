@@ -1,6 +1,6 @@
 package dev.geco.gholo.object;
 
-public enum GHoloRowUpdateType {
+public enum GHoloUpdateType {
     CONTENT,
     LOCATION,
     RANGE,

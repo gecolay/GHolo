@@ -9,7 +9,7 @@ public interface IGHoloRowEntity {
 
     void loadHoloRow(@NotNull Player player);
 
-    void publishUpdate(@NotNull GHoloRowUpdateType updateType);
+    void publishUpdate(@NotNull GHoloUpdateType updateType);
 
     void unloadHoloRow();
 

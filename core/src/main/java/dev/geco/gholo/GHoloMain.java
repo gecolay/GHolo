@@ -6,12 +6,14 @@ import dev.geco.gholo.cmd.GHoloCommand;
 import dev.geco.gholo.cmd.GHoloReloadCommand;
 import dev.geco.gholo.cmd.tab.EmptyTabComplete;
 import dev.geco.gholo.cmd.tab.GHoloTabComplete;
+import dev.geco.gholo.event.IPacketHandler;
 import dev.geco.gholo.event.PlayerEventHandler;
 import dev.geco.gholo.metric.BStatsMetric;
 import dev.geco.gholo.service.ConfigService;
 import dev.geco.gholo.service.DataService;
 import dev.geco.gholo.service.HoloAnimationService;
-import dev.geco.gholo.service.HoloImportService;
+import dev.geco.gholo.service.HoloImporterService;
+import dev.geco.gholo.service.InteractService;
 import dev.geco.gholo.service.HoloService;
 import dev.geco.gholo.service.MessageService;
 import dev.geco.gholo.service.PermissionService;
@@ -23,6 +25,7 @@ import dev.geco.gholo.service.message.SpigotMessageService;
 import dev.geco.gholo.util.FormatUtil;
 import dev.geco.gholo.util.IEntityUtil;
 import dev.geco.gholo.util.ImageUtil;
+import dev.geco.gholo.util.ServerUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
@@ -46,14 +49,19 @@ public class GHoloMain extends JavaPlugin {
     private VersionService versionService;
     private HoloService holoService;
     private HoloAnimationService holoAnimationService;
-    private HoloImportService holoImportService;
+    private HoloImporterService holoImportService;
+    private InteractService interactService;
+    private IPacketHandler packetHandler;
     private FormatUtil formatUtil;
     private IEntityUtil entityUtil;
+    private ServerUtil serverUtil;
     private boolean placeholderAPILink = false;
     private boolean supportsPaperFeature = false;
     private boolean supportsTaskFeature = false;
 
     public static GHoloMain getInstance() { return gHoloMain; }
+
+    public VersionService getVersionService() { return versionService; }
 
     public ConfigService getConfigService() { return configService; }
 
@@ -67,17 +75,21 @@ public class GHoloMain extends JavaPlugin {
 
     public DataService getDataService() { return dataService; }
 
-    public VersionService getVersionService() { return versionService; }
-
     public HoloService getHoloService() { return holoService; }
 
     public HoloAnimationService getHoloAnimationService() { return holoAnimationService; }
 
-    public HoloImportService getHoloImportService() { return holoImportService; }
+    public HoloImporterService getHoloImportService() { return holoImportService; }
+
+    public InteractService getInteractService() { return interactService; }
+
+    public IPacketHandler getPacketHandler() { return packetHandler; }
 
     public FormatUtil getFormatUtil() { return formatUtil; }
 
     public IEntityUtil getEntityUtil() { return entityUtil; }
+
+    public ServerUtil getServerUtil() { return serverUtil; }
 
     public boolean hasPlaceholderAPILink() { return placeholderAPILink; }
 
@@ -88,17 +100,20 @@ public class GHoloMain extends JavaPlugin {
     public void onLoad() {
         gHoloMain = this;
 
+        versionService = new VersionService(this);
         configService = new ConfigService(this);
+
         updateService = new UpdateService(this);
         permissionService = new PermissionService();
         taskService = new TaskService(this);
         dataService = new DataService(this);
-        versionService = new VersionService(this);
         holoService = new HoloService(this);
         holoAnimationService = new HoloAnimationService(this);
-        holoImportService = new HoloImportService(this);
+        holoImportService = new HoloImporterService();
+        interactService = new InteractService(this);
 
         formatUtil = new FormatUtil(this);
+        serverUtil = new ServerUtil(this);
 
         loadFeatures();
 
@@ -108,6 +123,7 @@ public class GHoloMain extends JavaPlugin {
     public void onEnable() {
         if(!versionCheck()) return;
 
+        packetHandler = (IPacketHandler)  versionService.getPackageObjectInstance("event.PacketHandler", this);
         entityUtil = (IEntityUtil) versionService.getPackageObjectInstance("util.EntityUtil");
 
         loadPluginDependencies();
@@ -132,10 +148,13 @@ public class GHoloMain extends JavaPlugin {
 
     private void loadSettings(CommandSender sender) {
         if(!connectDatabase(sender)) return;
+        holoImportService.registerDefaultHoloImports();
+        serverUtil.setupChannel();
         holoAnimationService.loadHoloAnimations();
         holoService.createTables();
         holoService.loadHolos();
         ImageUtil.generateFolder();
+        packetHandler.setupPlayerPacketHandlers();
     }
 
     public void reload(CommandSender sender) {
@@ -156,8 +175,12 @@ public class GHoloMain extends JavaPlugin {
 
     private void unload() {
         dataService.close();
+        holoImportService.clearHoloImporters();
+        serverUtil.teardownChannel();
+        packetHandler.removePlayerPacketHandlers();
         holoService.unloadHolos();
         holoAnimationService.stopHoloAnimations();
+        interactService.clearInteractions();
     }
 
     private void setupCommands() {
