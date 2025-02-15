@@ -44,7 +44,7 @@ public class InteractService {
         UUID playerId = player.getUniqueId();
         long currentTime = System.currentTimeMillis();
         Long lastInteractionTime = lastHoloRowInteractions.get(playerId);
-        if (lastInteractionTime != null && (currentTime - lastInteractionTime) < INTERACTION_COOLDOWN_MILLIS) return true;
+        if(lastInteractionTime != null && (currentTime - lastInteractionTime) < INTERACTION_COOLDOWN_MILLIS) return true;
         lastHoloRowInteractions.put(playerId, currentTime);
         player.sendMessage(player + " : " + holoRow);
         // call GHoloRowInteractEvent

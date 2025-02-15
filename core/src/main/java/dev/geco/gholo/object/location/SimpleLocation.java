@@ -39,7 +39,7 @@ public class SimpleLocation extends Location {
             double y = ((Number) data.get("y")).doubleValue();
             double z = ((Number) data.get("z")).doubleValue();
             return new SimpleLocation(world, x, y, z);
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
         return null;
     }
 

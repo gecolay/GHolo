@@ -55,7 +55,7 @@ public class SimpleOffset implements Cloneable {
             double y = ((Number) data.get("y")).doubleValue();
             double z = ((Number) data.get("z")).doubleValue();
             return new SimpleOffset(x, y, z);
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
         return null;
     }
 

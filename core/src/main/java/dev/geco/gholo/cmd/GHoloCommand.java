@@ -658,6 +658,8 @@ public class GHoloCommand implements CommandExecutor {
                     break;
                 }
                 GHoloImporterResult importerResult = holoImporter.importHolos(gHoloMain, true);
+                gHoloMain.getHoloService().unloadHolos();
+                gHoloMain.getHoloService().loadHolos();
                 if(!importerResult.hasSucceeded()) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import-import-error", "%Type%", args[1]);
                     break;

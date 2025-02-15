@@ -44,7 +44,7 @@ public class SimpleRotation implements Cloneable {
             float yaw = ((Number) data.get("yaw")).floatValue();
             float pitch = ((Number) data.get("pitch")).floatValue();
             return new SimpleRotation(yaw, pitch);
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
         return null;
     }
 

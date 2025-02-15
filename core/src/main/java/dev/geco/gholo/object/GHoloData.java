@@ -143,7 +143,7 @@ public class GHoloData implements Cloneable {
             }
             if(data.containsKey("brightness")) brightness = ((Number) data.get("brightness")).byteValue();
             if(data.containsKey("permission")) permission = (String) data.get("permission");
-        } catch (Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { e.printStackTrace(); }
         return this;
     }
 

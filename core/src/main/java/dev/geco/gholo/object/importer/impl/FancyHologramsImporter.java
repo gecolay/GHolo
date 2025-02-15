@@ -3,6 +3,7 @@ package dev.geco.gholo.object.importer.impl;
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.GHolo;
 import dev.geco.gholo.object.GHoloData;
+import dev.geco.gholo.object.GHoloRow;
 import dev.geco.gholo.object.importer.GHoloImporter;
 import dev.geco.gholo.object.importer.GHoloImporterResult;
 import dev.geco.gholo.object.location.SimpleLocation;
@@ -16,6 +17,7 @@ import org.joml.Vector3f;
 
 import java.io.File;
 import java.util.List;
+import java.util.UUID;
 
 public class FancyHologramsImporter extends GHoloImporter {
 
@@ -31,16 +33,20 @@ public class FancyHologramsImporter extends GHoloImporter {
 
         FileConfiguration fileContent = YamlConfiguration.loadConfiguration(contentFile);
         int version = fileContent.getInt("version");
-        if(version == 2) {
-            for(String hologram : fileContent.getConfigurationSection("holograms").getKeys(false)) {
-                String type = fileContent.getString("holograms." + hologram + ".type", "");
+        if(version != 2) return new GHoloImporterResult(false, 0);
+
+        for(String id : fileContent.getConfigurationSection("holograms").getKeys(false)) {
+            try {
+                String type = fileContent.getString("holograms." + id + ".type", "");
                 if(!type.equalsIgnoreCase("TEXT")) continue;
 
-                String locationPath = "holograms." + hologram + ".location.";
+                if(!override && gHoloMain.getHoloService().getHolo(id) != null) continue;
 
-                String worldString = fileContent.getString(locationPath + "world");
+                String locationPath = "holograms." + id + ".location.";
+
+                String worldString = fileContent.getString(locationPath + "world", "");
                 World world = Bukkit.getWorld(worldString);
-                if(world == null) continue;
+                if(world == null) throw new RuntimeException("Can not import holo with id '" + id + "', because the world is invalid!");
                 double x = fileContent.getDouble(locationPath + "x");
                 double y = fileContent.getDouble(locationPath + "y");
                 double z = fileContent.getDouble(locationPath + "z");
@@ -49,44 +55,47 @@ public class FancyHologramsImporter extends GHoloImporter {
                 SimpleLocation location = new SimpleLocation(world, x, y ,z);
                 SimpleRotation rotation = new SimpleRotation(yaw, pitch);
 
-                GHolo holo = gHoloMain.getHoloService().createHolo(hologram, location);
+                GHolo holo = new GHolo(UUID.randomUUID(), id, location);
                 holo.setRotation(rotation);
-                GHoloData data = holo.getData();
+                GHoloData data = holo.getRawData();
 
-                double range = fileContent.getDouble("holograms." + hologram + ".visibility_distance", GHoloData.DEFAULT_RANGE);
+                double range = fileContent.getDouble("holograms." + id + ".visibility_distance", GHoloData.DEFAULT_RANGE);
                 if(GHoloData.DEFAULT_RANGE != range) data.setRange(range);
 
-                String backgroundColor = fileContent.getString("holograms." + hologram + ".background", GHoloData.DEFAULT_BACKGROUND_COLOR);
+                String backgroundColor = fileContent.getString("holograms." + id + ".background", GHoloData.DEFAULT_BACKGROUND_COLOR);
                 if(!GHoloData.DEFAULT_BACKGROUND_COLOR.equalsIgnoreCase(backgroundColor)) data.setBackgroundColor(backgroundColor);
 
-                boolean textShadow = fileContent.getBoolean("holograms." + hologram + ".text_shadow", GHoloData.DEFAULT_HAS_TEXT_SHADOW);
+                boolean textShadow = fileContent.getBoolean("holograms." + id + ".text_shadow", GHoloData.DEFAULT_HAS_TEXT_SHADOW);
                 if(GHoloData.DEFAULT_HAS_TEXT_SHADOW != textShadow) data.setTextShadow(textShadow);
 
-                String textAlignment = fileContent.getString("holograms." + hologram + ".text_alignment", GHoloData.DEFAULT_TEXT_ALIGNMENT);
+                String textAlignment = fileContent.getString("holograms." + id + ".text_alignment", GHoloData.DEFAULT_TEXT_ALIGNMENT);
                 if(!GHoloData.DEFAULT_TEXT_ALIGNMENT.equalsIgnoreCase(textAlignment)) data.setTextAlignment(textAlignment);
 
-                String billboard = fileContent.getString("holograms." + hologram + ".billboard", GHoloData.DEFAULT_BILLBOARD);
+                String billboard = fileContent.getString("holograms." + id + ".billboard", GHoloData.DEFAULT_BILLBOARD);
                 if(!GHoloData.DEFAULT_BILLBOARD.equalsIgnoreCase(billboard)) data.setBillboard(billboard);
 
-                boolean seeThrough = fileContent.getBoolean("holograms." + hologram + ".see_through", GHoloData.DEFAULT_CAN_SEE_THROUGH);
+                boolean seeThrough = fileContent.getBoolean("holograms." + id + ".see_through", GHoloData.DEFAULT_CAN_SEE_THROUGH);
                 if(GHoloData.DEFAULT_CAN_SEE_THROUGH != seeThrough) data.setSeeThrough(seeThrough);
 
                 Vector3f defaultScale = GHoloData.DEFAULT_SCALE;
-                float scaleX = (float) fileContent.getDouble("holograms." + hologram + ".scale_x", defaultScale.x);
-                float scaleY = (float) fileContent.getDouble("holograms." + hologram + ".scale_y", defaultScale.y);
-                float scaleZ = (float) fileContent.getDouble("holograms." + hologram + ".scale_z", defaultScale.z);
+                float scaleX = (float) fileContent.getDouble("holograms." + id + ".scale_x", defaultScale.x);
+                float scaleY = (float) fileContent.getDouble("holograms." + id + ".scale_y", defaultScale.y);
+                float scaleZ = (float) fileContent.getDouble("holograms." + id + ".scale_z", defaultScale.z);
                 if(scaleX != defaultScale.x || scaleY != defaultScale.y || scaleZ != defaultScale.z) data.setScale(new Vector3f(scaleX, scaleY, scaleZ));
 
-                String brightness = fileContent.getString("holograms." + hologram + ".brightness");
+                String brightness = fileContent.getString("holograms." + id + ".brightness");
                 if(brightness != null) data.setBrightness(Byte.parseByte(brightness));
 
-                gHoloMain.getHoloService().updateHoloData(holo, data);
+                gHoloMain.getHoloService().writeHolo(holo, override);
 
-                List<String> rows = fileContent.getStringList("holograms." + hologram + ".text");
-                gHoloMain.getHoloService().setAllHoloRowContent(holo, rows);
+                List<String> rows = fileContent.getStringList("holograms." + id + ".text");
+                for(String rowContent : rows) {
+                    GHoloRow row = new GHoloRow(holo, rowContent);
+                    gHoloMain.getHoloService().writeHoloRow(row, row.getPosition());
+                }
 
                 imported++;
-            }
+            } catch(Throwable e) { e.printStackTrace(); }
         }
 
         return new GHoloImporterResult(true, imported);
