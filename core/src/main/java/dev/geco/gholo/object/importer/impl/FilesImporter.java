@@ -43,8 +43,8 @@ public class FilesImporter extends GHoloImporter {
                 World world = Bukkit.getWorld(fileContent.getString("Holo.location.world", ""));
                 if(world == null) throw new RuntimeException("Can not import holo with id '" + id + "', because the world is invalid!");
                 double x = fileContent.getDouble("Holo.location.x", 0);
-                double y = fileContent.getDouble("Holo.location.x", 0);
-                double z = fileContent.getDouble("Holo.location.x", 0);
+                double y = fileContent.getDouble("Holo.location.y", 0);
+                double z = fileContent.getDouble("Holo.location.z", 0);
                 SimpleLocation location = new SimpleLocation(world, x, y, z);
 
                 float yaw = (float) fileContent.getDouble("Holo.rotation.yaw", 0);
@@ -83,9 +83,7 @@ public class FilesImporter extends GHoloImporter {
                             row.setRotation(new SimpleRotation(rowYaw != null ? rowYaw.floatValue() : 0, rowPitch != null ? rowPitch.floatValue() : 0));
                         }
 
-                        if(rowSection.containsKey("data")) {
-                            deserializeData(row.getRawData(), (HashMap<String, Object>) rowSection.get("data"));
-                        }
+                        if(rowSection.containsKey("data")) deserializeData(row.getRawData(), (HashMap<String, Object>) rowSection.get("data"));
 
                         holo.addRow(row);
                     }

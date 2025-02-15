@@ -30,6 +30,7 @@ import org.joml.Vector3f;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEntity {
 
@@ -120,38 +121,38 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
                 setRot(rotation.getYaw(), rotation.getPitch());
                 break;
             case RANGE:
-                double range = rowData.getRange() != null ? rowData.getRange() : (holoData.getRange() != null ? holoData.getRange() : GHoloData.DEFAULT_RANGE);
+                double range = rowData.getRange() != GHoloData.DEFAULT_RANGE ? rowData.getRange() : (holoData.getRange() != GHoloData.DEFAULT_RANGE ? holoData.getRange() : GHoloData.DEFAULT_RANGE);
                 setViewRange((float) (range / 64));
                 break;
             case BACKGROUND_COLOR:
-                String backgroundColor = rowData.getBackgroundColor() != null ? rowData.getBackgroundColor() : (holoData.getBackgroundColor() != null ? holoData.getBackgroundColor() : GHoloData.DEFAULT_BACKGROUND_COLOR);
+                String backgroundColor = !Objects.equals(rowData.getBackgroundColor(), GHoloData.DEFAULT_BACKGROUND_COLOR) ? rowData.getBackgroundColor() : (!Objects.equals(holoData.getBackgroundColor(), GHoloData.DEFAULT_BACKGROUND_COLOR) ? holoData.getBackgroundColor() : GHoloData.DEFAULT_BACKGROUND_COLOR);
                 setBackgroundColor(backgroundColor);
                 break;
             case TEXT_OPACITY:
-                byte textOpacity = rowData.getTextOpacity() != null ? rowData.getTextOpacity() : (holoData.getTextOpacity() != null ? holoData.getTextOpacity() : GHoloData.DEFAULT_TEXT_OPACITY);
+                byte textOpacity = rowData.getTextOpacity() != GHoloData.DEFAULT_TEXT_OPACITY ? rowData.getTextOpacity() : (holoData.getTextOpacity() != GHoloData.DEFAULT_TEXT_OPACITY ? holoData.getTextOpacity() : GHoloData.DEFAULT_TEXT_OPACITY);
                 setRealTextOpacity(textOpacity);
                 break;
             case TEXT_SHADOW:
-                boolean textShadow = rowData.getTextShadow() != null ? rowData.getTextShadow() : (holoData.getTextShadow() != null ? holoData.getTextShadow() : GHoloData.DEFAULT_HAS_TEXT_SHADOW);
+                boolean textShadow = rowData.getTextShadow() != GHoloData.DEFAULT_HAS_TEXT_SHADOW ? rowData.getTextShadow() : (holoData.getTextShadow() != GHoloData.DEFAULT_HAS_TEXT_SHADOW ? holoData.getTextShadow() : GHoloData.DEFAULT_HAS_TEXT_SHADOW);
                 setTextShadow(textShadow);
                 break;
             case TEXT_ALIGNMENT:
-                String textAlignment = rowData.getTextAlignment() != null ? rowData.getTextAlignment() : (holoData.getTextAlignment() != null ? holoData.getTextAlignment() : GHoloData.DEFAULT_TEXT_ALIGNMENT);
+                String textAlignment = !Objects.equals(rowData.getTextAlignment(), GHoloData.DEFAULT_TEXT_ALIGNMENT) ? rowData.getTextAlignment() : (!Objects.equals(holoData.getTextAlignment(), GHoloData.DEFAULT_TEXT_ALIGNMENT) ? holoData.getTextAlignment() : GHoloData.DEFAULT_TEXT_ALIGNMENT);
                 setTextAlignment(textAlignment);
             case BILLBOARD:
-                String billboard = rowData.getBillboard() != null ? rowData.getBillboard() : (holoData.getBillboard() != null ? holoData.getBillboard() : GHoloData.DEFAULT_BILLBOARD);
+                String billboard = !Objects.equals(rowData.getBillboard(), GHoloData.DEFAULT_BILLBOARD) ? rowData.getBillboard() : (!Objects.equals(holoData.getBillboard(), GHoloData.DEFAULT_BILLBOARD) ? holoData.getBillboard() : GHoloData.DEFAULT_BILLBOARD);
                 setBillboard(billboard);
                 break;
             case SEE_THROUGH:
-                boolean seeThrough = rowData.getSeeThrough() != null ? rowData.getSeeThrough() : (holoData.getSeeThrough() != null ? holoData.getSeeThrough() : GHoloData.DEFAULT_CAN_SEE_THROUGH);
+                boolean seeThrough = rowData.getSeeThrough() != GHoloData.DEFAULT_CAN_SEE_THROUGH ? rowData.getSeeThrough() : (holoData.getSeeThrough() != GHoloData.DEFAULT_CAN_SEE_THROUGH ? holoData.getSeeThrough() : GHoloData.DEFAULT_CAN_SEE_THROUGH);
                 setSeeThrough(seeThrough);
                 break;
             case SCALE:
-                Vector3f scale = rowData.getScale() != null ? rowData.getScale() : (holoData.getScale() != null ? holoData.getScale() : GHoloData.DEFAULT_SCALE);
+                Vector3f scale = !Objects.equals(rowData.getScale(), GHoloData.DEFAULT_SCALE) ? rowData.getScale() : (!Objects.equals(holoData.getScale(), GHoloData.DEFAULT_SCALE) ? holoData.getScale() : GHoloData.DEFAULT_SCALE);
                 entityData.set(holoScaleData, scale);
                 break;
             case BRIGHTNESS:
-                Byte brigthness = rowData.getBrightness() != null ? rowData.getBrightness() : (holoData.getBrightness() != null ? holoData.getBrightness() : GHoloData.DEFAULT_BRIGHTNESS);
+                Byte brigthness = rowData.getBrightness() != GHoloData.DEFAULT_BRIGHTNESS ? rowData.getBrightness() : (holoData.getBrightness() != GHoloData.DEFAULT_BRIGHTNESS ? holoData.getBrightness() : GHoloData.DEFAULT_BRIGHTNESS);
                 setBrightnessOverride(brigthness != null ? new Brightness(brigthness, Brightness.FULL_BRIGHT.sky()) : null);
         }
     }
