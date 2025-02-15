@@ -5,6 +5,8 @@ import org.joml.Vector3f;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import java.util.Objects;
+
 public class GHoloData implements Cloneable {
 
     public static final double DEFAULT_RANGE = 120d;
@@ -102,22 +104,22 @@ public class GHoloData implements Cloneable {
     @Override
     public String toString() {
         JSONObject data = new JSONObject();
-        if(range != null) data.put("range", range);
-        if(backgroundColor != null) data.put("background_color", backgroundColor);
-        if(textOpacity != null) data.put("text_opacity", textOpacity);
-        if(hasTextShadow != null) data.put("text_shadow", hasTextShadow);
-        if(textAlignment != null) data.put("text_alignment", textAlignment);
-        if(billboard != null) data.put("billboard", billboard);
-        if(canSeeThrough != null) data.put("see_through", canSeeThrough);
-        if(scale != null) {
+        if(range != DEFAULT_RANGE) data.put("range", range);
+        if(!Objects.equals(backgroundColor, DEFAULT_BACKGROUND_COLOR)) data.put("background_color", backgroundColor);
+        if(textOpacity != DEFAULT_TEXT_OPACITY) data.put("text_opacity", textOpacity);
+        if(hasTextShadow != DEFAULT_HAS_TEXT_SHADOW) data.put("text_shadow", hasTextShadow);
+        if(!Objects.equals(textAlignment, DEFAULT_TEXT_ALIGNMENT)) data.put("text_alignment", textAlignment);
+        if(!Objects.equals(billboard, DEFAULT_BILLBOARD)) data.put("billboard", billboard);
+        if(canSeeThrough != DEFAULT_CAN_SEE_THROUGH) data.put("see_through", canSeeThrough);
+        if(!Objects.equals(scale, DEFAULT_SCALE)) {
             JSONObject scaleData = new JSONObject();
             scaleData.put("x", scale.x);
             scaleData.put("y", scale.y);
             scaleData.put("z", scale.z);
             data.put("scale", scaleData);
         }
-        if(brightness != null) data.put("brightness", brightness);
-        if(permission != null) data.put("permission", permission);
+        if(brightness != DEFAULT_BRIGHTNESS) data.put("brightness", brightness);
+        if(!Objects.equals(permission, DEFAULT_PERMISSION)) data.put("permission", permission);
         return data.toJSONString();
     }
 

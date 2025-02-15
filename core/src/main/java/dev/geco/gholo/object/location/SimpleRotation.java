@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-public class SimpleRotation {
+public class SimpleRotation implements Cloneable {
 
     private float yaw;
     private float pitch;

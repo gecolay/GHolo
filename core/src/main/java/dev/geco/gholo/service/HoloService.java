@@ -126,7 +126,7 @@ public class HoloService {
         try {
             GHolo holo = new GHolo(UUID.randomUUID(), holoId, location);
 
-            gHoloMain.getDataService().execute("INSERT INTO gholo_holo (uuid TEXT, id TEXT, location TEXT, rotation TEXT, data TEXT) VALUES (?, ?, ?, ?, ?)",
+            gHoloMain.getDataService().execute("INSERT INTO gholo_holo (uuid, id, location, rotation, data) VALUES (?, ?, ?, ?, ?)",
                     holo.getUuid().toString(),
                     holoId,
                     location.toString(),
