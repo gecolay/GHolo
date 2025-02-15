@@ -20,16 +20,16 @@ public class GHoloData implements Cloneable {
     public static final Byte DEFAULT_BRIGHTNESS = null;
     public static final String DEFAULT_PERMISSION = null;
 
-    private Double range;
-    private String backgroundColor;
-    private Byte textOpacity;
-    private Boolean hasTextShadow;
-    private String textAlignment;
-    private String billboard;
-    private Boolean canSeeThrough;
-    private Vector3f scale;
-    private Byte brightness;
-    private String permission;
+    private Double range = DEFAULT_RANGE;
+    private String backgroundColor = DEFAULT_BACKGROUND_COLOR;
+    private Byte textOpacity = DEFAULT_TEXT_OPACITY;
+    private Boolean hasTextShadow = DEFAULT_HAS_TEXT_SHADOW;
+    private String textAlignment = DEFAULT_TEXT_ALIGNMENT;
+    private String billboard = DEFAULT_BILLBOARD;
+    private Boolean canSeeThrough = DEFAULT_CAN_SEE_THROUGH;
+    private Vector3f scale = DEFAULT_SCALE;
+    private Byte brightness = DEFAULT_BRIGHTNESS;
+    private String permission = DEFAULT_PERMISSION;
 
     public Double getRange() { return range; }
 

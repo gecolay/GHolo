@@ -191,8 +191,8 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     }
 
     private String getPermission() {
-        GHoloData holoData = holoRow.getHolo().getData();
         GHoloData rowData = holoRow.getRawData();
+        GHoloData holoData = holoRow.getHolo().getRawData();
         return rowData.getPermission() != null ? rowData.getPermission() : (holoData.getPermission() != null ? holoData.getPermission() : GHoloData.DEFAULT_PERMISSION);
     }
 

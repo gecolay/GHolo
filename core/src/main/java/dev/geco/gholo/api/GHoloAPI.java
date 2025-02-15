@@ -204,10 +204,10 @@ public class GHoloAPI {
      * @author Gecolay
      * @since 1.0.0
      * @param holo Holo
-     * @param copyToHolo CopyToHolo
+     * @param newId New id
      */
-    public static void copyHoloRows(@NotNull GHolo holo, @NotNull GHolo copyToHolo) {
-        getInstance().getHoloService().copyAllHoloRowContent(holo, copyToHolo);
+    public static void copyHoloRows(@NotNull GHolo holo, @NotNull String newId) {
+        getInstance().getHoloService().copyHolo(holo, newId);
     }
 
     /**

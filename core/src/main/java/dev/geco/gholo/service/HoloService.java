@@ -76,7 +76,7 @@ public class HoloService {
                         holo.setRotation(rotation);
 
                         String dataString = resultSet.getString("data");
-                        holo.getData().loadString(dataString);
+                        holo.getRawData().loadString(dataString);
 
                         holos.add(holo);
 
@@ -95,7 +95,7 @@ public class HoloService {
                                 holoRow.setRotation(rowRotation);
 
                                 String rowDataString = rowResultSet.getString("data");
-                                holoRow.getData().loadString(rowDataString);
+                                holoRow.getRawData().loadString(rowDataString);
 
                                 holoRowMap.put(position, holoRow);
                             }
@@ -337,7 +337,7 @@ public class HoloService {
         } catch(Throwable e) { e.printStackTrace(); }
     }
 
-    public void copyAllHoloRowContent(GHolo fromHolo, GHolo toHolo) {
+    public void copyHolo(GHolo holo, String holoId) {
         try {
 
         } catch(Throwable e) { e.printStackTrace(); }

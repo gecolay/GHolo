@@ -31,13 +31,13 @@ public class GHoloTabComplete implements TabCompleter {
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         List<String> complete = new ArrayList<>(), completeStarted = new ArrayList<>();
 
-        List<String> holoIdArg = new ArrayList<>(List.of("info", "remove", "rename", "relocate", "tphere", "tpto", "align", "addrow", "insertrow", "setrow", "removerow", "positionrow", "copyrows", "data", "setimage"));
-        if(!(sender instanceof Player)) holoIdArg.removeAll(List.of("tpto", "tphere"));
+        List<String> holoIdArg = new ArrayList<>(List.of("info", "remove", "rename", "move", "tphere", "tp", "align", "addrow", "insertrow", "setrow", "removerow", "offsetrow", "copy", "option", "rotate", "image"));
+        if(!(sender instanceof Player)) holoIdArg.removeAll(List.of("tp", "tphere"));
 
         if(args.length == 1) {
             if(gHoloMain.getPermissionService().hasPermission(sender, "Holo")) {
                 complete.addAll(GHoloCommand.COMMAND_LIST);
-                if(!(sender instanceof Player)) complete.removeAll(List.of("create", "tpto", "tphere"));
+                if(!(sender instanceof Player)) complete.removeAll(List.of("create", "tp", "tphere"));
             }
             if(!args[args.length - 1].isEmpty()) {
                 for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);
@@ -58,17 +58,17 @@ public class GHoloTabComplete implements TabCompleter {
                 complete.clear();
             }
         } else if(args.length == 3) {
-            if(args[0].equalsIgnoreCase("align") || args[0].equalsIgnoreCase("copyrows")) {
+            if(args[0].equalsIgnoreCase("align")) {
                 complete.addAll(gHoloMain.getHoloService().getHolos().stream().map(GHolo::getId).filter(holoId -> !holoId.equalsIgnoreCase(args[1])).toList());
             }
-            if(args[0].equalsIgnoreCase("insertrow") || args[0].equalsIgnoreCase("setrow") || args[0].equalsIgnoreCase("removerow") || args[0].equalsIgnoreCase("positionrow")) {
+            if(args[0].equalsIgnoreCase("insertrow") || args[0].equalsIgnoreCase("setrow") || args[0].equalsIgnoreCase("removerow") || args[0].equalsIgnoreCase("offsetrow")) {
                 GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo != null) for(int row = 1; row <= holo.getRows().size(); row++) complete.add("" + row);
             }
-            if(args[0].equalsIgnoreCase("data")) {
-                complete.addAll(List.of("default", "row"));
+            if(args[0].equalsIgnoreCase("option")) {
+                complete.addAll(List.of("holo", "row"));
             }
-            if(args[0].equalsIgnoreCase("setimage")) {
+            if(args[0].equalsIgnoreCase("image")) {
                 complete.addAll(ImageUtil.IMAGE_TYPES);
             }
             if(!args[args.length - 1].isEmpty()) {
@@ -76,14 +76,11 @@ public class GHoloTabComplete implements TabCompleter {
                 complete.clear();
             }
         } else if(args.length == 4) {
-            if(args[0].equalsIgnoreCase("align")) {
+            if(args[0].equalsIgnoreCase("align") || args[0].equalsIgnoreCase("offsetrow")) {
                 complete.addAll(List.of("x", "y", "z", "xy", "xz", "yz", "xyz"));
             }
-            if(args[0].equalsIgnoreCase("positionrow")) {
-                complete.addAll(List.of("xoffset", "yoffset", "zoffset", "yaw", "pitch"));
-            }
-            if(args[0].equalsIgnoreCase("data")) {
-                if(args[2].equalsIgnoreCase("default")) {
+            if(args[0].equalsIgnoreCase("option")) {
+                if(args[2].equalsIgnoreCase("holo")) {
                     complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "text_alignment", "billboard", "see_through", "scale", "brightness", "permission"));
                 }
                 if(args[2].equalsIgnoreCase("row")) {
@@ -91,7 +88,7 @@ public class GHoloTabComplete implements TabCompleter {
                     if(holo != null) for(int row = 1; row <= holo.getRows().size(); row++) complete.add("" + row);
                 }
             }
-            if(args[0].equalsIgnoreCase("setimage")) {
+            if(args[0].equalsIgnoreCase("image")) {
                 if(args[2].equalsIgnoreCase("file")) {
                     File[] files = ImageUtil.IMAGE_FOLDER.listFiles();
                     if(files != null) complete.addAll(Arrays.stream(files).map(File::getName).toList());
@@ -105,8 +102,8 @@ public class GHoloTabComplete implements TabCompleter {
                 complete.clear();
             }
         } else if(args.length == 5) {
-            if(args[0].equalsIgnoreCase("data")) {
-                if(args[2].equalsIgnoreCase("default")) {
+            if(args[0].equalsIgnoreCase("option")) {
+                if(args[2].equalsIgnoreCase("holo")) {
                     if(args[3].equalsIgnoreCase("text_shadow") || args[3].equalsIgnoreCase("see_through")) {
                         complete.addAll(List.of("true", "false"));
                     }
@@ -127,7 +124,7 @@ public class GHoloTabComplete implements TabCompleter {
                 complete.clear();
             }
         } else if(args.length == 6) {
-            if(args[0].equalsIgnoreCase("data")) {
+            if(args[0].equalsIgnoreCase("option")) {
                 if(args[2].equalsIgnoreCase("row")) {
                     if(args[4].equalsIgnoreCase("text_shadow") || args[4].equalsIgnoreCase("see_through")) {
                         complete.addAll(List.of("true", "false"));
