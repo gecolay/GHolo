@@ -2,8 +2,8 @@ package dev.geco.gholo.object;
 
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
-
-import java.util.HashMap;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 public class GHoloData implements Cloneable {
 
@@ -28,68 +28,6 @@ public class GHoloData implements Cloneable {
     private Vector3f scale;
     private Byte brightness;
     private String permission;
-
-    @Override
-    public String toString() {
-        HashMap<String, Object> stringMap = new HashMap<>();
-        if(range != null) stringMap.put("range", range);
-        if(backgroundColor != null) stringMap.put("background_color", backgroundColor);
-        if(textOpacity != null) stringMap.put("text_opacity", textOpacity);
-        if(hasTextShadow != null) stringMap.put("text_shadow", hasTextShadow);
-        if(textAlignment != null) stringMap.put("text_alignment", textAlignment);
-        if(billboard != null) stringMap.put("billboard", billboard);
-        if(canSeeThrough != null) stringMap.put("see_through", canSeeThrough);
-        if(scale != null) stringMap.put("scale", scale.x + "," + scale.y + "," + scale.z);
-        if(brightness != null) stringMap.put("brightness", brightness);
-        if(permission != null) stringMap.put("permission", permission);
-        StringBuilder dataString = new StringBuilder();
-        for(HashMap.Entry<String, Object> entry : stringMap.entrySet()) {
-            if(!dataString.isEmpty()) dataString.append("§§");
-            dataString.append(entry.getKey()).append("§").append(entry.getValue());
-        }
-        return dataString.toString();
-    }
-
-    public void loadString(@NotNull String string) {
-        for(String dataPart : string.split("§§")) {
-            try {
-                String[] dataSplit = dataPart.split("§");
-                switch (dataSplit[0]) {
-                    case "range":
-                        range = Double.parseDouble(dataSplit[1]);
-                        break;
-                    case "background_color":
-                        backgroundColor = dataSplit[1];
-                        break;
-                    case "text_opacity":
-                        textOpacity = Byte.parseByte(dataSplit[1]);
-                        break;
-                    case "text_shadow":
-                        hasTextShadow = Boolean.parseBoolean(dataSplit[1]);
-                        break;
-                    case "text_alignment":
-                        textAlignment = dataSplit[1];
-                        break;
-                    case "billboard":
-                        billboard = dataSplit[1];
-                        break;
-                    case "see_through":
-                        canSeeThrough = Boolean.parseBoolean(dataSplit[1]);
-                        break;
-                    case "scale":
-                        String[] scaleSplit = dataSplit[1].split(",");
-                        scale = new Vector3f(Float.parseFloat(scaleSplit[0]), Float.parseFloat(scaleSplit[1]), Float.parseFloat(scaleSplit[2]));
-                        break;
-                    case "brightness":
-                        brightness = Byte.parseByte(dataSplit[1]);
-                        break;
-                    case "permission":
-                        permission = dataSplit[1];
-                        break;
-                }
-            } catch(Throwable e) { e.printStackTrace(); }
-        }
-    }
 
     public Double getRange() { return range; }
 
@@ -160,6 +98,54 @@ public class GHoloData implements Cloneable {
         this.permission = permission;
         return this;
     }
+
+    @Override
+    public String toString() {
+        JSONObject data = new JSONObject();
+        if(range != null) data.put("range", range);
+        if(backgroundColor != null) data.put("background_color", backgroundColor);
+        if(textOpacity != null) data.put("text_opacity", textOpacity);
+        if(hasTextShadow != null) data.put("text_shadow", hasTextShadow);
+        if(textAlignment != null) data.put("text_alignment", textAlignment);
+        if(billboard != null) data.put("billboard", billboard);
+        if(canSeeThrough != null) data.put("see_through", canSeeThrough);
+        if(scale != null) {
+            JSONObject scaleData = new JSONObject();
+            scaleData.put("x", scale.x);
+            scaleData.put("y", scale.y);
+            scaleData.put("z", scale.z);
+            data.put("scale", scaleData);
+        }
+        if(brightness != null) data.put("brightness", brightness);
+        if(permission != null) data.put("permission", permission);
+        return data.toJSONString();
+    }
+
+    public @NotNull GHoloData loadString(@NotNull String string) {
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject data = (JSONObject) parser.parse(string);
+            if(data.containsKey("range")) range = ((Number) data.get("range")).doubleValue();
+            if(data.containsKey("background_color")) backgroundColor = (String) data.get("background_color");
+            if(data.containsKey("text_opacity")) textOpacity = ((Number) data.get("text_opacity")).byteValue();
+            if(data.containsKey("text_shadow")) hasTextShadow = (Boolean) data.get("text_shadow");
+            if(data.containsKey("text_alignment")) textAlignment = (String) data.get("text_alignment");
+            if(data.containsKey("billboard")) billboard = (String) data.get("billboard");
+            if(data.containsKey("see_through")) canSeeThrough = (Boolean) data.get("see_through");
+            if(data.containsKey("scale")) {
+                JSONObject scaleData = (JSONObject) data.get("scale");
+                float x = ((Number) scaleData.get("x")).floatValue();
+                float y = ((Number) scaleData.get("y")).floatValue();
+                float z = ((Number) scaleData.get("z")).floatValue();
+                scale = new Vector3f(x, y, z);
+            }
+            if(data.containsKey("brightness")) brightness = ((Number) data.get("brightness")).byteValue();
+            if(data.containsKey("permission")) permission = (String) data.get("permission");
+        } catch (Throwable e) { e.printStackTrace(); }
+        return this;
+    }
+
+    public static @NotNull GHoloData fromString(@NotNull String string) { return new GHoloData().loadString(string); }
 
     @Override
     public @NotNull GHoloData clone() { try { return (GHoloData) super.clone(); } catch(CloneNotSupportedException e) { throw new Error(e); } }

@@ -12,6 +12,7 @@ import dev.geco.gholo.metric.BStatsMetric;
 import dev.geco.gholo.service.ConfigService;
 import dev.geco.gholo.service.DataService;
 import dev.geco.gholo.service.HoloAnimationService;
+import dev.geco.gholo.service.HoloExporterService;
 import dev.geco.gholo.service.HoloImporterService;
 import dev.geco.gholo.service.InteractService;
 import dev.geco.gholo.service.HoloService;
@@ -49,7 +50,8 @@ public class GHoloMain extends JavaPlugin {
     private VersionService versionService;
     private HoloService holoService;
     private HoloAnimationService holoAnimationService;
-    private HoloImporterService holoImportService;
+    private HoloImporterService holoImporterService;
+    private HoloExporterService holoExporterService;
     private InteractService interactService;
     private IPacketHandler packetHandler;
     private FormatUtil formatUtil;
@@ -79,7 +81,9 @@ public class GHoloMain extends JavaPlugin {
 
     public HoloAnimationService getHoloAnimationService() { return holoAnimationService; }
 
-    public HoloImporterService getHoloImportService() { return holoImportService; }
+    public HoloImporterService getHoloImporterService() { return holoImporterService; }
+
+    public HoloExporterService getHoloExporterService() { return holoExporterService; }
 
     public InteractService getInteractService() { return interactService; }
 
@@ -109,7 +113,8 @@ public class GHoloMain extends JavaPlugin {
         dataService = new DataService(this);
         holoService = new HoloService(this);
         holoAnimationService = new HoloAnimationService(this);
-        holoImportService = new HoloImporterService();
+        holoImporterService = new HoloImporterService();
+        holoExporterService = new HoloExporterService();
         interactService = new InteractService(this);
 
         formatUtil = new FormatUtil(this);
@@ -148,7 +153,8 @@ public class GHoloMain extends JavaPlugin {
 
     private void loadSettings(CommandSender sender) {
         if(!connectDatabase(sender)) return;
-        holoImportService.registerDefaultHoloImports();
+        holoImporterService.registerDefaultHoloImporters();
+        holoExporterService.registerDefaultHoloExporters();
         serverUtil.setupChannel();
         holoAnimationService.loadHoloAnimations();
         holoService.createTables();
@@ -175,7 +181,8 @@ public class GHoloMain extends JavaPlugin {
 
     private void unload() {
         dataService.close();
-        holoImportService.clearHoloImporters();
+        holoImporterService.unregisterHoloImporters();
+        holoExporterService.unregisterHoloExporters();
         serverUtil.teardownChannel();
         packetHandler.removePlayerPacketHandlers();
         holoService.unloadHolos();

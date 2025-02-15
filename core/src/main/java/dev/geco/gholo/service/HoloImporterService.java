@@ -14,15 +14,17 @@ public class HoloImporterService {
 
     public HashMap<String, GHoloImporter> getHoloImporters() { return holoImporters; }
 
-    public void clearHoloImporters() { holoImporters.clear(); }
+    public GHoloImporter getHoloImporter(String type) { return holoImporters.get(type.toLowerCase()); }
 
-    public void registerDefaultHoloImports() {
+    public void registerHoloImporter(GHoloImporter holoImporter) { this.holoImporters.put(holoImporter.getType().toLowerCase(), holoImporter); }
+
+    public void registerDefaultHoloImporters() {
         registerHoloImporter(new FilesImporter());
         registerHoloImporter(new DecentHologramsImporter());
         registerHoloImporter(new HolographicDisplaysImporter());
         registerHoloImporter(new FancyHologramsImporter());
     }
 
-    public void registerHoloImporter(GHoloImporter holoImporter) { this.holoImporters.put(holoImporter.getType().toLowerCase(), holoImporter); }
+    public void unregisterHoloImporters() { holoImporters.clear(); }
 
 }

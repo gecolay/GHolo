@@ -11,7 +11,7 @@ public class FilesImporter extends GHoloImporter {
     public @NotNull String getType() { return "files"; }
 
     @Override
-    public @NotNull GHoloImporterResult importHolos(@NotNull GHoloMain gHoloMain) {
+    public @NotNull GHoloImporterResult importHolos(@NotNull GHoloMain gHoloMain, boolean override) {
         int imported = 0;
 
         return new GHoloImporterResult(true, imported);

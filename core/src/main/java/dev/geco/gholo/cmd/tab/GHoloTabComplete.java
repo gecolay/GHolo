@@ -48,7 +48,10 @@ public class GHoloTabComplete implements TabCompleter {
                 complete.addAll(gHoloMain.getHoloService().getHolos().stream().map(GHolo::getId).toList());
             }
             if(args[0].equalsIgnoreCase("import")) {
-                complete.addAll(gHoloMain.getHoloImportService().getHoloImporters().keySet());
+                complete.addAll(gHoloMain.getHoloImporterService().getHoloImporters().keySet());
+            }
+            if(args[0].equalsIgnoreCase("export")) {
+                complete.addAll(gHoloMain.getHoloExporterService().getHoloExporters().keySet());
             }
             if(!args[args.length - 1].isEmpty()) {
                 for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);

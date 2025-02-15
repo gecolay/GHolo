@@ -1,28 +1,30 @@
 package dev.geco.gholo.object;
 
-import org.bukkit.Location;
-import org.bukkit.World;
+import dev.geco.gholo.object.location.SimpleLocation;
+import dev.geco.gholo.object.location.SimpleRotation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class GHolo {
 
-    private final String internalId;
+    private final UUID uuid;
     private String id;
-    private Location location;
+    private SimpleLocation location;
+    private SimpleRotation rotation = new SimpleRotation(0f, 0f);
     private final List<GHoloRow> rows = new ArrayList<>();
-    private GHoloData defaultData = new GHoloData();
+    private GHoloData data = new GHoloData();
 
-    public GHolo(@NotNull String internalId, @NotNull String id, @NotNull Location location) {
-        this.internalId = internalId;
+    public GHolo(@NotNull UUID uuid, @NotNull String id, @NotNull SimpleLocation location) {
+        this.uuid = uuid;
         this.id = id;
-        setLocation(location);
+        this.location = location.clone();
     }
 
-    public @NotNull String getInternalId() { return internalId; }
+    public @NotNull UUID getUuid() { return uuid; }
 
     public @NotNull String getId() { return id; }
 
@@ -31,46 +33,49 @@ public class GHolo {
         return this;
     }
 
-    public @NotNull Location getLocation() { return location.clone(); }
+    public @NotNull SimpleLocation getLocation() { return location.clone(); }
 
-    public @NotNull Location getRawLocation() { return location; }
+    public @NotNull SimpleLocation getRawLocation() { return location; }
 
-    public @NotNull GHolo setLocation(@NotNull Location location) {
-        World world = location.getWorld();
-        if(this.location == null || !this.location.getWorld().equals(world)) {
-            for(GHoloRow holoRow : rows) holoRow.getRawPosition().setWorld(world);
-        }
+    public @NotNull GHolo setLocation(@NotNull SimpleLocation location) {
         this.location = location.clone();
-        this.location.setYaw(0);
-        this.location.setPitch(0);
+        return this;
+    }
+
+    public @NotNull SimpleRotation getRotation() { return rotation.clone(); }
+
+    public @NotNull SimpleRotation getRawRotation() { return rotation; }
+
+    public @NotNull GHolo setRotation(@NotNull SimpleRotation rotation) {
+        this.rotation = rotation.clone();
         return this;
     }
 
     public @NotNull List<GHoloRow> getRows() { return rows; }
 
-    public @Nullable GHoloRow getRow(int rowId) { return rows.get(rowId); }
+    public @Nullable GHoloRow getRow(int position) { return rows.get(position); }
 
     public @NotNull GHolo addRow(@NotNull GHoloRow holoRow) {
         rows.add(holoRow);
         return this;
     }
 
-    public @NotNull GHolo insertRow(@NotNull GHoloRow holoRow, int rowId) {
-        rows.add(rowId, holoRow);
+    public @NotNull GHolo insertRow(@NotNull GHoloRow holoRow, int position) {
+        rows.add(position, holoRow);
         return this;
     }
 
-    public @NotNull GHolo removeRow(int rowId) {
-        rows.remove(rowId);
+    public @NotNull GHolo removeRow(int position) {
+        rows.remove(position);
         return this;
     }
 
-    public @NotNull GHoloData getDefaultData() { return defaultData.clone(); }
+    public @NotNull GHoloData getData() { return data.clone(); }
 
-    public @NotNull GHoloData getRawDefaultData() { return defaultData; }
+    public @NotNull GHoloData getRawData() { return data; }
 
-    public @NotNull GHolo setDefaultData(@NotNull GHoloData defaultData) {
-        this.defaultData = defaultData.clone();
+    public @NotNull GHolo setData(@NotNull GHoloData data) {
+        this.data = data.clone();
         return this;
     }
 

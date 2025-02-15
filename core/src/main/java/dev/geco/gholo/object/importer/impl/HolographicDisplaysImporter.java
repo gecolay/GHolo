@@ -4,8 +4,8 @@ import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.GHolo;
 import dev.geco.gholo.object.importer.GHoloImporter;
 import dev.geco.gholo.object.importer.GHoloImporterResult;
+import dev.geco.gholo.object.location.SimpleLocation;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -20,7 +20,7 @@ public class HolographicDisplaysImporter extends GHoloImporter {
     public @NotNull String getType() { return "holographic_displays"; }
 
     @Override
-    public @NotNull GHoloImporterResult importHolos(@NotNull GHoloMain gHoloMain) {
+    public @NotNull GHoloImporterResult importHolos(@NotNull GHoloMain gHoloMain, boolean override) {
         int imported = 0;
 
         File contentFile = new File("plugins/HolographicDisplays/database.yml");
@@ -48,7 +48,7 @@ public class HolographicDisplaysImporter extends GHoloImporter {
             List<String> removeContent = fileContent.getStringList(line + ".lines");
             for(String removeContentLine : removeContent) if(removeContentLine.equalsIgnoreCase("null")) rows.remove("null");
 
-            GHolo holo = gHoloMain.getHoloService().createHolo(line, new Location(world, Double.parseDouble(args[1]), Double.parseDouble(args[2]) - 0.51, Double.parseDouble(args[3])));
+            GHolo holo = gHoloMain.getHoloService().createHolo(line, new SimpleLocation(world, Double.parseDouble(args[1]), Double.parseDouble(args[2]) - 0.51, Double.parseDouble(args[3])));
 
             for(String row : rows) gHoloMain.getHoloService().createHoloRow(holo, row);
 

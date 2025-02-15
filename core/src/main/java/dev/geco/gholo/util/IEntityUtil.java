@@ -1,9 +1,12 @@
 package dev.geco.gholo.util;
 
 import dev.geco.gholo.object.GHoloRow;
+import dev.geco.gholo.object.GInteraction;
 
 public interface IEntityUtil {
 
-    void loadHoloRowEntity(GHoloRow holoRow);
+    void createHoloRowEntity(GHoloRow holoRow);
+
+    void createInteractionEntity(GInteraction interaction);
 
 }

@@ -64,7 +64,7 @@ public class HoloAnimationService {
     private void startHoloAnimations() {
         for(GHoloAnimation animation : animations.values()) {
             UUID taskId = gHoloMain.getTaskService().runAtFixedRate(() -> {
-                animation.setRowId(animation.getRowId() + 1 >= animation.getSize() ? 0 : animation.getRowId() + 1);
+                animation.updatePosition();
                 for(GHoloRow holoRow : animationSubscriber.get(animation.getId().toLowerCase())) {
                     holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.CONTENT);
                 }

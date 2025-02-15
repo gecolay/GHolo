@@ -4,13 +4,15 @@ import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.GHolo;
 import dev.geco.gholo.object.GHoloData;
 import dev.geco.gholo.object.GHoloRow;
+import dev.geco.gholo.object.location.SimpleLocation;
+import dev.geco.gholo.object.location.SimpleOffset;
+import dev.geco.gholo.object.location.SimpleRotation;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 public class GHoloAPI {
@@ -77,7 +79,7 @@ public class GHoloAPI {
      * @param location Location
      * @return Holo or <code>null</code> if the creation failed
      */
-    public static @Nullable GHolo createHolo(@NotNull String holoId, @NotNull Location location) {
+    public static @Nullable GHolo createHolo(@NotNull String holoId, @NotNull SimpleLocation location) {
         return getInstance().getHoloService().createHolo(holoId, location);
     }
 
@@ -98,13 +100,13 @@ public class GHoloAPI {
      * @author Gecolay
      * @since 1.0.0
      * @param holo Holo
-     * @param rowId Row id (0-indexed)
+     * @param position Position (0-indexed)
      * @param content Content
-     * @param updateOffset Should the offset of all rows with a higher row id be updated
+     * @param updateOffset Should the offset of all rows with a higher position be updated
      * @return Holo row or <code>null</code> if the creation failed
      */
-    public static @Nullable GHoloRow insertHoloRow(@NotNull GHolo holo, int rowId, @NotNull String content, boolean updateOffset) {
-        return getInstance().getHoloService().insertHoloRow(holo, rowId, content, updateOffset);
+    public static @Nullable GHoloRow insertHoloRow(@NotNull GHolo holo, int position, @NotNull String content, boolean updateOffset) {
+        return getInstance().getHoloService().insertHoloRow(holo, position, content, updateOffset);
     }
 
     /**
@@ -125,10 +127,10 @@ public class GHoloAPI {
      * @author Gecolay
      * @since 1.0.0
      * @param holoRow HoloRow
-     * @param position Position
+     * @param offset Offset
      */
-    public static void updateHoloRowPosition(@NotNull GHoloRow holoRow, @NotNull Location position) {
-        getInstance().getHoloService().updateHoloRowPosition(holoRow, position);
+    public static void updateHoloRowPosition(@NotNull GHoloRow holoRow, @NotNull SimpleOffset offset) {
+        getInstance().getHoloService().updateHoloRowOffset(holoRow, offset);
     }
 
     /**
@@ -171,7 +173,7 @@ public class GHoloAPI {
      * @param holo Holo
      * @param location Location
      */
-    public static void updateHoloLocation(@NotNull GHolo holo, @NotNull Location location) {
+    public static void updateHoloLocation(@NotNull GHolo holo, @NotNull SimpleLocation location) {
         getInstance().getHoloService().updateHoloLocation(holo, location);
     }
 
@@ -194,7 +196,7 @@ public class GHoloAPI {
      * @param rows Text-Rows
      */
     public static void setHoloRows(@NotNull GHolo holo, @NotNull List<String> rows) {
-        getInstance().getHoloService().setHoloRows(holo, rows);
+        getInstance().getHoloService().setAllHoloRowContent(holo, rows);
     }
 
     /**
@@ -205,7 +207,7 @@ public class GHoloAPI {
      * @param copyToHolo CopyToHolo
      */
     public static void copyHoloRows(@NotNull GHolo holo, @NotNull GHolo copyToHolo) {
-        getInstance().getHoloService().copyHoloRows(holo, copyToHolo);
+        getInstance().getHoloService().copyAllHoloRowContent(holo, copyToHolo);
     }
 
     /**
@@ -223,7 +225,7 @@ public class GHoloAPI {
     /**
      * Manually loads all holos in the world for a player
      * <p>
-     * (Only use this if you have previously unloaded all holos for the player, as all holos are already loaded automatically on creation ({@link #createHolo(String, Location)}) or on server join for a player.)
+     * (Only use this if you have previously unloaded all holos for the player, as all holos are already loaded automatically on creation ({@link #createHolo(String, SimpleLocation)}) or on server join for a player.)
      * @author Gecolay
      * @since 1.0.0
      * @param player Player
@@ -235,7 +237,7 @@ public class GHoloAPI {
     /**
      * Manually loads a holo on the server for all players
      * <p>
-     * (Only use this if you have previously unloaded the holo for all players, as the holo is already loaded automatically on creation ({@link #createHolo(String, Location)}) or on server join for all players.)
+     * (Only use this if you have previously unloaded the holo for all players, as the holo is already loaded automatically on creation ({@link #createHolo(String, SimpleLocation)}) or on server join for all players.)
      * @author Gecolay
      * @since 1.0.0
      * @param holo Holo
@@ -247,7 +249,7 @@ public class GHoloAPI {
     /**
      * Manually loads a holo in the world for a player
      * <p>
-     * (Only use this if you have previously unloaded the holo for the player, as the holo is already loaded automatically on creation ({@link #createHolo(String, Location)}) or on server join for a player.)
+     * (Only use this if you have previously unloaded the holo for the player, as the holo is already loaded automatically on creation ({@link #createHolo(String, SimpleLocation)}) or on server join for a player.)
      * @author Gecolay
      * @since 1.0.0
      * @param holo Holo

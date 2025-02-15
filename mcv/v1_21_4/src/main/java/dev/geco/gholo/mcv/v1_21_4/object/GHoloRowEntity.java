@@ -5,8 +5,10 @@ import dev.geco.gholo.object.GHoloData;
 import dev.geco.gholo.object.GHoloRow;
 import dev.geco.gholo.object.GHoloUpdateType;
 import dev.geco.gholo.object.IGHoloRowEntity;
+import dev.geco.gholo.object.location.SimpleLocation;
+import dev.geco.gholo.object.location.SimpleOffset;
+import dev.geco.gholo.object.location.SimpleRotation;
 import io.papermc.paper.adventure.PaperAdventure;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
@@ -19,7 +21,6 @@ import net.minecraft.util.Brightness;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PositionMoveRotation;
-import org.bukkit.Location;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
@@ -38,7 +39,6 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     protected final GHoloMain gHoloMain;
     protected final EntityDataAccessor<Component> holoTextData;
     protected final EntityDataAccessor<Vector3f> holoScaleData;
-    protected GHoloInteractEntity holoInteractEntity = null;
 
     public GHoloRowEntity(GHoloRow holoRow) {
         super(EntityType.TEXT_DISPLAY, ((CraftWorld) holoRow.getHolo().getRawLocation().getWorld()).getHandle());
@@ -65,10 +65,6 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         } catch(Throwable e) { e.printStackTrace(); }
         holoScaleData = scaleAccessor;
         for(GHoloUpdateType updateType : GHoloUpdateType.values()) handleUpdate(updateType);
-        /*if(holoRow.getHoloInteraction().isEmpty()) return;
-        holoInteractEntity = new GHoloInteractEntity(level());
-        holoInteractEntity.setPos(getX(), getY(), getZ());
-        gHoloMain.getInteractService().addInteractionEntry(holoInteractEntity.getId(), holoRow);*/
     }
 
     @Override
@@ -78,19 +74,8 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
             if(permission != null && !gHoloMain.getPermissionService().hasPermission(player, permission)) continue;
             ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-            showHoloRow(player, serverPlayer, addEntityPacket);
-            continue;
-
-            /*serverPlayer.connection.send(new ClientboundAddEntityPacket(holoInteractEntity.getId(), holoInteractEntity.getUUID(), holoInteractEntity.getX(), holoInteractEntity.getY(), holoInteractEntity.getZ(), holoInteractEntity.getXRot(), holoInteractEntity.getYRot(), holoInteractEntity.getType(), 0, holoInteractEntity.getDeltaMovement(), holoInteractEntity.getYHeadRot()));
-            serverPlayer.connection.send(new ClientboundSetEntityDataPacket(holoInteractEntity.getId(), holoInteractEntity.getEntityData().getNonDefaultValues()));
-
-            PlayerTeam pt = new PlayerTeam(new Scoreboard(), "hide");
-            pt. setCollisionRule(Team.CollisionRule.NEVER);
-            pt.setColor(ChatFormatting.AQUA);
-
-            serverPlayer.connection.send(ClientboundSetPlayerTeamPacket.createAddOrModifyPacket(pt, true));
-            serverPlayer.connection.send(ClientboundSetPlayerTeamPacket.createPlayerPacket(pt, holoInteractEntity.getUUID().toString(), ClientboundSetPlayerTeamPacket.Action.ADD));
-*/
+            serverPlayer.connection.send(addEntityPacket);
+            serverPlayer.connection.send(getDataPacket(player));
         }
     }
 
@@ -100,11 +85,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
         if(!serverPlayer.level().equals(level())) return;
         String permission = getPermission();
         if(permission != null && !gHoloMain.getPermissionService().hasPermission(player, permission)) return;
-        showHoloRow(player, serverPlayer, new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYHeadRot()));
-    }
-
-    private void showHoloRow(Player player, ServerPlayer serverPlayer, ClientboundAddEntityPacket addEntityPacket) {
-        serverPlayer.connection.send(addEntityPacket);
+        serverPlayer.connection.send(new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYHeadRot()));
         serverPlayer.connection.send(getDataPacket(player));
     }
 
@@ -129,49 +110,50 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     }
 
     private void handleUpdate(GHoloUpdateType updateType) {
-        GHoloData defaultData = holoRow.getHolo().getRawDefaultData();
-        GHoloData data = holoRow.getRawData();
+        GHoloData rowData = holoRow.getHolo().getData();
+        GHoloData holoData = holoRow.getRawData();
         switch (updateType) {
             case LOCATION:
-                Location location = holoRow.getHolo().getLocation();
-                Location position = holoRow.getRawPosition();
-                location.add(position);
+                SimpleLocation location = holoRow.getHolo().getLocation();
+                SimpleOffset offset = holoRow.getRawOffset();
+                location.add(offset);
                 setPos(location.getX(), location.getY(), location.getZ());
-                setRot(position.getYaw(), position.getPitch());
+                SimpleRotation rotation = holoRow.getRotation();
+                setRot(rotation.getYaw(), rotation.getPitch());
                 break;
             case RANGE:
-                double range = data.getRange() != null ? data.getRange() : (defaultData.getRange() != null ? defaultData.getRange() : GHoloData.DEFAULT_RANGE);
+                double range = rowData.getRange() != null ? rowData.getRange() : (holoData.getRange() != null ? holoData.getRange() : GHoloData.DEFAULT_RANGE);
                 setViewRange((float) (range / 64));
                 break;
             case BACKGROUND_COLOR:
-                String backgroundColor = data.getBackgroundColor() != null ? data.getBackgroundColor() : (defaultData.getBackgroundColor() != null ? defaultData.getBackgroundColor() : GHoloData.DEFAULT_BACKGROUND_COLOR);
+                String backgroundColor = rowData.getBackgroundColor() != null ? rowData.getBackgroundColor() : (holoData.getBackgroundColor() != null ? holoData.getBackgroundColor() : GHoloData.DEFAULT_BACKGROUND_COLOR);
                 setBackgroundColor(backgroundColor);
                 break;
             case TEXT_OPACITY:
-                byte textOpacity = data.getTextOpacity() != null ? data.getTextOpacity() : (defaultData.getTextOpacity() != null ? defaultData.getTextOpacity() : GHoloData.DEFAULT_TEXT_OPACITY);
+                byte textOpacity = rowData.getTextOpacity() != null ? rowData.getTextOpacity() : (holoData.getTextOpacity() != null ? holoData.getTextOpacity() : GHoloData.DEFAULT_TEXT_OPACITY);
                 setRealTextOpacity(textOpacity);
                 break;
             case TEXT_SHADOW:
-                boolean textShadow = data.getTextShadow() != null ? data.getTextShadow() : (defaultData.getTextShadow() != null ? defaultData.getTextShadow() : GHoloData.DEFAULT_HAS_TEXT_SHADOW);
+                boolean textShadow = rowData.getTextShadow() != null ? rowData.getTextShadow() : (holoData.getTextShadow() != null ? holoData.getTextShadow() : GHoloData.DEFAULT_HAS_TEXT_SHADOW);
                 setTextShadow(textShadow);
                 break;
             case TEXT_ALIGNMENT:
-                String textAlignment = data.getTextAlignment() != null ? data.getTextAlignment() : (defaultData.getTextAlignment() != null ? defaultData.getTextAlignment() : GHoloData.DEFAULT_TEXT_ALIGNMENT);
+                String textAlignment = rowData.getTextAlignment() != null ? rowData.getTextAlignment() : (holoData.getTextAlignment() != null ? holoData.getTextAlignment() : GHoloData.DEFAULT_TEXT_ALIGNMENT);
                 setTextAlignment(textAlignment);
             case BILLBOARD:
-                String billboard = data.getBillboard() != null ? data.getBillboard() : (defaultData.getBillboard() != null ? defaultData.getBillboard() : GHoloData.DEFAULT_BILLBOARD);
+                String billboard = rowData.getBillboard() != null ? rowData.getBillboard() : (holoData.getBillboard() != null ? holoData.getBillboard() : GHoloData.DEFAULT_BILLBOARD);
                 setBillboard(billboard);
                 break;
             case SEE_THROUGH:
-                boolean seeThrough = data.getSeeThrough() != null ? data.getSeeThrough() : (defaultData.getSeeThrough() != null ? defaultData.getSeeThrough() : GHoloData.DEFAULT_CAN_SEE_THROUGH);
+                boolean seeThrough = rowData.getSeeThrough() != null ? rowData.getSeeThrough() : (holoData.getSeeThrough() != null ? holoData.getSeeThrough() : GHoloData.DEFAULT_CAN_SEE_THROUGH);
                 setSeeThrough(seeThrough);
                 break;
             case SCALE:
-                Vector3f scale = data.getScale() != null ? data.getScale() : (defaultData.getScale() != null ? defaultData.getScale() : GHoloData.DEFAULT_SCALE);
+                Vector3f scale = rowData.getScale() != null ? rowData.getScale() : (holoData.getScale() != null ? holoData.getScale() : GHoloData.DEFAULT_SCALE);
                 entityData.set(holoScaleData, scale);
                 break;
             case BRIGHTNESS:
-                Byte brigthness = data.getBrightness() != null ? data.getBrightness() : (defaultData.getBrightness() != null ? defaultData.getBrightness() : GHoloData.DEFAULT_BRIGHTNESS);
+                Byte brigthness = rowData.getBrightness() != null ? rowData.getBrightness() : (holoData.getBrightness() != null ? holoData.getBrightness() : GHoloData.DEFAULT_BRIGHTNESS);
                 setBrightnessOverride(brigthness != null ? new Brightness(brigthness, Brightness.FULL_BRIGHT.sky()) : null);
         }
     }
@@ -211,9 +193,9 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     }
 
     private String getPermission() {
-        GHoloData defaultData = holoRow.getHolo().getRawDefaultData();
-        GHoloData data = holoRow.getRawData();
-        return data.getPermission() != null ? data.getPermission() : (defaultData.getPermission() != null ? defaultData.getPermission() : GHoloData.DEFAULT_PERMISSION);
+        GHoloData holoData = holoRow.getHolo().getData();
+        GHoloData rowData = holoRow.getRawData();
+        return rowData.getPermission() != null ? rowData.getPermission() : (holoData.getPermission() != null ? holoData.getPermission() : GHoloData.DEFAULT_PERMISSION);
     }
 
     private ClientboundSetEntityDataPacket getDataPacket(Player player) {
@@ -230,9 +212,6 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
 
     @Override
     public void unloadHoloRow() {
-        //gHoloMain.getHoloInteractService().removeInteraction(holoInteractEntity.getId());
-        /*IntArrayList ids = new IntArrayList(getId());
-        if(holoInteractEntity != null) ids.add(holoInteractEntity.getId());*/
         ClientboundRemoveEntitiesPacket removeEntityPacket = new ClientboundRemoveEntitiesPacket(getId());
         for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
             ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
@@ -243,8 +222,6 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     @Override
     public void unloadHoloRow(@NotNull Player player) {
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-        /*IntArrayList ids = new IntArrayList(getId());
-        if(holoInteractEntity != null) ids.add(holoInteractEntity.getId());*/
         serverPlayer.connection.send(new ClientboundRemoveEntitiesPacket(getId()));
     }
 

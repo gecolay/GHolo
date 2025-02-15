@@ -5,11 +5,11 @@ import dev.geco.gholo.object.GHolo;
 import dev.geco.gholo.object.GHoloData;
 import dev.geco.gholo.object.GHoloRow;
 import dev.geco.gholo.object.GHoloUpdateType;
-import org.bukkit.Bukkit;
+import dev.geco.gholo.object.location.SimpleLocation;
+import dev.geco.gholo.object.location.SimpleOffset;
+import dev.geco.gholo.object.location.SimpleRotation;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
-import org.json.simple.JSONObject;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,13 +29,25 @@ public class HoloService {
 
     public void createTables() {
         try {
-            gHoloMain.getDataService().execute("CREATE TABLE IF NOT EXISTS holo (id TEXT, l_world TEXT, l_x REAL, l_y REAL, l_z REAL, default_data TEXT);");
-            gHoloMain.getDataService().execute("CREATE TABLE IF NOT EXISTS holo_row (`row_number` INTEGER, holo_id TEXT, content TEXT, o_x REAL, o_y REAL, o_z REAL, l_yaw REAL, l_pitch REAL, data TEXT);");
-        } catch(SQLException e) { e.printStackTrace(); }
-
-        try {
-            gHoloMain.getDataService().execute("CREATE TABLE IF NOT EXISTS gholo_holo (id TEXT, id TEXT, l_world TEXT, l_x REAL, l_y REAL, l_z REAL, data TEXT);");
-            gHoloMain.getDataService().execute("CREATE TABLE IF NOT EXISTS gholo_holo_row (position INTEGER, holo_id TEXT, content TEXT, o_x REAL, o_y REAL, o_z REAL, l_yaw REAL, l_pitch REAL, data TEXT);");
+            gHoloMain.getDataService().execute("""
+                CREATE TABLE IF NOT EXISTS gholo_holo (
+                    uuid TEXT,
+                    id TEXT,
+                    location TEXT,
+                    rotation TEXT,
+                    data TEXT
+                );
+            """);
+            gHoloMain.getDataService().execute("""
+                CREATE TABLE IF NOT EXISTS gholo_holo_row (
+                    position INTEGER,
+                    holo_uuid TEXT,
+                    content TEXT,
+                    offset TEXT,
+                    rotation TEXT,
+                    data TEXT
+                );
+            """);
         } catch(SQLException e) { e.printStackTrace(); }
     }
 
@@ -54,49 +66,43 @@ public class HoloService {
             try(ResultSet resultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_holo")) {
                 while(resultSet.next()) {
                     try {
-                        String internalId = resultSet.getString("internal_id");
+                        UUID uuid = UUID.fromString(resultSet.getString("uuid"));
                         String id = resultSet.getString("id");
-                        String worldString = resultSet.getString("l_world");
-                        World world = Bukkit.getWorld(worldString);
-                        if(world == null) continue;
-                        double locationX = resultSet.getDouble("l_x");
-                        double locationY = resultSet.getDouble("l_y");
-                        double locationZ = resultSet.getDouble("l_z");
-                        float locationYaw = resultSet.getFloat("l_yaw");
-                        float locationPitch = resultSet.getFloat("l_pitch");
-                        Location location = new Location(world, locationX, locationY, locationZ, locationYaw, locationPitch);
-                        GHolo holo = new GHolo(internalId, id, location);
+                        SimpleLocation location = SimpleLocation.fromString(resultSet.getString("location"));
+                        if(location == null) throw new RuntimeException("Could not load holo '" + id + "', invalid location");
+                        SimpleRotation rotation = SimpleRotation.fromString(resultSet.getString("rotation"));
+                        if(rotation == null) throw new RuntimeException("Could not load holo '" + id + "', invalid rotation");
+                        GHolo holo = new GHolo(uuid, id, location);
+                        holo.setRotation(rotation);
 
-                        String defaultDataString = resultSet.getString("default_data");
-                        holo.getRawDefaultData().loadString(defaultDataString);
+                        String dataString = resultSet.getString("data");
+                        holo.getData().loadString(dataString);
 
                         holos.add(holo);
 
-                        try(ResultSet rowResultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_holo_row where holo_id = ?", holo.getId())) {
+                        try(ResultSet rowResultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_holo_row where holo_uuid = ?", uuid.toString())) {
                             TreeMap<Integer, GHoloRow> holoRowMap = new TreeMap<>();
 
                             while(rowResultSet.next()) {
-                                int row = rowResultSet.getInt("row_number");
+                                int position = rowResultSet.getInt("position");
                                 String content = gHoloMain.getFormatUtil().formatBase(rowResultSet.getString("content"));
+                                SimpleOffset offset = SimpleOffset.fromString(rowResultSet.getString("offset"));
+                                if(offset == null) throw new RuntimeException("Could not load holo row '" + position + "' of holo '" + id + "', invalid location");
+                                SimpleRotation rowRotation = SimpleRotation.fromString(rowResultSet.getString("rotation"));
+                                if(rowRotation == null) throw new RuntimeException("Could not load holo row '" + position + "' of holo '" + id + "', invalid rotation");
                                 GHoloRow holoRow = new GHoloRow(holo, content);
-
-                                double offsetX = rowResultSet.getDouble("o_x");
-                                double offsetY = rowResultSet.getDouble("o_y");
-                                double offsetZ = rowResultSet.getDouble("o_z");
-                                float rowLocationYaw = rowResultSet.getFloat("l_yaw");
-                                float rowLocationPitch = rowResultSet.getFloat("l_pitch");
-                                Location position = new Location(world, offsetX, offsetY, offsetZ, rowLocationYaw, rowLocationPitch);
-                                holoRow.setPosition(position);
+                                holoRow.setOffset(offset);
+                                holoRow.setRotation(rowRotation);
 
                                 String rowDataString = rowResultSet.getString("data");
-                                holoRow.getRawData().loadString(rowDataString);
+                                holoRow.getData().loadString(rowDataString);
 
-                                holoRowMap.put(row, holoRow);
+                                holoRowMap.put(position, holoRow);
                             }
 
                             for(GHoloRow holoRow : holoRowMap.values()) {
                                 holo.addRow(holoRow);
-                                gHoloMain.getEntityUtil().loadHoloRowEntity(holoRow);
+                                gHoloMain.getEntityUtil().createHoloRowEntity(holoRow);
                                 gHoloMain.getHoloAnimationService().updateSubscriptionStatus(holoRow);
                             }
                         }
@@ -116,17 +122,16 @@ public class HoloService {
 
     public void unloadHoloForPlayer(GHolo holo, Player player) { for(GHoloRow row : holo.getRows()) row.getHoloRowEntity().unloadHoloRow(player); }
 
-    public GHolo createHolo(String holoId, Location location) {
+    public GHolo createHolo(String holoId, SimpleLocation location) {
         try {
-            GHolo holo = new GHolo(UUID.randomUUID().toString(), holoId, location);
+            GHolo holo = new GHolo(UUID.randomUUID(), holoId, location);
 
-            gHoloMain.getDataService().execute("INSERT INTO holo (id, l_world, l_x, l_y, l_z, default_data) VALUES (?, ?, ?, ?, ?, ?)",
+            gHoloMain.getDataService().execute("INSERT INTO gholo_holo (uuid TEXT, id TEXT, location TEXT, rotation TEXT, data TEXT) VALUES (?, ?, ?, ?, ?)",
+                    holo.getUuid().toString(),
                     holoId,
-                    location.getWorld().getName(),
-                    location.getX(),
-                    location.getY(),
-                    location.getZ(),
-                    holo.getRawDefaultData().toString()
+                    location.toString(),
+                    holo.getRotation().toString(),
+                    holo.getData().toString()
             );
 
             holos.add(holo);
@@ -136,36 +141,28 @@ public class HoloService {
         return null;
     }
 
-    public boolean importHolo(GHolo holo) {
-
-        return true;
-    }
-
     public GHoloRow createHoloRow(GHolo holo, String content) {
         try {
-            int row = holo.getRows().size();
-            double offset = gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
-            double rowOffset = offset * row;
-            Location position = new Location(holo.getRawLocation().getWorld(), 0, -rowOffset, 0, 0, 0);
+            int position = holo.getRows().size();
+            double sizeBetweenRows = gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
+            double rowOffset = sizeBetweenRows * position;
+            SimpleOffset offset = new SimpleOffset(0, -rowOffset, 0);
 
             GHoloRow holoRow = new GHoloRow(holo, gHoloMain.getFormatUtil().formatBase(content));
-            holoRow.setPosition(position);
+            holoRow.setOffset(offset);
 
-            gHoloMain.getDataService().execute("INSERT INTO holo_row (`row_number`, holo_id, content, o_x, o_y, o_z, l_yaw, l_pitch, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    row,
-                    holo.getId(),
+            gHoloMain.getDataService().execute("INSERT INTO gholo_holo_row (position, holo_uuid, content, offset, rotation, data) VALUES (?, ?, ?, ?, ?, ?)",
+                    position,
+                    holo.getUuid().toString(),
                     content,
-                    position.getX(),
-                    position.getY(),
-                    position.getZ(),
-                    position.getYaw(),
-                    position.getPitch(),
+                    offset.toString(),
+                    holo.getRotation().toString(),
                     holoRow.getRawData().toString()
             );
 
             holo.addRow(holoRow);
 
-            gHoloMain.getEntityUtil().loadHoloRowEntity(holoRow);
+            gHoloMain.getEntityUtil().createHoloRowEntity(holoRow);
             gHoloMain.getHoloAnimationService().updateSubscriptionStatus(holoRow);
 
             return holoRow;
@@ -173,42 +170,46 @@ public class HoloService {
         return null;
     }
 
-    public GHoloRow insertHoloRow(GHolo holo, int rowId, String content, boolean updateOffset) {
+    public GHoloRow insertHoloRow(GHolo holo, int position, String content, boolean updateOffsets) {
         try {
-            double offset = gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
-            double rowOffset = offset * rowId;
-            Location position = new Location(holo.getRawLocation().getWorld(), 0, -rowOffset, 0, 0, 0);
+            double sizeBetweenRows = gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
+            double rowOffset = sizeBetweenRows * position;
+            SimpleOffset offset = new SimpleOffset(0, -rowOffset, 0);
 
-            if(updateOffset) {
-                gHoloMain.getDataService().execute("UPDATE holo_row SET o_y = o_y - ? WHERE holo_id = ? AND `row_number` >= ?", offset, holo.getId(), rowId);
-                for(GHoloRow holoRow : holo.getRows().subList(rowId, holo.getRows().size())) {
-                    Location rowPosition = holoRow.getPosition();
-                    rowPosition.setY(rowPosition.getY() - offset);
-                    holoRow.setPosition(rowPosition);
-                    holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
+            if(updateOffsets) {
+                try (ResultSet moveOffsetResultSet = gHoloMain.getDataService().executeAndGet("SELECT position, offset FROM gholo_holo_row WHERE holo_uuid = ? AND position >= ?", holo.getUuid().toString(), position)) {
+                    while(moveOffsetResultSet.next()) {
+                        int movePosition = moveOffsetResultSet.getInt("position");
+                        SimpleOffset moveOffset = SimpleOffset.fromString(moveOffsetResultSet.getString("offset"));
+                        moveOffset.setY(moveOffset.getY() - sizeBetweenRows);
+                        gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET offset = ? WHERE holo_uuid = ? AND position = ?", moveOffset, holo.getUuid().toString(), movePosition);
+                    }
+                }
+                for(GHoloRow updateHoloRow : holo.getRows().subList(position, holo.getRows().size())) {
+                    SimpleOffset moveOffset = updateHoloRow.getOffset();
+                    moveOffset.setY(moveOffset.getY() - sizeBetweenRows);
+                    updateHoloRow.setOffset(moveOffset);
+                    updateHoloRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
                 }
             }
 
-            gHoloMain.getDataService().execute("UPDATE holo_row SET `row_number` = `row_number` + 1 WHERE holo_id = ? AND `row_number` >= ?", holo.getId(), rowId);
+            gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET position = position + 1 WHERE holo_uuid = ? AND position >= ?", holo.getUuid().toString(), position);
 
             GHoloRow holoRow = new GHoloRow(holo, gHoloMain.getFormatUtil().formatBase(content));
-            holoRow.setPosition(position);
+            holoRow.setOffset(offset);
 
-            gHoloMain.getDataService().execute("INSERT INTO holo_row (`row_number`, holo_id, content, o_x, o_y, o_z, l_yaw, l_pitch, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    rowId,
-                    holo.getId(),
+            gHoloMain.getDataService().execute("INSERT INTO gholo_holo_row (position, holo_uuid, content, offset, rotation, data) VALUES (?, ?, ?, ?, ?, ?)",
+                    position,
+                    holo.getUuid().toString(),
                     content,
-                    position.getX(),
-                    position.getY(),
-                    position.getZ(),
-                    position.getYaw(),
-                    position.getPitch(),
+                    offset.toString(),
+                    holo.getRotation().toString(),
                     holoRow.getRawData().toString()
             );
 
-            holo.insertRow(holoRow, rowId);
+            holo.insertRow(holoRow, position);
 
-            gHoloMain.getEntityUtil().loadHoloRowEntity(holoRow);
+            gHoloMain.getEntityUtil().createHoloRowEntity(holoRow);
             gHoloMain.getHoloAnimationService().updateSubscriptionStatus(holoRow);
 
             return holoRow;
@@ -218,53 +219,68 @@ public class HoloService {
 
     public void updateHoloRowContent(GHoloRow holoRow, String content) {
         try {
-            gHoloMain.getDataService().execute("UPDATE holo_row SET content = ? WHERE `row_number` = ? AND holo_id = ?", content, holoRow.getRowId(), holoRow.getHolo().getId());
+            gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET content = ? WHERE position = ? AND holo_uuid = ?", content, holoRow.getPosition(), holoRow.getHolo().getUuid().toString());
             holoRow.setContent(gHoloMain.getFormatUtil().formatBase(content));
             holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.CONTENT);
             gHoloMain.getHoloAnimationService().updateSubscriptionStatus(holoRow);
         } catch(Throwable e) { e.printStackTrace(); }
     }
 
-    public void updateHoloRowPosition(GHoloRow holoRow, Location position) {
+    public void updateHoloRowOffset(GHoloRow holoRow, SimpleOffset offset) {
         try {
-            gHoloMain.getDataService().execute("UPDATE holo_row SET o_x = ?, o_y = ?, o_z = ?, l_yaw = ?, l_pitch = ? WHERE `row_number` = ? AND holo_id = ?",
-                    position.getX(),
-                    position.getY(),
-                    position.getZ(),
-                    position.getYaw(),
-                    position.getPitch(),
-                    holoRow.getRowId(),
-                    holoRow.getHolo().getId()
+            gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET offset = ? WHERE position = ? AND holo_uuid = ?",
+                    offset.toString(),
+                    holoRow.getPosition(),
+                    holoRow.getHolo().getUuid().toString()
             );
-            holoRow.setPosition(position);
+            holoRow.setOffset(offset);
             holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
         } catch(Throwable e) { e.printStackTrace(); }
     }
 
-    public void updateHoloRowData(GHoloRow holoRow, GHoloData rowData) {
+    public void updateHoloRowRotation(GHoloRow holoRow, SimpleRotation rotation) {
         try {
-            gHoloMain.getDataService().execute("UPDATE holo_row SET data = ? WHERE `row_number` = ? AND holo_id = ?", rowData.toString(), holoRow.getRowId(), holoRow.getHolo().getId());
-            holoRow.setData(rowData);
+            gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET rotation = ? WHERE position = ? AND holo_uuid = ?",
+                    rotation.toString(),
+                    holoRow.getPosition(),
+                    holoRow.getHolo().getUuid().toString()
+            );
+            holoRow.setRotation(rotation);
+            holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
         } catch(Throwable e) { e.printStackTrace(); }
     }
 
-    public void removeHoloRow(GHoloRow holoRow, boolean updateOffset) {
+    public void updateHoloRowData(GHoloRow holoRow, GHoloData data) {
+        try {
+            gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET data = ? WHERE position = ? AND holo_uuid = ?", data.toString(), holoRow.getPosition(), holoRow.getHolo().getUuid().toString());
+            holoRow.setData(data);
+        } catch(Throwable e) { e.printStackTrace(); }
+    }
+
+    public void removeHoloRow(GHoloRow holoRow, boolean updateOffsets) {
         try {
             GHolo holo = holoRow.getHolo();
-            int row = holoRow.getRowId();
-            double offset = gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
-            gHoloMain.getDataService().execute("DELETE FROM holo_row where holo_id = ? AND `row_number` = ?", holo.getId(), row);
-            if(updateOffset) {
-                gHoloMain.getDataService().execute("UPDATE holo_row SET o_y = o_y + ? WHERE holo_id = ? AND `row_number` > ?", offset, holo.getId(), row);
-                for(GHoloRow updateHoloRow : holo.getRows().subList(row + 1, holo.getRows().size())) {
-                    Location rowPosition = updateHoloRow.getPosition();
-                    rowPosition.setY(rowPosition.getY() + offset);
-                    updateHoloRow.setPosition(rowPosition);
+            int position = holoRow.getPosition();
+            double sizeBetweenRows = gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
+            gHoloMain.getDataService().execute("DELETE FROM gholo_holo_row where holo_uuid = ? AND position = ?", holo.getUuid().toString(), position);
+            if(updateOffsets) {
+                try (ResultSet moveOffsetResultSet = gHoloMain.getDataService().executeAndGet("SELECT position, offset FROM gholo_holo_row WHERE holo_uuid = ? AND position > ?", holo.getUuid().toString(), position)) {
+                    while(moveOffsetResultSet.next()) {
+                        int movePosition = moveOffsetResultSet.getInt("position");
+                        SimpleOffset moveOffset = SimpleOffset.fromString(moveOffsetResultSet.getString("offset"));
+                        moveOffset.setY(moveOffset.getY() + sizeBetweenRows);
+                        gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET offset = ? WHERE holo_uuid = ? AND position = ?", moveOffset, holo.getUuid().toString(), movePosition);
+                    }
+                }
+                for(GHoloRow updateHoloRow : holo.getRows().subList(position + 1, holo.getRows().size())) {
+                    SimpleOffset moveOffset = updateHoloRow.getOffset();
+                    moveOffset.setY(moveOffset.getY() + sizeBetweenRows);
+                    updateHoloRow.setOffset(moveOffset);
                     updateHoloRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
                 }
             }
-            gHoloMain.getDataService().execute("UPDATE holo_row SET `row_number` = `row_number` - 1 WHERE holo_id = ? AND `row_number` > ?", holo.getId(), row);
-            holo.removeRow(row);
+            gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET position = position - 1 WHERE holo_uuid = ? AND position > ?", holo.getUuid().toString(), position);
+            holo.removeRow(position);
             holoRow.getHoloRowEntity().unloadHoloRow();
             gHoloMain.getHoloAnimationService().unsubscribe(holoRow);
         } catch(Throwable e) { e.printStackTrace(); }
@@ -272,25 +288,21 @@ public class HoloService {
 
     public void updateHoloId(GHolo holo, String holoId) {
         try {
-            gHoloMain.getDataService().execute("UPDATE holo SET id = ? WHERE id = ?", holoId, holo.getId());
-            gHoloMain.getDataService().execute("UPDATE holo_row SET holo_id = ? WHERE holo_id = ?", holoId, holo.getId());
+            gHoloMain.getDataService().execute("UPDATE gholo_holo SET id = ? WHERE uuid = ?", holoId, holo.getUuid());
             holo.setId(holoId);
         } catch(Throwable e) { e.printStackTrace(); }
     }
 
-    public void updateHoloLocation(GHolo holo, Location location) {
+    public void updateHoloLocation(GHolo holo, SimpleLocation location) {
         try {
-            gHoloMain.getDataService().execute("UPDATE holo SET l_world = ?, l_x = ?, l_y = ?, l_z = ? WHERE id = ?",
-                    location.getWorld().getName(),
-                    location.getX(),
-                    location.getY(),
-                    location.getZ(),
-                    holo.getId()
+            gHoloMain.getDataService().execute("UPDATE gholo_holo SET location = ? WHERE uuid = ?",
+                    location.toString(),
+                    holo.getUuid().toString()
             );
             if(!holo.getRawLocation().getWorld().equals(location.getWorld())) {
                 unloadHolo(holo);
                 holo.setLocation(location);
-                for(GHoloRow holoRow : holo.getRows()) gHoloMain.getEntityUtil().loadHoloRowEntity(holoRow);
+                for(GHoloRow holoRow : holo.getRows()) gHoloMain.getEntityUtil().createHoloRowEntity(holoRow);
                 return;
             }
             holo.setLocation(location);
@@ -298,76 +310,43 @@ public class HoloService {
         } catch(Throwable e) { e.printStackTrace(); }
     }
 
-    public void updateHoloData(GHolo holo, GHoloData rowData) {
+    public void updateHoloRotation(GHolo holo, SimpleRotation rotation) {
         try {
-            gHoloMain.getDataService().execute("UPDATE holo SET default_data = ? WHERE id = ?", rowData.toString(), holo.getId());
-            holo.setDefaultData(rowData);
+            gHoloMain.getDataService().execute("UPDATE gholo_holo SET rotation = ? WHERE uuid = ?",
+                    rotation.toString(),
+                    holo.getUuid().toString()
+            );
+            holo.setRotation(rotation);
+            for(GHoloRow holoRow : holo.getRows()) holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
         } catch(Throwable e) { e.printStackTrace(); }
     }
 
-    public void setHoloRows(GHolo holo, List<String> rows) {
+    public void updateHoloData(GHolo holo, GHoloData data) {
+        try {
+            gHoloMain.getDataService().execute("UPDATE gholo_holo SET data = ? WHERE uuid = ?", data.toString(), holo.getUuid().toString());
+            holo.setData(data);
+        } catch(Throwable e) { e.printStackTrace(); }
+    }
+
+    public void setAllHoloRowContent(GHolo holo, List<String> rows) {
         unloadHolo(holo);
         holo.getRows().clear();
         try {
-            gHoloMain.getDataService().execute("DELETE FROM holo_row where holo_id = ?", holo.getId());
+            gHoloMain.getDataService().execute("DELETE FROM gholo_holo_row where holo_uuid = ?", holo.getUuid().toString());
             for(String row : rows) createHoloRow(holo, row);
         } catch(Throwable e) { e.printStackTrace(); }
     }
 
-    public void copyHoloRows(GHolo holo, GHolo copyToHolo) {
+    public void copyAllHoloRowContent(GHolo fromHolo, GHolo toHolo) {
         try {
-            try (ResultSet resultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM holo_row WHERE holo_id = ?", holo.getId())) {
-                unloadHolo(copyToHolo);
-                for(GHoloRow holoRow : copyToHolo.getRows()) gHoloMain.getHoloAnimationService().unsubscribe(holoRow);
-                copyToHolo.getRows().clear();
-                gHoloMain.getDataService().execute("DELETE FROM holo_row where holo_id = ?", copyToHolo.getId());
 
-                TreeMap<Integer, GHoloRow> holoRowMap = new TreeMap<>();
-
-                while(resultSet.next()) {
-                    int rowId = resultSet.getInt("row_number");
-                    String content = resultSet.getString("content");
-                    double offsetX = resultSet.getDouble("o_x");
-                    double offsetY = resultSet.getDouble("o_y");
-                    double offsetZ = resultSet.getDouble("o_z");
-                    float locationYaw = resultSet.getFloat("l_yaw");
-                    float locationPitch = resultSet.getFloat("l_pitch");
-                    Location position = new Location(copyToHolo.getRawLocation().getWorld(), offsetX, offsetY, offsetZ, locationYaw, locationPitch);
-                    String rowDataString = resultSet.getString("data");
-
-                    gHoloMain.getDataService().execute("INSERT INTO holo_row (`row_number`, holo_id, content, o_x, o_y, o_z, l_yaw, l_pitch, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                            rowId,
-                            copyToHolo.getId(),
-                            content,
-                            position.getX(),
-                            position.getY(),
-                            position.getZ(),
-                            locationYaw,
-                            locationPitch,
-                            rowDataString
-                    );
-
-                    GHoloRow holoRow = new GHoloRow(copyToHolo, gHoloMain.getFormatUtil().formatBase(content));
-                    holoRow.setPosition(position);
-
-                    holoRow.getRawData().loadString(rowDataString);
-
-                    holoRowMap.put(rowId, holoRow);
-                }
-
-                for(GHoloRow holoRow : holoRowMap.values()) {
-                    copyToHolo.addRow(holoRow);
-                    gHoloMain.getEntityUtil().loadHoloRowEntity(holoRow);
-                    gHoloMain.getHoloAnimationService().updateSubscriptionStatus(holoRow);
-                }
-            }
         } catch(Throwable e) { e.printStackTrace(); }
     }
 
     public void removeHolo(GHolo holo) {
         try {
-            gHoloMain.getDataService().execute("DELETE FROM holo WHERE id = ?", holo.getId());
-            gHoloMain.getDataService().execute("DELETE FROM holo_row WHERE holo_id = ?", holo.getId());
+            gHoloMain.getDataService().execute("DELETE FROM gholo_holo WHERE uuid = ?", holo.getUuid().toString());
+            gHoloMain.getDataService().execute("DELETE FROM gholo_holo_row WHERE holo_uuid = ?", holo.getUuid().toString());
             holos.remove(holo);
             for(GHoloRow holoRow : holo.getRows()) gHoloMain.getHoloAnimationService().unsubscribe(holoRow);
             unloadHolo(holo);

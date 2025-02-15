@@ -5,8 +5,9 @@ import dev.geco.gholo.object.GHolo;
 import dev.geco.gholo.object.GHoloData;
 import dev.geco.gholo.object.importer.GHoloImporter;
 import dev.geco.gholo.object.importer.GHoloImporterResult;
+import dev.geco.gholo.object.location.SimpleLocation;
+import dev.geco.gholo.object.location.SimpleRotation;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -22,7 +23,7 @@ public class FancyHologramsImporter extends GHoloImporter {
     public @NotNull String getType() { return "fancy_holograms"; }
 
     @Override
-    public @NotNull GHoloImporterResult importHolos(@NotNull GHoloMain gHoloMain) {
+    public @NotNull GHoloImporterResult importHolos(@NotNull GHoloMain gHoloMain, boolean override) {
         int imported = 0;
 
         File contentFile = new File("plugins/FancyHolograms/holograms.yml");
@@ -45,10 +46,12 @@ public class FancyHologramsImporter extends GHoloImporter {
                 double z = fileContent.getDouble(locationPath + "z");
                 float yaw = (float) fileContent.getDouble(locationPath + "yaw");
                 float pitch = (float) fileContent.getDouble(locationPath + "pitch");
-                Location location = new Location(world, x, y ,z, yaw, pitch);
+                SimpleLocation location = new SimpleLocation(world, x, y ,z);
+                SimpleRotation rotation = new SimpleRotation(yaw, pitch);
 
                 GHolo holo = gHoloMain.getHoloService().createHolo(hologram, location);
-                GHoloData data = holo.getDefaultData();
+                holo.setRotation(rotation);
+                GHoloData data = holo.getData();
 
                 double range = fileContent.getDouble("holograms." + hologram + ".visibility_distance", GHoloData.DEFAULT_RANGE);
                 if(GHoloData.DEFAULT_RANGE != range) data.setRange(range);
@@ -80,7 +83,7 @@ public class FancyHologramsImporter extends GHoloImporter {
                 gHoloMain.getHoloService().updateHoloData(holo, data);
 
                 List<String> rows = fileContent.getStringList("holograms." + hologram + ".text");
-                gHoloMain.getHoloService().setHoloRows(holo, rows);
+                gHoloMain.getHoloService().setAllHoloRowContent(holo, rows);
 
                 imported++;
             }

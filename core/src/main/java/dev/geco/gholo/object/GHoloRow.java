@@ -1,17 +1,16 @@
 package dev.geco.gholo.object;
 
-import org.bukkit.Location;
+import dev.geco.gholo.object.location.SimpleOffset;
+import dev.geco.gholo.object.location.SimpleRotation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class GHoloRow {
 
     private final GHolo holo;
     private String content;
-    private Location position = new Location(null, 0, 0, 0);
+    private SimpleOffset offset = new SimpleOffset(0, 0, 0);
+    private SimpleRotation rotation = new SimpleRotation(0f, 0f);
     private GHoloData data = new GHoloData();
     private IGHoloRowEntity holoRowEntity = null;
 
@@ -22,7 +21,7 @@ public class GHoloRow {
 
     public @NotNull GHolo getHolo() { return holo; }
 
-    public int getRowId() { return holo.getRows().indexOf(this); }
+    public int getPosition() { return holo.getRows().indexOf(this); }
 
     public @NotNull String getContent() { return content; }
 
@@ -31,12 +30,21 @@ public class GHoloRow {
         return this;
     }
 
-    public @NotNull Location getPosition() { return position.clone(); }
+    public @NotNull SimpleOffset getOffset() { return offset.clone(); }
 
-    public @NotNull Location getRawPosition() { return position; }
+    public @NotNull SimpleOffset getRawOffset() { return offset; }
 
-    public @NotNull GHoloRow setPosition(@NotNull Location position) {
-        this.position = position.clone();
+    public @NotNull GHoloRow setOffset(@NotNull SimpleOffset offset) {
+        this.offset = offset.clone();
+        return this;
+    }
+
+    public @NotNull SimpleRotation getRotation() { return rotation.clone(); }
+
+    public @NotNull SimpleRotation getRawRotation() { return rotation; }
+
+    public @NotNull GHoloRow setRotation(@NotNull SimpleRotation rotation) {
+        this.rotation = rotation.clone();
         return this;
     }
 

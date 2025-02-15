@@ -5,8 +5,8 @@ import dev.geco.gholo.object.GHolo;
 import dev.geco.gholo.object.GHoloData;
 import dev.geco.gholo.object.importer.GHoloImporter;
 import dev.geco.gholo.object.importer.GHoloImporterResult;
+import dev.geco.gholo.object.location.SimpleLocation;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -22,7 +22,7 @@ public class DecentHologramsImporter extends GHoloImporter {
     public @NotNull String getType() { return "decent_holograms"; }
 
     @Override
-    public @NotNull GHoloImporterResult importHolos(@NotNull GHoloMain gHoloMain) {
+    public @NotNull GHoloImporterResult importHolos(@NotNull GHoloMain gHoloMain, boolean override) {
         int imported = 0;
 
         File hologramsDir = new File("plugins/DecentHolograms/holograms");
@@ -38,10 +38,10 @@ public class DecentHologramsImporter extends GHoloImporter {
             String[] args = fileContent.getString("location", "").split(":");
             World world = Bukkit.getWorld(args[0]);
             if(world == null) continue;
-            Location location = new Location(world, Double.parseDouble(args[1].replace(",", ".")), Double.parseDouble(args[2].replace(",", ".")) - 0.41, Double.parseDouble(args[3].replace(",", ".")));
+            SimpleLocation location = new SimpleLocation(world, Double.parseDouble(args[1].replace(",", ".")), Double.parseDouble(args[2].replace(",", ".")) - 0.41, Double.parseDouble(args[3].replace(",", ".")));
 
             GHolo holo = gHoloMain.getHoloService().createHolo(name, location);
-            GHoloData data = holo.getDefaultData();
+            GHoloData data = holo.getData();
 
             double range = fileContent.getDouble("display-range", GHoloData.DEFAULT_RANGE);
             if(GHoloData.DEFAULT_RANGE != range) data.setRange(range);

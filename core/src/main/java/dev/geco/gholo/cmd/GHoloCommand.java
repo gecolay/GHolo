@@ -5,11 +5,14 @@ import dev.geco.gholo.object.GHolo;
 import dev.geco.gholo.object.GHoloData;
 import dev.geco.gholo.object.GHoloRow;
 import dev.geco.gholo.object.GHoloUpdateType;
+import dev.geco.gholo.object.exporter.GHoloExporter;
+import dev.geco.gholo.object.exporter.GHoloExporterResult;
 import dev.geco.gholo.object.importer.GHoloImporter;
 import dev.geco.gholo.object.importer.GHoloImporterResult;
+import dev.geco.gholo.object.location.SimpleLocation;
+import dev.geco.gholo.object.location.SimpleOffset;
 import dev.geco.gholo.util.ImageUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -29,7 +32,7 @@ import java.util.UUID;
 
 public class GHoloCommand implements CommandExecutor {
 
-    public static List<String> COMMAND_LIST = List.of("help", "list", "near", "create", "info", "remove", "rename", "relocate", "tphere", "tpto", "align", "addrow", "insertrow", "setrow", "removerow", "positionrow", "copyrows", "data", "setimage", "import");
+    public static List<String> COMMAND_LIST = List.of("help", "list", "near", "create", "info", "remove", "rename", "relocate", "tphere", "tpto", "align", "addrow", "insertrow", "setrow", "removerow", "positionrow", "copyrows", "data", "setimage", "import", "export");
 
     private final GHoloMain gHoloMain;
 
@@ -75,7 +78,7 @@ public class GHoloCommand implements CommandExecutor {
                     int endIndex = Math.min(startIndex + pageSize, totalHoloCount);
                     for(int i = startIndex; i < endIndex; i++) {
                         GHolo listHolo = holoList.get(i);
-                        Location holoLocation = listHolo.getRawLocation();
+                        SimpleLocation holoLocation = listHolo.getRawLocation();
                         BigDecimal x = BigDecimal.valueOf(holoLocation.getX()).setScale(2, RoundingMode.HALF_UP);
                         BigDecimal y = BigDecimal.valueOf(holoLocation.getY()).setScale(2, RoundingMode.HALF_UP);
                         BigDecimal z = BigDecimal.valueOf(holoLocation.getZ()).setScale(2, RoundingMode.HALF_UP);
@@ -106,7 +109,7 @@ public class GHoloCommand implements CommandExecutor {
                     }
                     gHoloMain.getMessageService().sendMessage(sender, "HoloNearCommand.header", "%Range%", range);
                     for(GHolo nearHolo : nearHoloList) {
-                        Location holoLocation = nearHolo.getRawLocation();
+                        SimpleLocation holoLocation = nearHolo.getRawLocation();
                         BigDecimal x = BigDecimal.valueOf(holoLocation.getX()).setScale(2, RoundingMode.HALF_UP);
                         BigDecimal y = BigDecimal.valueOf(holoLocation.getY()).setScale(2, RoundingMode.HALF_UP);
                         BigDecimal z = BigDecimal.valueOf(holoLocation.getZ()).setScale(2, RoundingMode.HALF_UP);
@@ -132,7 +135,7 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-create-exist-error", "%Holo%", holo.getId());
                     break;
                 }
-                gHoloMain.getHoloService().createHolo(args[1], player.getLocation());
+                gHoloMain.getHoloService().createHolo(args[1], SimpleLocation.fromBukkitLocation(player.getLocation()));
                 gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-create", "%Holo%", args[1]);
                 break;
             case "info":
@@ -146,7 +149,7 @@ public class GHoloCommand implements CommandExecutor {
                     break;
                 }
                 gHoloMain.getMessageService().sendMessage(sender, "HoloInfoCommand.header", "%Holo%", holo.getId());
-                Location holoInfoLocation = holo.getRawLocation();
+                SimpleLocation holoInfoLocation = holo.getRawLocation();
                 BigDecimal x = BigDecimal.valueOf(holoInfoLocation.getX()).setScale(2, RoundingMode.HALF_UP);
                 BigDecimal y = BigDecimal.valueOf(holoInfoLocation.getY()).setScale(2, RoundingMode.HALF_UP);
                 BigDecimal z = BigDecimal.valueOf(holoInfoLocation.getZ()).setScale(2, RoundingMode.HALF_UP);
@@ -201,7 +204,7 @@ public class GHoloCommand implements CommandExecutor {
                     break;
                 }
                 try {
-                    Location location = holo.getLocation();
+                    SimpleLocation location = holo.getLocation();
                     location.set(Double.parseDouble(args[2]), Double.parseDouble(args[3]), Double.parseDouble(args[4]));
                     gHoloMain.getHoloService().updateHoloLocation(holo, location);
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-relocate", "%Holo%", holo.getId());
@@ -223,7 +226,7 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
                     break;
                 }
-                gHoloMain.getHoloService().updateHoloLocation(holo, player.getLocation());
+                gHoloMain.getHoloService().updateHoloLocation(holo, SimpleLocation.fromBukkitLocation(player.getLocation()));
                 gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-tphere", "%Holo%", holo.getId());
                 break;
             case "tpto":
@@ -259,8 +262,8 @@ public class GHoloCommand implements CommandExecutor {
                     break;
                 }
                 String axis = args[3].toLowerCase();
-                Location holoLocation = holo.getLocation();
-                Location alignOnHoloLocation = alignOnHolo.getRawLocation();
+                SimpleLocation holoLocation = holo.getLocation();
+                SimpleLocation alignOnHoloLocation = alignOnHolo.getRawLocation();
                 String appliedAxis = "";
                 if(axis.contains("x")) {
                     holoLocation.setX(alignOnHoloLocation.getX());
@@ -320,7 +323,7 @@ public class GHoloCommand implements CommandExecutor {
                         for(int arg = 3; arg <= args.length - 1; arg++) insertIdStringBuilder.append(args[arg]).append(" ");
                         insertIdStringBuilder.deleteCharAt(insertIdStringBuilder.length() - 1);
                     }
-                    gHoloMain.getHoloService().insertHoloRow(holo, holoRow.getRowId(), insertIdStringBuilder.toString(), true);
+                    gHoloMain.getHoloService().insertHoloRow(holo, holoRow.getPosition(), insertIdStringBuilder.toString(), true);
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-insertrow", "%Holo%", holo.getId(), "%Row%", Integer.parseInt(args[2]), "%Content%", insertIdStringBuilder.toString());
                 } catch(NumberFormatException e) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Row%", args[2]);
@@ -392,28 +395,28 @@ public class GHoloCommand implements CommandExecutor {
                         break;
                     }
                     try {
-                        Location position = holoRow.getPosition();
+                        SimpleOffset offset = holoRow.getOffset();
                         switch(args[3].toLowerCase()) {
                             case "xoffset":
-                                position.setX(Double.parseDouble(args[4]));
+                                offset.setX(Double.parseDouble(args[4]));
                                 break;
                             case "yoffset":
-                                position.setY(Double.parseDouble(args[4]));
+                                offset.setY(Double.parseDouble(args[4]));
                                 break;
                             case "zoffset":
-                                position.setZ(Double.parseDouble(args[4]));
+                                offset.setZ(Double.parseDouble(args[4]));
                                 break;
-                            case "yaw":
-                                position.setYaw(Float.parseFloat(args[4]));
+                            /*case "yaw":
+                                offset.setYaw(Float.parseFloat(args[4]));
                                 break;
                             case "pitch":
-                                position.setPitch(Float.parseFloat(args[4]));
-                                break;
+                                offset.setPitch(Float.parseFloat(args[4]));
+                                break;*/
                             default:
                                 gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-positionrow-use-error");
                                 return true;
                         }
-                        gHoloMain.getHoloService().updateHoloRowPosition(holoRow, position);
+                        gHoloMain.getHoloService().updateHoloRowOffset(holoRow, offset);
                         gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-positionrow");
                     } catch(NumberFormatException e) {
                         gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-positionrow-value-error", "%Value%", args[4]);
@@ -437,7 +440,7 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
                     break;
                 }
-                gHoloMain.getHoloService().copyHoloRows(holo, copyToHolo);
+                gHoloMain.getHoloService().copyAllHoloRowContent(holo, copyToHolo);
                 gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-copyrows", "%Holo%", holo.getId(), "%CopyToHolo%", copyToHolo.getId());
                 break;
             case "data":
@@ -455,7 +458,7 @@ public class GHoloCommand implements CommandExecutor {
                 GHoloRow holoRow = null;
                 switch (args[2].toLowerCase()) {
                     case "default":
-                        data = holo.getDefaultData();
+                        data = holo.getData();
                         break;
                     case "row":
                         try {
@@ -636,7 +639,7 @@ public class GHoloCommand implements CommandExecutor {
                             return;
                         }
                     }  else rows = new ImageUtil(bufferedImage).getLines();
-                    gHoloMain.getHoloService().setHoloRows(holo, rows);
+                    gHoloMain.getHoloService().setAllHoloRowContent(holo, rows);
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-setimage", "%Holo%", holo.getId(), "%Type%", args[2].toLowerCase(), "%Source%", args[3]);
                 }, false);
                 break;
@@ -645,18 +648,34 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import-use-error");
                     break;
                 }
-                String plugin = args[1].toLowerCase();
-                GHoloImporter holoImporter = gHoloMain.getHoloImportService().getHoloImporters().get(plugin);
+                GHoloImporter holoImporter = gHoloMain.getHoloImporterService().getHoloImporter(args[1]);
                 if(holoImporter == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import-exist-error", "%Plugin%", args[1]);
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import-exist-error", "%Type%", args[1]);
                     break;
                 }
-                GHoloImporterResult importerResult = holoImporter.importHolos(gHoloMain);
+                GHoloImporterResult importerResult = holoImporter.importHolos(gHoloMain, true);
                 if(!importerResult.hasSucceeded()) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import-import-error", "%Plugin%", plugin);
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import-import-error", "%Type%", args[1]);
                     break;
                 }
-                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import", "%Plugin%", plugin, "%Imported%", importerResult.getCount());
+                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import", "%Type%", args[1], "%Count%", importerResult.getCount());
+                break;
+            case "export":
+                if(args.length == 1) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-export-use-error");
+                    break;
+                }
+                GHoloExporter holoExporter = gHoloMain.getHoloExporterService().getHoloExporter(args[1]);
+                if(holoExporter == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-export-exist-error", "%Type%", args[1]);
+                    break;
+                }
+                GHoloExporterResult exporterResult = holoExporter.exportHolos(gHoloMain, true);
+                if(!exporterResult.hasSucceeded()) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-export-export-error", "%Type%", args[1]);
+                    break;
+                }
+                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-export", "%Type%", args[1], "%Count%", exporterResult.getCount());
                 break;
             default:
                 gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-use-error");

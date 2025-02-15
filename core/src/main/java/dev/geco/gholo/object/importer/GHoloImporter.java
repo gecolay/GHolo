@@ -7,6 +7,6 @@ public abstract class GHoloImporter {
 
     abstract public @NotNull String getType();
 
-    abstract public @NotNull GHoloImporterResult importHolos(@NotNull GHoloMain gHoloMain);
+    abstract public @NotNull GHoloImporterResult importHolos(@NotNull GHoloMain gHoloMain, boolean override);
 
 }
