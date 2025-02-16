@@ -1,7 +1,7 @@
 package dev.geco.gholo.util;
 
-import dev.geco.gholo.object.GHoloRow;
-import dev.geco.gholo.object.GInteraction;
+import dev.geco.gholo.object.holo.GHoloRow;
+import dev.geco.gholo.object.interaction.GInteraction;
 
 public interface IEntityUtil {
 

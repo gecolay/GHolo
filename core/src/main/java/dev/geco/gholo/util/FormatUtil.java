@@ -1,7 +1,7 @@
 package dev.geco.gholo.util;
 
 import dev.geco.gholo.GHoloMain;
-import dev.geco.gholo.object.GHoloAnimation;
+import dev.geco.gholo.object.holo.GHoloAnimation;
 import dev.geco.gholo.service.HoloAnimationService;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;

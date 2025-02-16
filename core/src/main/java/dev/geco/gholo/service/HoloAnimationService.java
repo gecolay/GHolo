@@ -1,9 +1,9 @@
 package dev.geco.gholo.service;
 
 import dev.geco.gholo.GHoloMain;
-import dev.geco.gholo.object.GHoloAnimation;
-import dev.geco.gholo.object.GHoloRow;
-import dev.geco.gholo.object.GHoloUpdateType;
+import dev.geco.gholo.object.holo.GHoloAnimation;
+import dev.geco.gholo.object.holo.GHoloRow;
+import dev.geco.gholo.object.holo.GHoloUpdateType;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 

@@ -1,40 +1,31 @@
 package dev.geco.gholo.cmd;
 
 import dev.geco.gholo.GHoloMain;
-import dev.geco.gholo.object.GHolo;
-import dev.geco.gholo.object.GHoloData;
-import dev.geco.gholo.object.GHoloRow;
-import dev.geco.gholo.object.GHoloUpdateType;
-import dev.geco.gholo.object.GInteraction;
-import dev.geco.gholo.object.exporter.GHoloExporter;
-import dev.geco.gholo.object.exporter.GHoloExporterResult;
-import dev.geco.gholo.object.importer.GHoloImporter;
-import dev.geco.gholo.object.importer.GHoloImporterResult;
+import dev.geco.gholo.object.interaction.GInteraction;
+import dev.geco.gholo.object.interaction.GInteractionAction;
+import dev.geco.gholo.object.interaction.GInteractionData;
+import dev.geco.gholo.object.interaction.GInteractionUpdateType;
+import dev.geco.gholo.object.interaction.exporter.GInteractionExporter;
+import dev.geco.gholo.object.interaction.exporter.GInteractionExporterResult;
+import dev.geco.gholo.object.interaction.importer.GInteractionImporter;
+import dev.geco.gholo.object.interaction.importer.GInteractionImporterResult;
 import dev.geco.gholo.object.location.SimpleLocation;
-import dev.geco.gholo.object.location.SimpleOffset;
-import dev.geco.gholo.util.ImageUtil;
-import org.bukkit.Bukkit;
+import dev.geco.gholo.object.location.SimpleRotation;
 import org.bukkit.Location;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Display;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.UUID;
 
 public class GInteractionCommand implements CommandExecutor {
 
-    public static List<String> COMMAND_LIST = List.of("help", "list", "near", "create", "info", "remove", "rename", "move", "tphere", "tp", "align", "addaction", "insertaction", "setaction", "removeaction", "copy", "rotate", "import", "export");
+    public static List<String> COMMAND_LIST = List.of("help", "list", "near", "create", "info", "remove", "rename", "move", "tphere", "tp", "align", "addaction", "insertaction", "setaction", "removeaction", "copy", "option", "rotate", "import", "export");
 
     private final GHoloMain gHoloMain;
 
@@ -54,7 +45,7 @@ public class GInteractionCommand implements CommandExecutor {
             return true;
         }
 
-        GHolo holo;
+        GInteraction interaction;
         switch(args[0].toLowerCase()) {
             case "help":
                 gHoloMain.getMessageService().sendMessage(sender, "InteractionHelpCommand.header");
@@ -72,23 +63,23 @@ public class GInteractionCommand implements CommandExecutor {
                 try {
                     int pageSize = gHoloMain.getConfigService().LIST_PAGE_SIZE;
                     int page = args.length > 1 ? Integer.parseInt(args[1]) : 1;
-                    int totalHoloCount = interactionList.size();
-                    int maxPage = (int) Math.ceil((double) totalHoloCount / pageSize);
+                    int totalInteractionCount = interactionList.size();
+                    int maxPage = (int) Math.ceil((double) totalInteractionCount / pageSize);
                     page = Math.max(Math.min(page, maxPage), 1);
-                    gHoloMain.getMessageService().sendMessage(sender, "HoloListCommand.header", "%Page%", page, "%MaxPage%", maxPage);
+                    gHoloMain.getMessageService().sendMessage(sender, "InteractionListCommand.header", "%Page%", page, "%MaxPage%", maxPage);
                     int startIndex = (page - 1) * pageSize;
-                    int endIndex = Math.min(startIndex + pageSize, totalHoloCount);
+                    int endIndex = Math.min(startIndex + pageSize, totalInteractionCount);
                     for(int i = startIndex; i < endIndex; i++) {
-                        GInteraction listHolo = interactionList.get(i);
-                        SimpleLocation holoLocation = listHolo.getRawLocation();
-                        BigDecimal x = BigDecimal.valueOf(holoLocation.getX()).setScale(2, RoundingMode.HALF_UP);
-                        BigDecimal y = BigDecimal.valueOf(holoLocation.getY()).setScale(2, RoundingMode.HALF_UP);
-                        BigDecimal z = BigDecimal.valueOf(holoLocation.getZ()).setScale(2, RoundingMode.HALF_UP);
-                        gHoloMain.getMessageService().sendMessage(sender, "HoloListCommand.holo", "%Holo%", listHolo.getId(), "%X%", x.stripTrailingZeros().toPlainString(), "%Y%", y.stripTrailingZeros().toPlainString(), "%Z%", z.stripTrailingZeros().toPlainString(), "%World%", holoLocation.getWorld().getName());
+                        GInteraction listInteraction = interactionList.get(i);
+                        SimpleLocation interactionLocation = listInteraction.getRawLocation();
+                        BigDecimal x = BigDecimal.valueOf(interactionLocation.getX()).setScale(2, RoundingMode.HALF_UP);
+                        BigDecimal y = BigDecimal.valueOf(interactionLocation.getY()).setScale(2, RoundingMode.HALF_UP);
+                        BigDecimal z = BigDecimal.valueOf(interactionLocation.getZ()).setScale(2, RoundingMode.HALF_UP);
+                        gHoloMain.getMessageService().sendMessage(sender, "InteractionListCommand.interaction", "%Interaction%", listInteraction.getId(), "%X%", x.stripTrailingZeros().toPlainString(), "%Y%", y.stripTrailingZeros().toPlainString(), "%Z%", z.stripTrailingZeros().toPlainString(), "%World%", interactionLocation.getWorld().getName());
                     }
-                    gHoloMain.getMessageService().sendMessage(sender, "HoloListCommand.footer", "%Page%", page, "%MaxPage%", maxPage);
+                    gHoloMain.getMessageService().sendMessage(sender, "InteractionListCommand.footer", "%Page%", page, "%MaxPage%", maxPage);
                 } catch(NumberFormatException e) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-list-page-error", "%Page%", args[1]);
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-list-page-error", "%Page%", args[1]);
                     break;
                 }
                 break;
@@ -97,29 +88,28 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-sender-error");
                     break;
                 }
-                List<GHolo> allHoloList = gHoloMain.getHoloService().getHolos();
-                if(allHoloList.isEmpty()) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-none");
+                if(gHoloMain.getInteractionService().getInteractions().isEmpty()) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-none");
                     break;
                 }
                 try {
                     double range = args.length > 1 ? Double.parseDouble(args[1]) : gHoloMain.getConfigService().NEAR_RANGE;
-                    List<GHolo> nearHoloList = gHoloMain.getHoloService().getNearHolos(player.getLocation(), range);
-                    if(nearHoloList.isEmpty()) {
-                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-near-none");
+                    List<GInteraction> nearInteractionList = gHoloMain.getInteractionService().getNearInteractions(player.getLocation(), range);
+                    if(nearInteractionList.isEmpty()) {
+                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-near-none");
                         break;
                     }
-                    gHoloMain.getMessageService().sendMessage(sender, "HoloNearCommand.header", "%Range%", range);
-                    for(GHolo nearHolo : nearHoloList) {
-                        SimpleLocation holoLocation = nearHolo.getRawLocation();
-                        BigDecimal x = BigDecimal.valueOf(holoLocation.getX()).setScale(2, RoundingMode.HALF_UP);
-                        BigDecimal y = BigDecimal.valueOf(holoLocation.getY()).setScale(2, RoundingMode.HALF_UP);
-                        BigDecimal z = BigDecimal.valueOf(holoLocation.getZ()).setScale(2, RoundingMode.HALF_UP);
-                        gHoloMain.getMessageService().sendMessage(sender, "HoloNearCommand.holo", "%Holo%", nearHolo.getId(), "%X%", x.stripTrailingZeros().toPlainString(), "%Y%", y.stripTrailingZeros().toPlainString(), "%Z%", z.stripTrailingZeros().toPlainString(), "%World%", holoLocation.getWorld().getName());
+                    gHoloMain.getMessageService().sendMessage(sender, "InteractionNearCommand.header", "%Range%", range);
+                    for(GInteraction nearInteraction : nearInteractionList) {
+                        SimpleLocation interactionLocation = nearInteraction.getRawLocation();
+                        BigDecimal x = BigDecimal.valueOf(interactionLocation.getX()).setScale(2, RoundingMode.HALF_UP);
+                        BigDecimal y = BigDecimal.valueOf(interactionLocation.getY()).setScale(2, RoundingMode.HALF_UP);
+                        BigDecimal z = BigDecimal.valueOf(interactionLocation.getZ()).setScale(2, RoundingMode.HALF_UP);
+                        gHoloMain.getMessageService().sendMessage(sender, "InteractionNearCommand.interaction", "%Interaction%", nearInteraction.getId(), "%X%", x.stripTrailingZeros().toPlainString(), "%Y%", y.stripTrailingZeros().toPlainString(), "%Z%", z.stripTrailingZeros().toPlainString(), "%World%", interactionLocation.getWorld().getName());
                     }
-                    gHoloMain.getMessageService().sendMessage(sender, "HoloNearCommand.footer", "%Range%", range);
+                    gHoloMain.getMessageService().sendMessage(sender, "InteractionNearCommand.footer", "%Range%", range);
                 } catch(NumberFormatException e) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-near-range-error", "%Range%", args[1]);
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-near-range-error", "%Range%", args[1]);
                     break;
                 }
                 break;
@@ -129,89 +119,89 @@ public class GInteractionCommand implements CommandExecutor {
                     break;
                 }
                 if(args.length == 1) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-create-use-error");
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-create-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo != null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-create-exist-error", "%Holo%", holo.getId());
+                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                if(interaction != null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-create-exist-error", "%Interaction%", interaction.getId());
                     break;
                 }
-                gHoloMain.getHoloService().createHolo(args[1], SimpleLocation.fromBukkitLocation(player.getLocation()));
-                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-create", "%Holo%", args[1]);
+                gHoloMain.getInteractionService().createInteraction(args[1], SimpleLocation.fromBukkitLocation(player.getLocation()));
+                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-create", "%Interaction%", args[1]);
                 break;
             case "info":
                 if(args.length == 1) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-info-use-error");
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-info-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
+                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                if(interaction == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1].toLowerCase());
                     break;
                 }
-                gHoloMain.getMessageService().sendMessage(sender, "HoloInfoCommand.header", "%Holo%", holo.getId());
-                SimpleLocation holoInfoLocation = holo.getRawLocation();
-                BigDecimal x = BigDecimal.valueOf(holoInfoLocation.getX()).setScale(2, RoundingMode.HALF_UP);
-                BigDecimal y = BigDecimal.valueOf(holoInfoLocation.getY()).setScale(2, RoundingMode.HALF_UP);
-                BigDecimal z = BigDecimal.valueOf(holoInfoLocation.getZ()).setScale(2, RoundingMode.HALF_UP);
-                gHoloMain.getMessageService().sendMessage(sender, "HoloInfoCommand.location", "%X%", x.stripTrailingZeros().toPlainString(), "%Y%", y.stripTrailingZeros().toPlainString(), "%Z%", z.stripTrailingZeros().toPlainString(), "%World%", holoInfoLocation.getWorld().getName());
-                int row = 1;
-                for(GHoloRow holoRow : holo.getRows()) {
-                    gHoloMain.getMessageService().sendMessage(sender, "HoloInfoCommand.row", "%Row%", row, "%Content%", holoRow.getContent());
-                    row++;
+                gHoloMain.getMessageService().sendMessage(sender, "InteractionInfoCommand.header", "%Interaction%", interaction.getId());
+                SimpleLocation interactionInfoLocation = interaction.getRawLocation();
+                BigDecimal x = BigDecimal.valueOf(interactionInfoLocation.getX()).setScale(2, RoundingMode.HALF_UP);
+                BigDecimal y = BigDecimal.valueOf(interactionInfoLocation.getY()).setScale(2, RoundingMode.HALF_UP);
+                BigDecimal z = BigDecimal.valueOf(interactionInfoLocation.getZ()).setScale(2, RoundingMode.HALF_UP);
+                gHoloMain.getMessageService().sendMessage(sender, "InteractionInfoCommand.location", "%X%", x.stripTrailingZeros().toPlainString(), "%Y%", y.stripTrailingZeros().toPlainString(), "%Z%", z.stripTrailingZeros().toPlainString(), "%World%", interactionInfoLocation.getWorld().getName());
+                int position = 1;
+                for(GInteractionAction interactionAction : interaction.getActions()) {
+                    gHoloMain.getMessageService().sendMessage(sender, "InteractionInfoCommand.row", "%Position%", position, "%Type%", interactionAction.getType(), "%Parameter%", interactionAction.getParameter());
+                    position++;
                 }
-                gHoloMain.getMessageService().sendMessage(sender, "HoloInfoCommand.footer", "%Holo%", holo.getId());
+                gHoloMain.getMessageService().sendMessage(sender, "InteractionInfoCommand.footer", "%Interaction%", interaction.getId());
                 break;
             case "remove":
                 if(args.length == 1) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-remove-use-error");
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-remove-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
+                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                if(interaction == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1].toLowerCase());
                     break;
                 }
-                gHoloMain.getHoloService().removeHolo(holo);
-                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-remove", "%Holo%", holo.getId());
+                gHoloMain.getInteractionService().removeInteraction(interaction);
+                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-remove", "%Interaction%", interaction.getId());
                 break;
             case "rename":
                 if(args.length <= 2) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-rename-use-error");
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-rename-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
+                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                if(interaction == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1].toLowerCase());
                     break;
                 }
-                GHolo newIdHolo = gHoloMain.getHoloService().getHolo(args[2]);
-                if(newIdHolo != null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-rename-exist-error", "%Holo%", newIdHolo.getId());
+                GInteraction newIdInteraction = gHoloMain.getInteractionService().getInteraction(args[2]);
+                if(newIdInteraction != null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-rename-exist-error", "%Interaction%", newIdInteraction.getId());
                     break;
                 }
-                String oldId = holo.getId();
-                gHoloMain.getHoloService().updateHoloId(holo, args[2]);
-                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-rename", "%Holo%", holo.getId(), "%OldHolo%", oldId);
+                String oldId = interaction.getId();
+                gHoloMain.getInteractionService().updateInteractionId(interaction, args[2]);
+                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-rename", "%Interaction%", interaction.getId(), "%OldInteraction%", oldId);
                 break;
             case "move":
                 if(args.length <= 4) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-move-use-error");
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-move-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
+                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                if(interaction == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1].toLowerCase());
                     break;
                 }
                 try {
-                    SimpleLocation location = holo.getLocation();
+                    SimpleLocation location = interaction.getLocation();
                     location.set(Double.parseDouble(args[2]), Double.parseDouble(args[3]), Double.parseDouble(args[4]));
-                    gHoloMain.getHoloService().updateHoloLocation(holo, location);
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-move", "%Holo%", holo.getId());
+                    gHoloMain.getInteractionService().updateInteractionLocation(interaction, location);
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-move", "%Interaction%", interaction.getId());
                 } catch(NumberFormatException e) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-move-location-error");
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-move-location-error");
                 }
                 break;
             case "tphere":
@@ -220,16 +210,16 @@ public class GInteractionCommand implements CommandExecutor {
                     break;
                 }
                 if(args.length == 1) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-tphere-use-error");
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-tphere-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
+                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                if(interaction == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1].toLowerCase());
                     break;
                 }
-                gHoloMain.getHoloService().updateHoloLocation(holo, SimpleLocation.fromBukkitLocation(player.getLocation()));
-                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-tphere", "%Holo%", holo.getId());
+                gHoloMain.getInteractionService().updateInteractionLocation(interaction, SimpleLocation.fromBukkitLocation(player.getLocation()));
+                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-tphere", "%Interaction%", interaction.getId());
                 break;
             case "tp":
                 if(!(sender instanceof Player player)) {
@@ -237,455 +227,263 @@ public class GInteractionCommand implements CommandExecutor {
                     break;
                 }
                 if(args.length == 1) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-tp-use-error");
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-tp-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
+                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                if(interaction == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1].toLowerCase());
                     break;
                 }
-                Location location = holo.getLocation();
+                Location location = interaction.getLocation();
                 location.setYaw(player.getLocation().getYaw());
                 location.setPitch(player.getLocation().getPitch());
                 player.teleport(location, PlayerTeleportEvent.TeleportCause.COMMAND);
-                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-tp", "%Holo%", holo.getId());
+                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-tp", "%Interaction%", interaction.getId());
                 break;
             case "align":
                 if(args.length <= 3) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-align-use-error");
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-align-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
+                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                if(interaction == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1].toLowerCase());
                     break;
                 }
-                GHolo alignOnHolo = gHoloMain.getHoloService().getHolo(args[2]);
-                if(alignOnHolo == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[2].toLowerCase());
+                GInteraction alignOnInteraction = gHoloMain.getInteractionService().getInteraction(args[2]);
+                if(alignOnInteraction == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[2].toLowerCase());
                     break;
                 }
-                SimpleLocation holoLocation = holo.getLocation();
-                SimpleLocation alignOnHoloLocation = alignOnHolo.getRawLocation();
+                SimpleLocation interactionLocation = interaction.getLocation();
+                SimpleLocation alignOnInteractionLocation = alignOnInteraction.getRawLocation();
                 String appliedAxis = "";
                 String axis = args[3].toLowerCase();
                 if(axis.contains("x")) {
-                    holoLocation.setX(alignOnHoloLocation.getX());
+                    interactionLocation.setX(alignOnInteractionLocation.getX());
                     appliedAxis += "x";
                 }
                 if(axis.contains("y")) {
-                    holoLocation.setY(alignOnHoloLocation.getY());
+                    interactionLocation.setY(alignOnInteractionLocation.getY());
                     appliedAxis += "y";
                 }
                 if(axis.contains("z")) {
-                    holoLocation.setZ(alignOnHoloLocation.getZ());
+                    interactionLocation.setZ(alignOnInteractionLocation.getZ());
                     appliedAxis += "z";
                 }
                 if(appliedAxis.isEmpty()) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-align-axis-error", "%Axis%", axis);
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-align-axis-error", "%Axis%", axis);
                     break;
                 }
-                gHoloMain.getHoloService().updateHoloLocation(holo, holoLocation);
-                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-align", "%Holo%", holo.getId(), "%Axis%", appliedAxis, "%AlignOnHolo%", alignOnHolo.getId());
+                gHoloMain.getInteractionService().updateInteractionLocation(interaction, interactionLocation);
+                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-align", "%Interaction%", interaction.getId(), "%Axis%", appliedAxis, "%AlignOnInteraction%", alignOnInteraction.getId());
                 break;
-            case "addrow":
+            case "addaction":
                 if(args.length == 1) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-addrow-use-error");
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-addaction-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
+                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                if(interaction == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1].toLowerCase());
                     break;
                 }
-                StringBuilder addIdStringBuilder = new StringBuilder();
-                if(args.length > 2) {
-                    for(int arg = 2; arg <= args.length - 1; arg++) addIdStringBuilder.append(args[arg]).append(" ");
-                    addIdStringBuilder.deleteCharAt(addIdStringBuilder.length() - 1);
-                }
-                gHoloMain.getHoloService().addHoloRow(holo, addIdStringBuilder.toString());
-                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-addrow", "%Holo%", holo.getId(), "%Content%", addIdStringBuilder.toString());
+                String addActionType = args[2];
+                StringBuilder addActionParameter = new StringBuilder();
+                for(int arg = 3; arg <= args.length - 1; arg++) addActionParameter.append(args[arg]).append(" ");
+                addActionParameter.deleteCharAt(addActionParameter.length() - 1);
+                gHoloMain.getInteractionService().addInteractionAction(interaction, addActionType, addActionParameter.toString());
+                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-addaction", "%Interaction%", interaction.getId(), "%Content%", addActionParameter.toString());
                 break;
-            case "insertrow":
+            case "insertaction":
                 if(args.length <= 2) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-insertrow-use-error");
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-insertaction-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
+                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                if(interaction == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1].toLowerCase());
                     break;
                 }
                 try {
-                    GHoloRow holoRow = holo.getRow(Integer.parseInt(args[2]) - 1);
-                    if(holoRow == null) {
-                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Row%", args[2]);
+                    GInteractionAction interactionAction = interaction.getAction(Integer.parseInt(args[2]) - 1);
+                    if(interactionAction == null) {
+                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-row-error", "%Row%", args[2]);
                         break;
                     }
-                    StringBuilder insertIdStringBuilder = new StringBuilder();
-                    if(args.length > 3) {
-                        for(int arg = 3; arg <= args.length - 1; arg++) insertIdStringBuilder.append(args[arg]).append(" ");
-                        insertIdStringBuilder.deleteCharAt(insertIdStringBuilder.length() - 1);
-                    }
-                    gHoloMain.getHoloService().insertHoloRow(holo, holoRow.getPosition(), insertIdStringBuilder.toString(), true);
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-insertrow", "%Holo%", holo.getId(), "%Row%", Integer.parseInt(args[2]), "%Content%", insertIdStringBuilder.toString());
+                    String insertActionType = args[3];
+                    StringBuilder insertActionParameter = new StringBuilder();
+                    for(int arg = 4; arg <= args.length - 1; arg++) insertActionParameter.append(args[arg]).append(" ");
+                    insertActionParameter.deleteCharAt(insertActionParameter.length() - 1);
+                    gHoloMain.getInteractionService().insertInteractionAction(interaction, interactionAction.getPosition(), insertActionType, insertActionParameter.toString());
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-insertaction", "%Interaction%", interaction.getId(), "%Row%", Integer.parseInt(args[2]), "%Content%", insertActionParameter.toString());
                 } catch(NumberFormatException e) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Row%", args[2]);
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-row-error", "%Row%", args[2]);
                 }
                 break;
-            case "setrow":
+            case "setaction":
                 if(args.length <= 2) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-setrow-use-error");
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-setaction-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
+                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                if(interaction == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1].toLowerCase());
                     break;
                 }
                 try {
-                    GHoloRow holoRow = holo.getRow(Integer.parseInt(args[2]) - 1);
-                    if(holoRow == null) {
-                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Row%", args[2]);
+                    GInteractionAction interactionAction = interaction.getAction(Integer.parseInt(args[2]) - 1);
+                    if(interactionAction == null) {
+                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-row-error", "%Row%", args[2]);
                         break;
                     }
-                    StringBuilder setIdStringBuilder = new StringBuilder();
-                    if(args.length > 3) {
-                        for(int arg = 3; arg <= args.length - 1; arg++) setIdStringBuilder.append(args[arg]).append(" ");
-                        setIdStringBuilder.deleteCharAt(setIdStringBuilder.length() - 1);
-                    }
-                    gHoloMain.getHoloService().updateHoloRowContent(holoRow, setIdStringBuilder.toString());
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-setrow", "%Holo%", holo.getId(), "%Row%", Integer.parseInt(args[2]), "%Content%", setIdStringBuilder.toString());
+                    String setActionType = args[2];
+                    StringBuilder setActionParameter = new StringBuilder();
+                    for(int arg = 3; arg <= args.length - 1; arg++) setActionParameter.append(args[arg]).append(" ");
+                    setActionParameter.deleteCharAt(setActionParameter.length() - 1);
+                    gHoloMain.getInteractionService().updateInteractionAction(interactionAction, setActionType, setActionParameter.toString());
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-setaction", "%Interaction%", interaction.getId(), "%Row%", Integer.parseInt(args[2]), "%Content%", setActionParameter.toString());
                 } catch(NumberFormatException e) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Row%", args[2]);
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-row-error", "%Row%", args[2]);
                 }
                 break;
-            case "removerow":
+            case "removeaction":
                 if(args.length <= 2) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-removerow-use-error");
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-removeaction-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
-                    break;
-                }
-                try {
-                    GHoloRow holoRow = holo.getRow(Integer.parseInt(args[2]) - 1);
-                    if(holoRow == null) {
-                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Row%", args[2]);
-                        break;
-                    }
-                    gHoloMain.getHoloService().removeHoloRow(holoRow, true);
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-removerow", "%Holo%", holo.getId(), "%Row%", Integer.parseInt(args[2]));
-                } catch(NumberFormatException e) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Row%", args[2]);
-                }
-                break;
-            case "offsetrow":
-                if(args.length <= 4) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-offsetrow-use-error");
-                    break;
-                }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
+                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                if(interaction == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1].toLowerCase());
                     break;
                 }
                 try {
-                    GHoloRow holoRow = holo.getRow(Integer.parseInt(args[2]) - 1);
-                    if(holoRow == null) {
-                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Row%", args[2]);
+                    GInteractionAction interactionAction = interaction.getAction(Integer.parseInt(args[2]) - 1);
+                    if(interactionAction == null) {
+                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-row-error", "%Row%", args[2]);
                         break;
                     }
-                    try {
-                        SimpleOffset offset = holoRow.getOffset();
-                        double applyOffset = Double.parseDouble(args[4]);
-                        String appliedOffset = "";
-                        String offsets = args[3].toLowerCase();
-                        if(offsets.contains("x")) {
-                            offset.setX(applyOffset);
-                            appliedOffset += "x";
-                        }
-                        if(offsets.contains("y")) {
-                            offset.setY(applyOffset);
-                            appliedOffset += "y";
-                        }
-                        if(offsets.contains("z")) {
-                            offset.setZ(applyOffset);
-                            appliedOffset += "z";
-                        }
-                        if(appliedOffset.isEmpty()) {
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-offsetrow-offset-error", "%Offset%", offsets);
-                            break;
-                        }
-                        gHoloMain.getHoloService().updateHoloRowOffset(holoRow, offset);
-                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-offsetrow", "%Holo%", holo.getId(), "%Offset%", appliedOffset);
-                    } catch(NumberFormatException e) {
-                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-offsetrow-value-error", "%Value%", args[4]);
-                    }
+                    gHoloMain.getInteractionService().removeInteractionAction(interactionAction);
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-removeaction", "%Interaction%", interaction.getId(), "%Row%", Integer.parseInt(args[2]));
                 } catch(NumberFormatException e) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Row%", args[2]);
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-row-error", "%Row%", args[2]);
                 }
                 break;
             case "copy":
                 if(args.length <= 2) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-copy-use-error");
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-copy-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
+                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                if(interaction == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1].toLowerCase());
                     break;
                 }
-                if(gHoloMain.getHoloService().getHolo(args[2]) != null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-rename-exist-error", "%Holo%", args[2].toLowerCase());
+                if(gHoloMain.getInteractionService().getInteraction(args[2]) != null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-copy-exist-error", "%Interaction%", args[2].toLowerCase());
                     break;
                 }
-                gHoloMain.getHoloService().copyHolo(holo, args[2]);
-                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-copy", "%Holo%", holo.getId(), "%NewHolo%", args[2]);
+                gHoloMain.getInteractionService().copyInteraction(interaction, args[2]);
+                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-copy", "%Interaction%", interaction.getId(), "%NewInteraction%", args[2]);
                 break;
             case "option":
-                if(args.length <= 4) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-use-error");
+                if(args.length <= 3) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-option-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
+                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                if(interaction == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1].toLowerCase());
                     break;
                 }
-                GHoloData data = null;
-                int arg = 3;
-                GHoloRow holoRow = null;
-                switch(args[2].toLowerCase()) {
-                    case "holo":
-                        data = holo.getData();
-                        break;
-                    case "row":
-                        try {
-                            holoRow = holo.getRow(Integer.parseInt(args[3]) - 1);
-                            if(holoRow == null) {
-                                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Row%", args[3]);
-                                return true;
-                            }
-                            data = holoRow.getData();
-                            arg = 4;
-                        } catch(NumberFormatException e) {
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Row%", args[3]);
-                            return true;
-                        }
-                        break;
-                }
-                if(data == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-use-error");
-                    break;
-                }
-                GHoloUpdateType updateType = null;
-                String option = args[arg].toLowerCase();
-                switch(option) {
-                    case "range":
-                        try {
-                            if(args[arg + 1].equalsIgnoreCase("*")) data.setRange(GHoloData.DEFAULT_RANGE);
-                            else data.setRange(Double.parseDouble(args[arg + 1]));
-                            updateType = GHoloUpdateType.RANGE;
-                        } catch(NumberFormatException e) {
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-value-error", "%Option%", option, "%Value%", args[arg + 1]);
-                            return true;
-                        }
-                        break;
-                    case "background_color":
-                        if(args[arg + 1].equalsIgnoreCase("*")) data.setBackgroundColor(GHoloData.DEFAULT_BACKGROUND_COLOR);
-                        else {
-                            String backgroundColor = args[arg + 1];
-                            if(!backgroundColor.matches("^#?[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$")) {
-                                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-value-error", "%Option%", option, "%Value%", backgroundColor);
-                                return true;
-                            } else data.setBackgroundColor(backgroundColor);
-                        }
-                        updateType = GHoloUpdateType.BACKGROUND_COLOR;
-                        break;
-                    case "text_opacity":
-                        try {
-                            if(args[arg + 1].equalsIgnoreCase("*")) data.setTextOpacity(GHoloData.DEFAULT_TEXT_OPACITY);
-                            else data.setTextOpacity(Byte.parseByte(args[arg + 1]));
-                            updateType = GHoloUpdateType.TEXT_OPACITY;
-                        } catch(NumberFormatException e) {
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-value-error", "%Option%", option, "%Value%", args[arg + 1]);
-                            return true;
-                        }
-                        break;
-                    case "text_shadow":
-                        try {
-                            if(args[arg + 1].equalsIgnoreCase("*")) data.setTextShadow(GHoloData.DEFAULT_HAS_TEXT_SHADOW);
-                            else data.setTextShadow(Boolean.parseBoolean(args[arg + 1]));
-                            updateType = GHoloUpdateType.TEXT_SHADOW;
-                        } catch(NumberFormatException e) {
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-value-error", "%Option%", option, "%Value%", args[arg + 1]);
-                            return true;
-                        }
-                        break;
-                    case "text_alignment":
-                        try {
-                            if(args[arg + 1].equalsIgnoreCase("*")) data.setTextAlignment(GHoloData.DEFAULT_TEXT_ALIGNMENT);
-                            else data.setTextAlignment(TextDisplay.TextAlignment.valueOf(args[arg + 1].toUpperCase()).name().toLowerCase());
-                            updateType = GHoloUpdateType.TEXT_ALIGNMENT;
-                        } catch(IllegalArgumentException e) {
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-value-error", "%Option%", option, "%Value%", args[arg + 1].toUpperCase());
-                            return true;
-                        }
-                        break;
-                    case "billboard":
-                        try {
-                            if(args[arg + 1].equalsIgnoreCase("*")) data.setBillboard(GHoloData.DEFAULT_BILLBOARD);
-                            else data.setBillboard(Display.Billboard.valueOf(args[arg + 1].toUpperCase()).name().toLowerCase());
-                            updateType = GHoloUpdateType.BILLBOARD;
-                        } catch(IllegalArgumentException e) {
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-value-error", "%Option%", option, "%Value%", args[arg + 1].toUpperCase());
-                            return true;
-                        }
-                        break;
-                    case "see_through":
-                        try {
-                            if(args[arg + 1].equalsIgnoreCase("*")) data.setSeeThrough(GHoloData.DEFAULT_CAN_SEE_THROUGH);
-                            else data.setSeeThrough(Boolean.parseBoolean(args[arg + 1]));
-                            updateType = GHoloUpdateType.SEE_THROUGH;
-                        } catch(NumberFormatException e) {
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-value-error", "%Option%", option, "%Value%", args[arg + 1]);
-                            return true;
-                        }
-                        break;
-                    case "scale":
-                        try {
-                            if(args[arg + 1].equalsIgnoreCase("*")) data.setScale(GHoloData.DEFAULT_SCALE);
-                            else data.setScale(new org.joml.Vector3f(Float.parseFloat(args[arg + 1]), Float.parseFloat(args[arg + 1]), Float.parseFloat(args[arg + 1])));
-                            updateType = GHoloUpdateType.SCALE;
-                        } catch(NumberFormatException e) {
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-value-error", "%Option%", option, "%Value%", args[arg + 1]);
-                            return true;
-                        }
-                        break;
-                    case "brightness":
-                        try {
-                            if(args[arg + 1].equalsIgnoreCase("*")) data.setBrightness(GHoloData.DEFAULT_TEXT_OPACITY);
-                            else data.setBrightness(Byte.parseByte(args[arg + 1]));
-                            updateType = GHoloUpdateType.BRIGHTNESS;
-                        } catch(NumberFormatException e) {
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-value-error", "%Option%", option, "%Value%", args[arg + 1]);
-                            return true;
-                        }
-                        break;
+                GInteractionData data = interaction.getData();
+                int optionArg = 3;
+                GInteractionUpdateType optionUpdateType = null;
+                switch(args[optionArg].toLowerCase()) {
                     case "permission":
-                        if(args[arg + 1].equalsIgnoreCase("*")) data.setPermission(GHoloData.DEFAULT_PERMISSION);
-                        else data.setPermission(args[arg + 1]);
-                        updateType = GHoloUpdateType.PERMISSION;
+                        if(args[optionArg + 1].equalsIgnoreCase("*")) data.setPermission(GInteractionData.DEFAULT_PERMISSION);
+                        else data.setPermission(args[optionArg + 1]);
+                        optionUpdateType = GInteractionUpdateType.PERMISSION;
                         break;
                 }
-                if(holoRow == null) {
-                    gHoloMain.getHoloService().updateHoloData(holo, data);
-                    for(GHoloRow updateHoloRow : holo.getRows()) updateHoloRow.getHoloRowEntity().publishUpdate(updateType);
-                } else {
-                    gHoloMain.getHoloService().updateHoloRowData(holoRow, data);
-                    holoRow.getHoloRowEntity().publishUpdate(updateType);
-                }
-                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option", "%Option%", option, "%Value%", args[arg + 1].toLowerCase());
+                gHoloMain.getInteractionService().updateInteractionData(interaction, data);
+                interaction.getInteractionEntity().publishUpdate(optionUpdateType);
+                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-option", "%Option%", args[optionArg], "%Value%", args[optionArg + 1].toLowerCase());
                 break;
             case "rotate":
-                break;
-            case "image":
                 if(args.length <= 3) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-image-use-error");
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-rotate-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1].toLowerCase());
+                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                if(interaction == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1].toLowerCase());
                     break;
                 }
-                gHoloMain.getTaskService().run(() -> {
-                    BufferedImage bufferedImage = null;
-                    switch(args[2].toLowerCase()) {
-                        case "file":
-                            File imageFile = new File(ImageUtil.IMAGE_FOLDER, args[3]);
-                            if(!imageFile.exists()) break;
-                            bufferedImage = ImageUtil.getBufferedImage(imageFile);
-                            break;
-                        case "url":
-                            bufferedImage = ImageUtil.getBufferedImage(args[3]);
-                            break;
-                        case "avatar":
-                        case "helm":
-                            OfflinePlayer target;
-                            try {
-                                target = Bukkit.getOfflinePlayer(UUID.fromString(args[3]));
-                            } catch(Throwable e) {
-                                target = Bukkit.getOfflinePlayer(args[3]);
-                            }
-                            bufferedImage = ImageUtil.getBufferedImage(target, args[2].equalsIgnoreCase("helm"));
-                            break;
-                        default:
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-image-use-error");
-                            return;
-                    }
-                    if(bufferedImage == null) {
-                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-image-image-error", "%Type%", args[2].toLowerCase(), "%Source%", args[3]);
-                        return;
-                    }
-                    List<String> rows;
-                    if(args.length > 4) {
+                SimpleRotation rotation = null;
+                int rotateArg = 3;
+                switch(args[rotateArg].toLowerCase()) {
+                    case "yaw":
                         try {
-                            if(args[4].contains(":")) {
-                                String[] sizes = args[4].split(":");
-                                rows = new ImageUtil(bufferedImage, Integer.parseInt(sizes[0]), Integer.parseInt(sizes[1])).getLines();
-                            } else rows = new ImageUtil(bufferedImage, Integer.parseInt(args[4])).getLines();
-                        } catch(Throwable e) {
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-image-size-error");
-                            return;
+                            if(args[rotateArg + 1].equalsIgnoreCase("*")) rotation.setYaw(0f);
+                            else rotation.setYaw(Float.parseFloat(args[rotateArg + 1]));
+                        } catch(NumberFormatException e) {
+                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-rotate-value-error", "%Option%", args[rotateArg], "%Value%", args[rotateArg + 1]);
+                            return true;
                         }
-                    }  else rows = new ImageUtil(bufferedImage).getLines();
-                    gHoloMain.getHoloService().setAllHoloRowContent(holo, rows);
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-image", "%Holo%", holo.getId(), "%Type%", args[2].toLowerCase(), "%Source%", args[3]);
-                }, false);
+                        break;
+                    case "pitch":
+                        try {
+                            if(args[rotateArg + 1].equalsIgnoreCase("*")) rotation.setPitch(0f);
+                            else rotation.setPitch(Float.parseFloat(args[rotateArg + 1]));
+                        } catch(NumberFormatException e) {
+                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-rotate-value-error", "%Option%", args[rotateArg], "%Value%", args[rotateArg + 1]);
+                            return true;
+                        }
+                }
+                gHoloMain.getInteractionService().updateInteractionRotation(interaction, rotation);
+                interaction.getInteractionEntity().publishUpdate(GInteractionUpdateType.LOCATION);
+                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-rotate", "%Option%", args[rotateArg], "%Value%", args[rotateArg + 1].toLowerCase());
                 break;
             case "import":
                 if(args.length == 1) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import-use-error");
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-import-use-error");
                     break;
                 }
-                GHoloImporter holoImporter = gHoloMain.getHoloImporterService().getHoloImporter(args[1]);
-                if(holoImporter == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import-exist-error", "%Type%", args[1]);
+                GInteractionImporter interactionImporter = gHoloMain.getInteractionImporterService().getInteractionImporter(args[1]);
+                if(interactionImporter == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-import-exist-error", "%Type%", args[1]);
                     break;
                 }
-                GHoloImporterResult importerResult = holoImporter.importHolos(gHoloMain, true);
-                gHoloMain.getHoloService().unloadHolos();
-                gHoloMain.getHoloService().loadHolos();
+                GInteractionImporterResult importerResult = interactionImporter.importInteractions(gHoloMain, true);
+                gHoloMain.getInteractionService().unloadInteractions();
+                gHoloMain.getInteractionService().loadInteractions();
                 if(!importerResult.hasSucceeded()) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import-import-error", "%Type%", args[1]);
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-import-import-error", "%Type%", args[1]);
                     break;
                 }
-                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import", "%Type%", args[1], "%Count%", importerResult.getCount());
+                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-import", "%Type%", args[1], "%Count%", importerResult.getCount());
                 break;
             case "export":
                 if(args.length == 1) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-export-use-error");
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-export-use-error");
                     break;
                 }
-                GHoloExporter holoExporter = gHoloMain.getHoloExporterService().getHoloExporter(args[1]);
-                if(holoExporter == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-export-exist-error", "%Type%", args[1]);
+                GInteractionExporter interactionExporter = gHoloMain.getInteractionExporterService().getInteractionExporter(args[1]);
+                if(interactionExporter == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-export-exist-error", "%Type%", args[1]);
                     break;
                 }
-                GHoloExporterResult exporterResult = holoExporter.exportHolos(gHoloMain, true);
+                GInteractionExporterResult exporterResult = interactionExporter.exportInteractions(gHoloMain, true);
                 if(!exporterResult.hasSucceeded()) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-export-export-error", "%Type%", args[1]);
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-export-export-error", "%Type%", args[1]);
                     break;
                 }
-                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-export", "%Type%", args[1], "%Count%", exporterResult.getCount());
+                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-export", "%Type%", args[1], "%Count%", exporterResult.getCount());
                 break;
             default:
-                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-use-error");
+                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-use-error");
         }
 
         return true;

@@ -1,10 +1,10 @@
 package dev.geco.gholo.service;
 
-import dev.geco.gholo.object.importer.GHoloImporter;
-import dev.geco.gholo.object.importer.impl.DecentHologramsImporter;
-import dev.geco.gholo.object.importer.impl.FancyHologramsImporter;
-import dev.geco.gholo.object.importer.impl.FilesImporter;
-import dev.geco.gholo.object.importer.impl.HolographicDisplaysImporter;
+import dev.geco.gholo.object.holo.importer.GHoloImporter;
+import dev.geco.gholo.object.holo.importer.impl.DecentHologramsImporter;
+import dev.geco.gholo.object.holo.importer.impl.FancyHologramsImporter;
+import dev.geco.gholo.object.holo.importer.impl.FilesImporter;
+import dev.geco.gholo.object.holo.importer.impl.HolographicDisplaysImporter;
 
 import java.util.HashMap;
 

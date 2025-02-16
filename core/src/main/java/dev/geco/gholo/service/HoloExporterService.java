@@ -1,7 +1,7 @@
 package dev.geco.gholo.service;
 
-import dev.geco.gholo.object.exporter.GHoloExporter;
-import dev.geco.gholo.object.exporter.impl.FilesExporter;
+import dev.geco.gholo.object.holo.exporter.GHoloExporter;
+import dev.geco.gholo.object.holo.exporter.impl.FilesExporter;
 
 import java.util.HashMap;
 

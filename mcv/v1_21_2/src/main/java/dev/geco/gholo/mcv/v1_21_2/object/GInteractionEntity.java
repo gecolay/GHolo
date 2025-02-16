@@ -1,10 +1,10 @@
 package dev.geco.gholo.mcv.v1_21_2.object;
 
 import dev.geco.gholo.GHoloMain;
-import dev.geco.gholo.object.GInteraction;
-import dev.geco.gholo.object.GInteractionData;
-import dev.geco.gholo.object.GInteractionUpdateType;
-import dev.geco.gholo.object.IGInteractionEntity;
+import dev.geco.gholo.object.interaction.GInteraction;
+import dev.geco.gholo.object.interaction.GInteractionData;
+import dev.geco.gholo.object.interaction.GInteractionUpdateType;
+import dev.geco.gholo.object.interaction.IGInteractionEntity;
 import dev.geco.gholo.object.location.SimpleLocation;
 import dev.geco.gholo.object.location.SimpleRotation;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;

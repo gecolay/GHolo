@@ -1,11 +1,11 @@
 package dev.geco.gholo.service;
 
 import dev.geco.gholo.GHoloMain;
-import dev.geco.gholo.api.event.GInteractionEvent;
-import dev.geco.gholo.object.GInteraction;
-import dev.geco.gholo.object.GInteractionAction;
-import dev.geco.gholo.object.GInteractionData;
-import dev.geco.gholo.object.GInteractionUpdateType;
+import dev.geco.gholo.api.event.GPlayerInteractionEvent;
+import dev.geco.gholo.object.interaction.GInteraction;
+import dev.geco.gholo.object.interaction.GInteractionAction;
+import dev.geco.gholo.object.interaction.GInteractionData;
+import dev.geco.gholo.object.interaction.GInteractionUpdateType;
 import dev.geco.gholo.object.location.SimpleLocation;
 import dev.geco.gholo.object.location.SimpleRotation;
 import org.bukkit.Bukkit;
@@ -105,10 +105,10 @@ public class InteractionService {
                             for(GInteractionAction interactionAction : interactionActionMap.values()) {
                                 interaction.addAction(interactionAction);
                             }
-
-                            gHoloMain.getEntityUtil().createInteractionEntity(interaction);
-                            interactionMap.put(interaction.getInteractionEntity().getId(), interaction);
                         }
+
+                        gHoloMain.getEntityUtil().createInteractionEntity(interaction);
+                        interactionMap.put(interaction.getInteractionEntity().getId(), interaction);
                     } catch(Throwable e) { e.printStackTrace(); }
                 }
             }
@@ -130,6 +130,8 @@ public class InteractionService {
             GInteraction interaction = new GInteraction(UUID.randomUUID(), interactionId, location);
             writeInteraction(interaction, false);
             interactions.add(interaction);
+            gHoloMain.getEntityUtil().createInteractionEntity(interaction);
+            interactionMap.put(interaction.getInteractionEntity().getId(), interaction);
             return interaction;
         } catch(Throwable e) { e.printStackTrace(); }
         return null;
@@ -155,6 +157,18 @@ public class InteractionService {
             GInteractionAction interactionAction = new GInteractionAction(interaction, type, parameter);
             writeInteractionAction(interactionAction, position);
             interaction.insertAction(interactionAction, position);
+
+            return interactionAction;
+        } catch(Throwable e) { e.printStackTrace(); }
+        return null;
+    }
+
+    public GInteractionAction updateInteractionAction(GInteractionAction interactionAction, String type, String parameter) {
+        try {
+            gHoloMain.getDataService().execute("UPDATE gholo_interaction_action SET type = ?, parameter = ? WHERE interaction_uuid = ? AND position = ?", type, parameter, interactionAction.getInteraction().getUuid().toString(), interactionAction.getPosition());
+
+            interactionAction.setType(type);
+            interactionAction.setParameter(parameter);
 
             return interactionAction;
         } catch(Throwable e) { e.printStackTrace(); }
@@ -291,8 +305,11 @@ public class InteractionService {
         long currentTime = System.currentTimeMillis();
         Long lastInteractionTime = lastInteractions.get(playerId);
         if(lastInteractionTime != null && (currentTime - lastInteractionTime) < INTERACTION_COOLDOWN_MILLIS) return true;
-        lastInteractions.put(playerId, currentTime);
-        Bukkit.getPluginManager().callEvent(new GInteractionEvent(interaction, player, mainHand));
+        gHoloMain.getTaskService().run(() -> {
+            GPlayerInteractionEvent interactionEvent = new GPlayerInteractionEvent(interaction, player, mainHand);
+            Bukkit.getPluginManager().callEvent(interactionEvent);
+            if(!interactionEvent.isCancelled()) lastInteractions.put(playerId, currentTime);
+        }, true);
         return true;
     }
 

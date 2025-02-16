@@ -2,8 +2,8 @@ package dev.geco.gholo.mcv.v1_21.util;
 
 import dev.geco.gholo.mcv.v1_21.object.GHoloRowEntity;
 import dev.geco.gholo.mcv.v1_21.object.GInteractionEntity;
-import dev.geco.gholo.object.GHoloRow;
-import dev.geco.gholo.object.GInteraction;
+import dev.geco.gholo.object.holo.GHoloRow;
+import dev.geco.gholo.object.interaction.GInteraction;
 import dev.geco.gholo.util.IEntityUtil;
 
 public class EntityUtil implements IEntityUtil {

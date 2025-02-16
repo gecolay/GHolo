@@ -2,7 +2,7 @@ package dev.geco.gholo.cmd.tab;
 
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.cmd.GHoloCommand;
-import dev.geco.gholo.object.GHolo;
+import dev.geco.gholo.object.holo.GHolo;
 import dev.geco.gholo.util.ImageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -68,6 +68,9 @@ public class GHoloTabComplete implements TabCompleter {
             if(args[0].equalsIgnoreCase("option")) {
                 complete.addAll(List.of("holo", "row"));
             }
+            if(args[0].equalsIgnoreCase("rotate")) {
+                complete.addAll(List.of("yaw", "pitch"));
+            }
             if(args[0].equalsIgnoreCase("image")) {
                 complete.addAll(ImageUtil.IMAGE_TYPES);
             }
@@ -87,6 +90,9 @@ public class GHoloTabComplete implements TabCompleter {
                     GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                     if(holo != null) for(int row = 1; row <= holo.getRows().size(); row++) complete.add("" + row);
                 }
+            }
+            if(args[0].equalsIgnoreCase("rotate")) {
+                complete.add("*");
             }
             if(args[0].equalsIgnoreCase("image")) {
                 if(args[2].equalsIgnoreCase("file")) {

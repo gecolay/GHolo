@@ -1,10 +1,10 @@
 package dev.geco.gholo.mcv.v1_20_5.object;
 
 import dev.geco.gholo.GHoloMain;
-import dev.geco.gholo.object.GHoloData;
-import dev.geco.gholo.object.GHoloRow;
-import dev.geco.gholo.object.GHoloUpdateType;
-import dev.geco.gholo.object.IGHoloRowEntity;
+import dev.geco.gholo.object.holo.GHoloData;
+import dev.geco.gholo.object.holo.GHoloRow;
+import dev.geco.gholo.object.holo.GHoloUpdateType;
+import dev.geco.gholo.object.holo.IGHoloRowEntity;
 import dev.geco.gholo.object.location.SimpleLocation;
 import dev.geco.gholo.object.location.SimpleOffset;
 import dev.geco.gholo.object.location.SimpleRotation;

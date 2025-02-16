@@ -1,9 +1,9 @@
 package dev.geco.gholo.api;
 
 import dev.geco.gholo.GHoloMain;
-import dev.geco.gholo.object.GHolo;
-import dev.geco.gholo.object.GHoloData;
-import dev.geco.gholo.object.GHoloRow;
+import dev.geco.gholo.object.holo.GHolo;
+import dev.geco.gholo.object.holo.GHoloData;
+import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.location.SimpleLocation;
 import dev.geco.gholo.object.location.SimpleOffset;
 import org.bukkit.Location;
