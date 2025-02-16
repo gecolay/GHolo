@@ -34,7 +34,7 @@ public class FilesExporter extends GHoloExporter {
         List<GHolo> holos = gHoloMain.getHoloService().getHolos();
         if(holos.isEmpty()) return new GHoloExporterResult(true, exported);
 
-        File holoFileDir = new File(gHoloMain.getDataFolder(), "files");
+        File holoFileDir = new File(gHoloMain.getDataFolder(), "holos");
         if(holoFileDir.exists()) holoFileDir.mkdir();
 
         for(GHolo holo : holos) {

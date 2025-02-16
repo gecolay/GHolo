@@ -1,10 +1,10 @@
 package dev.geco.gholo.object.action;
 
-public class GInteractionActionResult {
+public class GInteractionActionTypeResult {
 
     private final boolean success;
 
-    public GInteractionActionResult(boolean success) {
+    public GInteractionActionTypeResult(boolean success) {
         this.success = success;
     }
 

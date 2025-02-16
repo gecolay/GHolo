@@ -6,7 +6,6 @@ import dev.geco.gholo.object.GHoloData;
 import dev.geco.gholo.object.GHoloRow;
 import dev.geco.gholo.object.location.SimpleLocation;
 import dev.geco.gholo.object.location.SimpleOffset;
-import dev.geco.gholo.object.location.SimpleRotation;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -92,7 +91,7 @@ public class GHoloAPI {
      * @return Holo row or <code>null</code> if the creation failed
      */
     public static @Nullable GHoloRow createHoloRow(@NotNull GHolo holo, @NotNull String content) {
-        return getInstance().getHoloService().createHoloRow(holo, content);
+        return getInstance().getHoloService().addHoloRow(holo, content);
     }
 
     /**

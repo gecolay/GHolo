@@ -51,9 +51,9 @@ public class PacketHandler implements IPacketHandler {
 
     private boolean handlePacket(Object packet, Player player) {
         if(!(packet instanceof ServerboundInteractPacket serverboundInteractPacket)) return false;
-        boolean isLeftClick = !serverboundInteractPacket.isUsingSecondaryAction();
+        boolean mainHand = !serverboundInteractPacket.isUsingSecondaryAction();
         int targetId = serverboundInteractPacket.getEntityId();
-        return gHoloMain.getInteractService().callHoloHowInteraction(targetId, player, isLeftClick);
+        return gHoloMain.getInteractionService().callInteraction(targetId, player, mainHand);
     }
 
 }

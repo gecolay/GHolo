@@ -30,7 +30,7 @@ public class FilesImporter extends GHoloImporter {
     public @NotNull GHoloImporterResult importHolos(@NotNull GHoloMain gHoloMain, boolean override) {
         int imported = 0;
 
-        File holoFileDir = new File( gHoloMain.getDataFolder(), "files");
+        File holoFileDir = new File(gHoloMain.getDataFolder(), "holos");
         if(!holoFileDir.exists()) return new GHoloImporterResult(false, 0);
 
         for(File file : holoFileDir.listFiles()) {

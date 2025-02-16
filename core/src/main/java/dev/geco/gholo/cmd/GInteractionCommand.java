@@ -5,6 +5,7 @@ import dev.geco.gholo.object.GHolo;
 import dev.geco.gholo.object.GHoloData;
 import dev.geco.gholo.object.GHoloRow;
 import dev.geco.gholo.object.GHoloUpdateType;
+import dev.geco.gholo.object.GInteraction;
 import dev.geco.gholo.object.exporter.GHoloExporter;
 import dev.geco.gholo.object.exporter.GHoloExporterResult;
 import dev.geco.gholo.object.importer.GHoloImporter;
@@ -31,54 +32,54 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.UUID;
 
-public class GHoloCommand implements CommandExecutor {
+public class GInteractionCommand implements CommandExecutor {
 
-    public static List<String> COMMAND_LIST = List.of("help", "list", "near", "create", "info", "remove", "rename", "move", "tphere", "tp", "align", "addrow", "insertrow", "setrow", "removerow", "offsetrow", "copy", "option", "rotate", "image", "import", "export");
+    public static List<String> COMMAND_LIST = List.of("help", "list", "near", "create", "info", "remove", "rename", "move", "tphere", "tp", "align", "addaction", "insertaction", "setaction", "removeaction", "copy", "rotate", "import", "export");
 
     private final GHoloMain gHoloMain;
 
-    public GHoloCommand(GHoloMain gHoloMain) {
+    public GInteractionCommand(GHoloMain gHoloMain) {
         this.gHoloMain = gHoloMain;
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-        if(!gHoloMain.getPermissionService().hasPermission(sender, "Holo")) {
+        if(!gHoloMain.getPermissionService().hasPermission(sender, "Interaction")) {
             gHoloMain.getMessageService().sendMessage(sender, "Messages.command-permission-error");
             return true;
         }
 
         if(args.length == 0) {
-            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-use-error");
+            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-use-error");
             return true;
         }
 
         GHolo holo;
         switch(args[0].toLowerCase()) {
             case "help":
-                gHoloMain.getMessageService().sendMessage(sender, "HoloHelpCommand.header");
+                gHoloMain.getMessageService().sendMessage(sender, "InteractionHelpCommand.header");
                 for(String helpRow : COMMAND_LIST) {
-                    gHoloMain.getMessageService().sendMessage(sender, "HoloHelpCommand." + helpRow.toLowerCase());
+                    gHoloMain.getMessageService().sendMessage(sender, "InteractionHelpCommand." + helpRow.toLowerCase());
                 }
-                gHoloMain.getMessageService().sendMessage(sender, "HoloHelpCommand.footer");
+                gHoloMain.getMessageService().sendMessage(sender, "InteractionHelpCommand.footer");
                 break;
             case "list":
-                List<GHolo> holoList = gHoloMain.getHoloService().getHolos();
-                if(holoList.isEmpty()) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-none");
+                List<GInteraction> interactionList = gHoloMain.getInteractionService().getInteractions();
+                if(interactionList.isEmpty()) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-none");
                     break;
                 }
                 try {
                     int pageSize = gHoloMain.getConfigService().LIST_PAGE_SIZE;
                     int page = args.length > 1 ? Integer.parseInt(args[1]) : 1;
-                    int totalHoloCount = holoList.size();
+                    int totalHoloCount = interactionList.size();
                     int maxPage = (int) Math.ceil((double) totalHoloCount / pageSize);
                     page = Math.max(Math.min(page, maxPage), 1);
                     gHoloMain.getMessageService().sendMessage(sender, "HoloListCommand.header", "%Page%", page, "%MaxPage%", maxPage);
                     int startIndex = (page - 1) * pageSize;
                     int endIndex = Math.min(startIndex + pageSize, totalHoloCount);
                     for(int i = startIndex; i < endIndex; i++) {
-                        GHolo listHolo = holoList.get(i);
+                        GInteraction listHolo = interactionList.get(i);
                         SimpleLocation holoLocation = listHolo.getRawLocation();
                         BigDecimal x = BigDecimal.valueOf(holoLocation.getX()).setScale(2, RoundingMode.HALF_UP);
                         BigDecimal y = BigDecimal.valueOf(holoLocation.getY()).setScale(2, RoundingMode.HALF_UP);

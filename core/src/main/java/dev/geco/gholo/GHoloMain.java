@@ -4,8 +4,10 @@ import dev.geco.gholo.api.event.GHoloLoadedEvent;
 import dev.geco.gholo.api.event.GHoloReloadEvent;
 import dev.geco.gholo.cmd.GHoloCommand;
 import dev.geco.gholo.cmd.GHoloReloadCommand;
+import dev.geco.gholo.cmd.GInteractionCommand;
 import dev.geco.gholo.cmd.tab.EmptyTabComplete;
 import dev.geco.gholo.cmd.tab.GHoloTabComplete;
+import dev.geco.gholo.cmd.tab.GInteractionTabComplete;
 import dev.geco.gholo.event.IPacketHandler;
 import dev.geco.gholo.event.PlayerEventHandler;
 import dev.geco.gholo.metric.BStatsMetric;
@@ -14,7 +16,7 @@ import dev.geco.gholo.service.DataService;
 import dev.geco.gholo.service.HoloAnimationService;
 import dev.geco.gholo.service.HoloExporterService;
 import dev.geco.gholo.service.HoloImporterService;
-import dev.geco.gholo.service.InteractService;
+import dev.geco.gholo.service.InteractionService;
 import dev.geco.gholo.service.HoloService;
 import dev.geco.gholo.service.MessageService;
 import dev.geco.gholo.service.PermissionService;
@@ -52,7 +54,7 @@ public class GHoloMain extends JavaPlugin {
     private HoloAnimationService holoAnimationService;
     private HoloImporterService holoImporterService;
     private HoloExporterService holoExporterService;
-    private InteractService interactService;
+    private InteractionService interactionService;
     private IPacketHandler packetHandler;
     private FormatUtil formatUtil;
     private IEntityUtil entityUtil;
@@ -85,7 +87,7 @@ public class GHoloMain extends JavaPlugin {
 
     public HoloExporterService getHoloExporterService() { return holoExporterService; }
 
-    public InteractService getInteractService() { return interactService; }
+    public InteractionService getInteractionService() { return interactionService; }
 
     public IPacketHandler getPacketHandler() { return packetHandler; }
 
@@ -115,7 +117,7 @@ public class GHoloMain extends JavaPlugin {
         holoAnimationService = new HoloAnimationService(this);
         holoImporterService = new HoloImporterService();
         holoExporterService = new HoloExporterService();
-        interactService = new InteractService(this);
+        interactionService = new InteractionService(this);
 
         formatUtil = new FormatUtil(this);
         serverUtil = new ServerUtil(this);
@@ -159,6 +161,8 @@ public class GHoloMain extends JavaPlugin {
         holoAnimationService.loadHoloAnimations();
         holoService.createTables();
         holoService.loadHolos();
+        interactionService.createTables();
+        interactionService.loadInteractions();
         ImageUtil.generateFolder();
         packetHandler.setupPlayerPacketHandlers();
     }
@@ -186,14 +190,18 @@ public class GHoloMain extends JavaPlugin {
         serverUtil.teardownChannel();
         packetHandler.removePlayerPacketHandlers();
         holoService.unloadHolos();
+        interactionService.unloadInteractions();
         holoAnimationService.stopHoloAnimations();
-        interactService.clearInteractions();
+        interactionService.clearInteractions();
     }
 
     private void setupCommands() {
         getCommand("gholo").setExecutor(new GHoloCommand(this));
         getCommand("gholo").setTabCompleter(new GHoloTabComplete(this));
         getCommand("gholo").setPermissionMessage(messageService.getMessage("Messages.command-permission-error"));
+        getCommand("ginteraction").setExecutor(new GInteractionCommand(this));
+        getCommand("ginteraction").setTabCompleter(new GInteractionTabComplete(this));
+        getCommand("ginteraction").setPermissionMessage(messageService.getMessage("Messages.command-permission-error"));
         getCommand("gholoreload").setExecutor(new GHoloReloadCommand(this));
         getCommand("gholoreload").setTabCompleter(new EmptyTabComplete());
         getCommand("gholoreload").setPermissionMessage(messageService.getMessage("Messages.command-permission-error"));
@@ -247,6 +255,8 @@ public class GHoloMain extends JavaPlugin {
         bStatsMetric.addCustomChart(new BStatsMetric.AdvancedPie("minecraft_version_player_amount", () -> Map.of(versionService.getServerVersion(), Bukkit.getOnlinePlayers().size())));
         bStatsMetric.addCustomChart(new BStatsMetric.SingleLineChart("holo_count", () -> holoService.getHoloCount()));
         bStatsMetric.addCustomChart(new BStatsMetric.SingleLineChart("holo_row_count", () -> holoService.getHoloRowCount()));
+        bStatsMetric.addCustomChart(new BStatsMetric.SingleLineChart("interaction_count", () -> interactionService.getInteractionCount()));
+        bStatsMetric.addCustomChart(new BStatsMetric.SingleLineChart("interaction_action_count", () -> interactionService.getInteractionActionCount()));
     }
 
 }

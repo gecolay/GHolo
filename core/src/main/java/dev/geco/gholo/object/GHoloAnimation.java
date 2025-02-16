@@ -26,18 +26,9 @@ public class GHoloAnimation {
 
     public @NotNull List<String> getContent() { return content; }
 
-    public int getSize() { return size; }
-
-    public int getPosition() { return position; }
-
     public int updatePosition() {
         position = position + 1 >= size ? 0 : position + 1;
         return position;
-    }
-
-    public @NotNull GHoloAnimation setPosition(int position) {
-        this.position = position;
-        return this;
     }
 
     public @Nullable String getCurrentContent() { return content.get(position); }

@@ -132,7 +132,7 @@ public class HoloService {
         return null;
     }
 
-    public GHoloRow createHoloRow(GHolo holo, String content) {
+    public GHoloRow addHoloRow(GHolo holo, String content) {
         try {
             int position = holo.getRows().size();
             double sizeBetweenRows = gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
@@ -261,7 +261,7 @@ public class HoloService {
 
     public void updateHoloId(GHolo holo, String holoId) {
         try {
-            gHoloMain.getDataService().execute("UPDATE gholo_holo SET id = ? WHERE uuid = ?", holoId, holo.getUuid());
+            gHoloMain.getDataService().execute("UPDATE gholo_holo SET id = ? WHERE uuid = ?", holoId, holo.getUuid().toString());
             holo.setId(holoId);
         } catch(Throwable e) { e.printStackTrace(); }
     }
@@ -306,7 +306,7 @@ public class HoloService {
         holo.getRows().clear();
         try {
             gHoloMain.getDataService().execute("DELETE FROM gholo_holo_row where holo_uuid = ?", holo.getUuid().toString());
-            for(String row : rows) createHoloRow(holo, row);
+            for(String row : rows) addHoloRow(holo, row);
         } catch(Throwable e) { e.printStackTrace(); }
     }
 

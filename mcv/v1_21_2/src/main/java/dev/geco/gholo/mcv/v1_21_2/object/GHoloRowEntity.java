@@ -113,7 +113,7 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     private void handleUpdate(GHoloUpdateType updateType) {
         GHoloData rowData = holoRow.getRawData();
         GHoloData holoData = holoRow.getHolo().getRawData();
-        switch (updateType) {
+        switch(updateType) {
             case LOCATION:
                 SimpleLocation location = holoRow.getHolo().getLocation();
                 SimpleOffset offset = holoRow.getRawOffset();

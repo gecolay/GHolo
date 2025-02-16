@@ -16,6 +16,12 @@ commands:
     aliases: [holo]
     description: Holo command
 
+  ginteraction:
+
+    usage: /<command>
+    aliases: [interaction]
+    description: Interaction command
+
   gholoreload:
 
     usage: /<command>
@@ -30,12 +36,17 @@ permissions:
     description: GHolo | Permissions
     children:
       GHolo.Holo: true
+      GHolo.Interaction: true
       GHolo.Update: true
       GHolo.Reload: true
 
   GHolo.Holo:
     default: op
     description: Holo command | Permission
+
+  GHolo.Interaction:
+    default: op
+    description: Interaction command | Permission
 
   GHolo.Update:
     default: op
