@@ -200,7 +200,21 @@ public class GHoloCommand implements CommandExecutor {
                 }
                 try {
                     Location location = holo.getLocation();
-                    location.set(Double.parseDouble(args[2]), Double.parseDouble(args[3]), Double.parseDouble(args[4]));
+
+                    double xLocation = args[2].startsWith("~") ?
+                        location.getX() + (args[2].length() > 1 ? Double.parseDouble(args[2].substring(1)) : 0) :
+                        Double.parseDouble(args[2]);
+
+                    double yLocation = args[3].startsWith("~") ?
+                        location.getY() + (args[3].length() > 1 ? Double.parseDouble(args[3].substring(1)) : 0) :
+                        Double.parseDouble(args[3]);
+
+                    double zLocation = args[4].startsWith("~") ?
+                        location.getZ() + (args[4].length() > 1 ? Double.parseDouble(args[4].substring(1)) : 0) :
+                        Double.parseDouble(args[4]);
+
+                    location.set(xLocation, yLocation, zLocation);
+
                     gHoloMain.getHoloService().updateHoloLocation(holo, location);
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-relocate", "%Holo%", holo.getId());
                 } catch(NumberFormatException e) {
