@@ -123,11 +123,11 @@ public class InteractionService {
 
     public void loadInteraction(GInteraction interaction) { for(Player player : interaction.getRawLocation().getWorld().getPlayers()) loadInteractionForPlayer(interaction, player); }
 
-    public void loadInteractionForPlayer(GInteraction interaction, Player player) { interaction.getInteractionEntity().loadInteraction(player); }
+    public void loadInteractionForPlayer(GInteraction interaction, Player player) { if(interaction.getInteractionEntity() != null) interaction.getInteractionEntity().loadInteraction(player); }
 
     public void unloadInteraction(GInteraction interaction) { for(Player player : interaction.getRawLocation().getWorld().getPlayers()) unloadInteractionForPlayer(interaction, player); }
 
-    public void unloadInteractionForPlayer(GInteraction interaction, Player player) { interaction.getInteractionEntity().unloadInteraction(player); }
+    public void unloadInteractionForPlayer(GInteraction interaction, Player player) { if(interaction.getInteractionEntity() != null) interaction.getInteractionEntity().unloadInteraction(player); }
 
     public GInteraction createInteraction(String interactionId, SimpleLocation location) {
         try {
@@ -209,7 +209,7 @@ public class InteractionService {
                 return;
             }
             interaction.setLocation(location);
-            interaction.getInteractionEntity().publishUpdate(GInteractionUpdateType.LOCATION);
+            if(interaction.getInteractionEntity() != null) interaction.getInteractionEntity().publishUpdate(GInteractionUpdateType.LOCATION);
         } catch(Throwable e) { e.printStackTrace(); }
     }
 
@@ -220,7 +220,7 @@ public class InteractionService {
                     interaction.getUuid().toString()
             );
             interaction.setRotation(rotation);
-            interaction.getInteractionEntity().publishUpdate(GInteractionUpdateType.LOCATION);
+            if(interaction.getInteractionEntity() != null) interaction.getInteractionEntity().publishUpdate(GInteractionUpdateType.LOCATION);
         } catch(Throwable e) { e.printStackTrace(); }
     }
 
@@ -228,7 +228,7 @@ public class InteractionService {
         try {
             gHoloMain.getDataService().execute("UPDATE gholo_interaction SET size = ? WHERE uuid = ?", size.toString(), interaction.getUuid().toString());
             interaction.setSize(size);
-            interaction.getInteractionEntity().publishUpdate(GInteractionUpdateType.SIZE);
+            if(interaction.getInteractionEntity() != null) interaction.getInteractionEntity().publishUpdate(GInteractionUpdateType.SIZE);
         } catch(Throwable e) { e.printStackTrace(); }
     }
 

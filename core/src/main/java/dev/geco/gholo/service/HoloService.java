@@ -116,11 +116,11 @@ public class HoloService {
 
     public void loadHolo(GHolo holo) { for(Player player : holo.getRawLocation().getWorld().getPlayers()) loadHoloForPlayer(holo, player); }
 
-    public void loadHoloForPlayer(GHolo holo, Player player) { for(GHoloRow row : holo.getRows()) row.getHoloRowEntity().loadHoloRow(player); }
+    public void loadHoloForPlayer(GHolo holo, Player player) { for(GHoloRow row : holo.getRows()) if(row.getHoloRowEntity() != null) row.getHoloRowEntity().loadHoloRow(player); }
 
     public void unloadHolo(GHolo holo) { for(Player player : holo.getRawLocation().getWorld().getPlayers()) unloadHoloForPlayer(holo, player); }
 
-    public void unloadHoloForPlayer(GHolo holo, Player player) { for(GHoloRow row : holo.getRows()) row.getHoloRowEntity().unloadHoloRow(player); }
+    public void unloadHoloForPlayer(GHolo holo, Player player) { for(GHoloRow row : holo.getRows()) if(row.getHoloRowEntity() != null) row.getHoloRowEntity().unloadHoloRow(player); }
 
     public GHolo createHolo(String holoId, SimpleLocation location) {
         try {
@@ -163,6 +163,7 @@ public class HoloService {
                     while(moveOffsetResultSet.next()) {
                         int movePosition = moveOffsetResultSet.getInt("position");
                         SimpleOffset moveOffset = SimpleOffset.fromString(moveOffsetResultSet.getString("offset"));
+                        if(moveOffset == null) continue;
                         moveOffset.setY(moveOffset.getY() - sizeBetweenRows);
                         gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET offset = ? WHERE holo_uuid = ? AND position = ?", moveOffset, holo.getUuid().toString(), movePosition);
                     }
@@ -171,7 +172,7 @@ public class HoloService {
                     SimpleOffset moveOffset = updateHoloRow.getOffset();
                     moveOffset.setY(moveOffset.getY() - sizeBetweenRows);
                     updateHoloRow.setOffset(moveOffset);
-                    updateHoloRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
+                    if(updateHoloRow.getHoloRowEntity() != null) updateHoloRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
                 }
             }
 
@@ -194,7 +195,7 @@ public class HoloService {
         try {
             gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET content = ? WHERE position = ? AND holo_uuid = ?", content, holoRow.getPosition(), holoRow.getHolo().getUuid().toString());
             holoRow.setContent(gHoloMain.getFormatUtil().formatBase(content));
-            holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.CONTENT);
+            if(holoRow.getHoloRowEntity() != null) holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.CONTENT);
             gHoloMain.getHoloAnimationService().updateSubscriptionStatus(holoRow);
         } catch(Throwable e) { e.printStackTrace(); }
     }
@@ -207,7 +208,7 @@ public class HoloService {
                     holoRow.getHolo().getUuid().toString()
             );
             holoRow.setOffset(offset);
-            holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
+            if(holoRow.getHoloRowEntity() != null) holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
         } catch(Throwable e) { e.printStackTrace(); }
     }
 
@@ -219,7 +220,7 @@ public class HoloService {
                     holoRow.getHolo().getUuid().toString()
             );
             holoRow.setRotation(rotation);
-            holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
+            if(holoRow.getHoloRowEntity() != null) holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
         } catch(Throwable e) { e.printStackTrace(); }
     }
 
@@ -241,6 +242,7 @@ public class HoloService {
                     while(moveOffsetResultSet.next()) {
                         int movePosition = moveOffsetResultSet.getInt("position");
                         SimpleOffset moveOffset = SimpleOffset.fromString(moveOffsetResultSet.getString("offset"));
+                        if(moveOffset == null) continue;
                         moveOffset.setY(moveOffset.getY() + sizeBetweenRows);
                         gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET offset = ? WHERE holo_uuid = ? AND position = ?", moveOffset, holo.getUuid().toString(), movePosition);
                     }
@@ -249,12 +251,12 @@ public class HoloService {
                     SimpleOffset moveOffset = updateHoloRow.getOffset();
                     moveOffset.setY(moveOffset.getY() + sizeBetweenRows);
                     updateHoloRow.setOffset(moveOffset);
-                    updateHoloRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
+                    if(updateHoloRow.getHoloRowEntity() != null) updateHoloRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
                 }
             }
             gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET position = position - 1 WHERE holo_uuid = ? AND position > ?", holo.getUuid().toString(), position);
             holo.removeRow(position);
-            holoRow.getHoloRowEntity().unloadHoloRow();
+            if(holoRow.getHoloRowEntity() != null) holoRow.getHoloRowEntity().unloadHoloRow();
             gHoloMain.getHoloAnimationService().unsubscribe(holoRow);
         } catch(Throwable e) { e.printStackTrace(); }
     }
@@ -279,7 +281,7 @@ public class HoloService {
                 return;
             }
             holo.setLocation(location);
-            for(GHoloRow holoRow : holo.getRows()) holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
+            for(GHoloRow holoRow : holo.getRows()) if(holoRow.getHoloRowEntity() != null) holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
         } catch(Throwable e) { e.printStackTrace(); }
     }
 
@@ -290,7 +292,7 @@ public class HoloService {
                     holo.getUuid().toString()
             );
             holo.setRotation(rotation);
-            for(GHoloRow holoRow : holo.getRows()) holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
+            for(GHoloRow holoRow : holo.getRows()) if(holoRow.getHoloRowEntity() != null) holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.LOCATION);
         } catch(Throwable e) { e.printStackTrace(); }
     }
 
