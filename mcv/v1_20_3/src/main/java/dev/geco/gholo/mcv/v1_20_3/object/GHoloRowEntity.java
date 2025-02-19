@@ -154,6 +154,10 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
     }
 
     private void setBackgroundColor(String color) {
+        if (color.equals("transparent")) {
+            entityData.set(DATA_BACKGROUND_COLOR_ID, 0);
+            return;
+        }
         color = color.startsWith("#") ? color.substring(1) : color;
         if(color.length() == 6) color = color + "40";
         color = color.substring(color.length() - 2) + color.substring(0, color.length() - 2);

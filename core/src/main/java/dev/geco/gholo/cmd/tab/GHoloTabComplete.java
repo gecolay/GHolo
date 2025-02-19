@@ -106,12 +106,12 @@ public class GHoloTabComplete implements TabCompleter {
                 if(args[2].equalsIgnoreCase("default")) {
                     if(args[3].equalsIgnoreCase("text_shadow") || args[3].equalsIgnoreCase("see_through")) {
                         complete.addAll(List.of("true", "false"));
-                    }
-                    if(args[3].equalsIgnoreCase("text_alignment")) {
+                    } else if (args[3].equalsIgnoreCase("text_alignment")) {
                         complete.addAll(Arrays.stream(TextDisplay.TextAlignment.values()).map(ta -> ta.name().toLowerCase()).toList());
-                    }
-                    if(args[3].equalsIgnoreCase("billboard")) {
+                    } else if (args[3].equalsIgnoreCase("billboard")) {
                         complete.addAll(Arrays.stream(Display.Billboard.values()).map(b -> b.name().toLowerCase()).toList());
+                    } else if (args[3].equalsIgnoreCase("background_color")) {
+                        complete.addAll(List.of("transparent", "000000", "FFFFFF"));
                     }
                     complete.add("*");
                 }

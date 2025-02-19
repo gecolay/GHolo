@@ -10,6 +10,7 @@ public class GHoloData implements Cloneable {
     public static final double DEFAULT_RANGE = 120d;
     public static final String DEFAULT_BACKGROUND_COLOR = "#000000";
     public static final byte DEFAULT_TEXT_OPACITY = 0;
+    public static final byte DEFAULT_BACKGROUND_OPACITY = 0;
     public static final boolean DEFAULT_HAS_TEXT_SHADOW = false;
     public static final String DEFAULT_TEXT_ALIGNMENT = "center";
     public static final String DEFAULT_BILLBOARD = "center";
@@ -21,6 +22,7 @@ public class GHoloData implements Cloneable {
     private Double range;
     private String backgroundColor;
     private Byte textOpacity;
+    private Byte backgroundOpacity;
     private Boolean hasTextShadow;
     private String textAlignment;
     private String billboard;
@@ -35,6 +37,7 @@ public class GHoloData implements Cloneable {
         if(range != null) stringMap.put("range", range);
         if(backgroundColor != null) stringMap.put("background_color", backgroundColor);
         if(textOpacity != null) stringMap.put("text_opacity", textOpacity);
+        if(backgroundOpacity != null) stringMap.put("background_opacity", backgroundOpacity);
         if(hasTextShadow != null) stringMap.put("text_shadow", hasTextShadow);
         if(textAlignment != null) stringMap.put("text_alignment", textAlignment);
         if(billboard != null) stringMap.put("billboard", billboard);
@@ -63,6 +66,9 @@ public class GHoloData implements Cloneable {
                         break;
                     case "text_opacity":
                         textOpacity = Byte.parseByte(dataSplit[1]);
+                        break;
+                    case "background_opacity":
+                        backgroundOpacity = Byte.parseByte(dataSplit[1]);
                         break;
                     case "text_shadow":
                         hasTextShadow = Boolean.parseBoolean(dataSplit[1]);
@@ -109,6 +115,13 @@ public class GHoloData implements Cloneable {
 
     public GHoloData setTextOpacity(Byte textOpacity) {
         this.textOpacity = textOpacity;
+        return this;
+    }
+
+    public Byte getBackgroundOpacity() { return backgroundOpacity; }
+
+    public GHoloData setBackgroundOpacity(Byte backgroundOpacity) {
+        this.backgroundOpacity = backgroundOpacity;
         return this;
     }
 

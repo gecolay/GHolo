@@ -488,15 +488,20 @@ public class GHoloCommand implements CommandExecutor {
                         }
                         break;
                     case "background_color":
-                        if(args[arg + 1].equalsIgnoreCase("*")) data.setBackgroundColor(GHoloData.DEFAULT_BACKGROUND_COLOR);
+                        if (args[arg + 1].equalsIgnoreCase("*")) data.setBackgroundColor(GHoloData.DEFAULT_BACKGROUND_COLOR);
                         else {
                             String backgroundColor = args[arg + 1];
-                            if(!backgroundColor.matches("^[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8}$")) {
+                            if (backgroundColor.matches("^[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8}$")) {
+                                data.setBackgroundColor(backgroundColor);
+                                updateType = GHoloRowUpdateType.BACKGROUND_COLOR;
+                            } else if (backgroundColor.equals("transparent")) {
+                                data.setBackgroundColor("transparent");
+                                updateType = GHoloRowUpdateType.BACKGROUND_COLOR;
+                            } else {
                                 gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-data-value-error", "%Data%", option, "%Value%", backgroundColor);
                                 return true;
-                            } else data.setBackgroundColor(backgroundColor);
+                            }
                         }
-                        updateType = GHoloRowUpdateType.BACKGROUND_COLOR;
                         break;
                     case "text_opacity":
                         try {
