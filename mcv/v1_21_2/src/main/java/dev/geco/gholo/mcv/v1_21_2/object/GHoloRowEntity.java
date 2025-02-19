@@ -7,7 +7,6 @@ import dev.geco.gholo.object.holo.GHoloUpdateType;
 import dev.geco.gholo.object.holo.IGHoloRowEntity;
 import dev.geco.gholo.object.location.SimpleLocation;
 import dev.geco.gholo.object.location.SimpleOffset;
-import dev.geco.gholo.object.location.SimpleRotation;
 import io.papermc.paper.adventure.PaperAdventure;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
@@ -119,8 +118,9 @@ public class GHoloRowEntity extends Display.TextDisplay implements IGHoloRowEnti
                 SimpleOffset offset = holoRow.getRawOffset();
                 location.add(offset);
                 setPos(location.getX(), location.getY(), location.getZ());
-                SimpleRotation rotation = holoRow.getRotation();
-                setRot(rotation.getYaw(), rotation.getPitch());
+                float yaw = holoRow.getRotation().getYaw() != null ? holoRow.getRotation().getYaw() : (holoRow.getHolo().getRotation().getYaw() != null ? holoRow.getHolo().getRotation().getYaw() : 0f);
+                float pitch = holoRow.getRotation().getPitch() != null ? holoRow.getRotation().getPitch() : (holoRow.getHolo().getRotation().getPitch() != null ? holoRow.getHolo().getRotation().getPitch() : 0f);
+                setRot(yaw, pitch);
                 break;
             case RANGE:
                 double range = rowData.getRange() != GHoloData.DEFAULT_RANGE ? rowData.getRange() : (holoData.getRange() != GHoloData.DEFAULT_RANGE ? holoData.getRange() : GHoloData.DEFAULT_RANGE);

@@ -24,7 +24,7 @@ public class GInteractionTabComplete implements TabCompleter {
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         List<String> complete = new ArrayList<>(), completeStarted = new ArrayList<>();
 
-        List<String> interactionIdArg = new ArrayList<>(List.of("info", "remove", "rename", "move", "tphere", "tp", "align", "addaction", "insertaction", "setaction", "removeaction", "copy", "option", "rotate"));
+        List<String> interactionIdArg = new ArrayList<>(List.of("info", "remove", "rename", "move", "tphere", "tp", "align", "size", "addaction", "insertaction", "setaction", "removeaction", "copy", "option", "rotate"));
         if(!(sender instanceof Player)) interactionIdArg.removeAll(List.of("tp", "tphere"));
 
         if(args.length == 1) {
@@ -54,12 +54,15 @@ public class GInteractionTabComplete implements TabCompleter {
             if(args[0].equalsIgnoreCase("align")) {
                 complete.addAll(gHoloMain.getInteractionService().getInteractions().stream().map(GInteraction::getId).filter(interactionId -> !interactionId.equalsIgnoreCase(args[1])).toList());
             }
+            if(args[0].equalsIgnoreCase("size")) {
+                complete.addAll(List.of("width", "height"));
+            }
             if(args[0].equalsIgnoreCase("insertaction") || args[0].equalsIgnoreCase("setaction") || args[0].equalsIgnoreCase("removeaction")) {
                 GInteraction interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
                 if(interaction != null) for(int row = 1; row <= interaction.getActions().size(); row++) complete.add("" + row);
             }
             if(args[0].equalsIgnoreCase("option")) {
-                complete.addAll(List.of("range", "permission"));
+                complete.addAll(List.of("permission"));
             }
             if(args[0].equalsIgnoreCase("rotate")) {
                 complete.addAll(List.of("yaw", "pitch"));
@@ -71,6 +74,9 @@ public class GInteractionTabComplete implements TabCompleter {
         } else if(args.length == 4) {
             if(args[0].equalsIgnoreCase("align")) {
                 complete.addAll(List.of("x", "y", "z", "xy", "xz", "yz", "xyz"));
+            }
+            if(args[0].equalsIgnoreCase("size")) {
+                complete.add("*");
             }
             if(args[0].equalsIgnoreCase("option") || args[0].equalsIgnoreCase("rotate")) {
                 complete.add("*");

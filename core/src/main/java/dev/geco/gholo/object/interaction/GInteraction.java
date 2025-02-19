@@ -14,9 +14,8 @@ public class GInteraction {
     private final UUID uuid;
     private String id;
     private SimpleLocation location;
-    private float width = 1f;
-    private float height = 1f;
-    private SimpleRotation rotation = new SimpleRotation(0f, 0f);
+    private GInteractionSize size = new GInteractionSize(1f, 1f);
+    private SimpleRotation rotation = new SimpleRotation(null, null);
     private final List<GInteractionAction> actions = new ArrayList<>();
     private GInteractionData data = new GInteractionData();
     private IGInteractionEntity interactionEntity = null;
@@ -45,17 +44,12 @@ public class GInteraction {
         return this;
     }
 
-    public @NotNull float getWidth() { return width; }
+    public @NotNull GInteractionSize getRawSize() { return size.clone(); }
 
-    public @NotNull GInteraction setWidth(@Nullable float width) {
-        this.width = width;
-        return this;
-    }
+    public @NotNull GInteractionSize getSize() { return size; }
 
-    public @NotNull float getHeight() { return height; }
-
-    public @NotNull GInteraction setHeight(@Nullable float height) {
-        this.height = height;
+    public @NotNull GInteraction setSize(@Nullable GInteractionSize size) {
+        this.size = size;
         return this;
     }
 

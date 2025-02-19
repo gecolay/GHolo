@@ -1,5 +1,6 @@
 package dev.geco.gholo.api.event;
 
+import dev.geco.gholo.object.interaction.GInteractType;
 import dev.geco.gholo.object.interaction.GInteraction;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
@@ -10,19 +11,19 @@ import org.jetbrains.annotations.NotNull;
 public class GPlayerInteractionEvent extends PlayerEvent implements Cancellable {
 
     private final GInteraction interaction;
-    private final boolean mainHand;
+    private final GInteractType interactType;
     private boolean cancel = false;
     private static final HandlerList handlers = new HandlerList();
 
-    public GPlayerInteractionEvent(@NotNull GInteraction interaction, Player player, boolean mainHand) {
+    public GPlayerInteractionEvent(@NotNull GInteraction interaction, Player player, GInteractType interactType) {
         super(player);
         this.interaction = interaction;
-        this.mainHand = mainHand;
+        this.interactType = interactType;
     }
 
     public GInteraction getInteraction() { return interaction; }
 
-    public boolean isMainHand() { return mainHand; }
+    public GInteractType getInteractType() { return interactType; }
 
     @Override
     public boolean isCancelled() { return cancel; }

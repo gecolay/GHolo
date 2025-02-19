@@ -6,7 +6,6 @@ import dev.geco.gholo.object.interaction.GInteractionData;
 import dev.geco.gholo.object.interaction.GInteractionUpdateType;
 import dev.geco.gholo.object.interaction.IGInteractionEntity;
 import dev.geco.gholo.object.location.SimpleLocation;
-import dev.geco.gholo.object.location.SimpleRotation;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
@@ -86,8 +85,13 @@ public class GInteractionEntity extends Interaction implements IGInteractionEnti
             case LOCATION:
                 SimpleLocation location = interaction.getLocation();
                 setPos(location.getX(), location.getY(), location.getZ());
-                SimpleRotation rotation = interaction.getRotation();
-                setRot(rotation.getYaw(), rotation.getPitch());
+                float yaw = interaction.getRotation().getYaw() != null ? interaction.getRotation().getYaw() : 0f;
+                float pitch = interaction.getRotation().getYaw() != null ? interaction.getRotation().getYaw() : 0f;
+                setRot(yaw, pitch);
+                break;
+            case SIZE:
+                setWidth(interaction.getRawSize().getWidth());
+                setHeight(interaction.getRawSize().getHeight());
                 break;
         }
     }

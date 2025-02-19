@@ -10,7 +10,7 @@ public class GHoloRow {
     private final GHolo holo;
     private String content;
     private SimpleOffset offset = new SimpleOffset(0, 0, 0);
-    private SimpleRotation rotation = new SimpleRotation(0f, 0f);
+    private SimpleRotation rotation = new SimpleRotation(null, null);
     private GHoloData data = new GHoloData();
     private IGHoloRowEntity holoRowEntity = null;
 

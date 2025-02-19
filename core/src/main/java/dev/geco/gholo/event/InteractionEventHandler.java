@@ -48,7 +48,7 @@ public class InteractionEventHandler implements Listener {
     public void playerInteractionEvent(GPlayerInteractionEvent event) {
         Player player = event.getPlayer();
 
-        player.sendMessage("INTERACTION: " + event.getInteraction().getId());
+        player.sendMessage("INTERACTION: " + event.getInteraction().getId() + " " + event.getInteractType());
     }
 
 }
