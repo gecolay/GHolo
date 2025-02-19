@@ -3,6 +3,7 @@ package dev.geco.gholo.cmd.tab;
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.cmd.GHoloCommand;
 import dev.geco.gholo.object.GHolo;
+import dev.geco.gholo.object.GHoloRow;
 import dev.geco.gholo.util.ImageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -100,6 +101,10 @@ public class GHoloTabComplete implements TabCompleter {
             if(!args[args.length - 1].isEmpty()) {
                 for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);
                 complete.clear();
+            }
+            if (args[0].equalsIgnoreCase("setrow")) {
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
+                holo.getRows().stream().filter(row -> row.getRowId() == Integer.parseInt(args[2]) - 1).findFirst().map(GHoloRow::getContent).ifPresent(complete::add);
             }
         } else if(args.length == 5) {
             if(args[0].equalsIgnoreCase("data")) {

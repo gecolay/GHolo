@@ -183,6 +183,7 @@ public class HoloImportService {
                 gHoloMain.getHoloService().updateHoloData(holo, data);
 
                 List<String> rows = fileContent.getStringList("holograms." + hologram + ".text");
+
                 gHoloMain.getHoloService().setHoloRows(holo, rows);
 
                 imported++;
