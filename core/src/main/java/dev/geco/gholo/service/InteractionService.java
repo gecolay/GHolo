@@ -8,6 +8,7 @@ import dev.geco.gholo.object.interaction.GInteractionAction;
 import dev.geco.gholo.object.interaction.GInteractionData;
 import dev.geco.gholo.object.interaction.GInteractionSize;
 import dev.geco.gholo.object.interaction.GInteractionUpdateType;
+import dev.geco.gholo.object.interaction.action.GInteractionActionType;
 import dev.geco.gholo.object.location.SimpleLocation;
 import dev.geco.gholo.object.location.SimpleRotation;
 import org.bukkit.Bukkit;
@@ -96,9 +97,11 @@ public class InteractionService {
                             while(rowResultSet.next()) {
                                 int position = rowResultSet.getInt("position");
                                 String type = rowResultSet.getString("type");
+                                GInteractionActionType interactionActionType = gHoloMain.getInteractionActionService().getInteractionAction(type);
+                                if(interactionActionType == null) throw new RuntimeException("Could not load interaction action '" + position + "' of interaction '" + id + "', invalid type");
                                 String parameter = rowResultSet.getString("parameter");
 
-                                GInteractionAction holoRow = new GInteractionAction(interaction, type, parameter);
+                                GInteractionAction holoRow = new GInteractionAction(interaction, interactionActionType, parameter);
 
                                 interactionActionMap.put(position, holoRow);
                             }
@@ -138,11 +141,11 @@ public class InteractionService {
         return null;
     }
 
-    public GInteractionAction addInteractionAction(GInteraction interaction, String type, String parameter) {
+    public GInteractionAction addInteractionAction(GInteraction interaction, GInteractionActionType interactionActionType, String parameter) {
         try {
             int position = interaction.getActions().size();
 
-            GInteractionAction interactionAction = new GInteractionAction(interaction, type, parameter);
+            GInteractionAction interactionAction = new GInteractionAction(interaction, interactionActionType, parameter);
             writeInteractionAction(interactionAction, position);
             interaction.addAction(interactionAction);
 
@@ -151,11 +154,11 @@ public class InteractionService {
         return null;
     }
 
-    public GInteractionAction insertInteractionAction(GInteraction interaction, int position, String type, String parameter) {
+    public GInteractionAction insertInteractionAction(GInteraction interaction, int position, GInteractionActionType interactionActionType, String parameter) {
         try {
             gHoloMain.getDataService().execute("UPDATE gholo_interaction_action SET position = position + 1 WHERE interaction_uuid = ? AND position >= ?", interaction.getUuid().toString(), position);
 
-            GInteractionAction interactionAction = new GInteractionAction(interaction, type, parameter);
+            GInteractionAction interactionAction = new GInteractionAction(interaction, interactionActionType, parameter);
             writeInteractionAction(interactionAction, position);
             interaction.insertAction(interactionAction, position);
 
@@ -164,11 +167,11 @@ public class InteractionService {
         return null;
     }
 
-    public GInteractionAction updateInteractionAction(GInteractionAction interactionAction, String type, String parameter) {
+    public GInteractionAction updateInteractionAction(GInteractionAction interactionAction, GInteractionActionType interactionActionType, String parameter) {
         try {
-            gHoloMain.getDataService().execute("UPDATE gholo_interaction_action SET type = ?, parameter = ? WHERE interaction_uuid = ? AND position = ?", type, parameter, interactionAction.getInteraction().getUuid().toString(), interactionAction.getPosition());
+            gHoloMain.getDataService().execute("UPDATE gholo_interaction_action SET type = ?, parameter = ? WHERE interaction_uuid = ? AND position = ?", interactionActionType.getType(), parameter, interactionAction.getInteraction().getUuid().toString(), interactionAction.getPosition());
 
-            interactionAction.setType(type);
+            interactionAction.setInteractionActionType(interactionActionType);
             interactionAction.setParameter(parameter);
 
             return interactionAction;
@@ -244,7 +247,7 @@ public class InteractionService {
             writeInteraction(newInteraction, false);
             interactions.add(newInteraction);
             for(GInteractionAction interactionAction : interaction.getActions()) {
-                GInteractionAction newInteractionAction = new GInteractionAction(newInteraction, interactionAction.getType(), interactionAction.getParameter());
+                GInteractionAction newInteractionAction = new GInteractionAction(newInteraction, interactionAction.getInteractionActionType(), interactionAction.getParameter());
                 writeInteractionAction(newInteractionAction, interactionAction.getPosition());
                 newInteraction.addAction(newInteractionAction);
             }
@@ -290,7 +293,7 @@ public class InteractionService {
         gHoloMain.getDataService().execute("INSERT INTO gholo_interaction_action (position, interaction_uuid, type, parameter) VALUES (?, ?, ?, ?)",
                 position,
                 interactionAction.getInteraction().getUuid().toString(),
-                interactionAction.getType(),
+                interactionAction.getInteractionActionType().getType(),
                 interactionAction.getParameter()
         );
     }

@@ -63,7 +63,7 @@ public class GHoloTabComplete implements TabCompleter {
             }
             if(args[0].equalsIgnoreCase("insertrow") || args[0].equalsIgnoreCase("setrow") || args[0].equalsIgnoreCase("removerow") || args[0].equalsIgnoreCase("offsetrow")) {
                 GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo != null) for(int row = 1; row <= holo.getRows().size(); row++) complete.add("" + row);
+                if(holo != null) for(int position = 1; position <= holo.getRows().size(); position++) complete.add("" + position);
             }
             if(args[0].equalsIgnoreCase("option")) {
                 complete.addAll(List.of("holo", "row"));

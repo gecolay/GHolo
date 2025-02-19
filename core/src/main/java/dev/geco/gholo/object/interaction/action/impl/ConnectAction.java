@@ -1,6 +1,7 @@
 package dev.geco.gholo.object.interaction.action.impl;
 
 import dev.geco.gholo.GHoloMain;
+import dev.geco.gholo.object.interaction.GInteractType;
 import dev.geco.gholo.object.interaction.action.GInteractionActionType;
 import dev.geco.gholo.object.interaction.action.GInteractionActionTypeResult;
 import org.bukkit.entity.Player;
@@ -11,9 +12,12 @@ public class ConnectAction extends GInteractionActionType {
     public @NotNull String getType() { return "connect"; }
 
     @Override
-    public @NotNull GInteractionActionTypeResult execute(@NotNull GHoloMain gHoloMain, @NotNull Player player, @NotNull String arguments) {
+    public boolean validateParameter(@NotNull String parameter) { return true; }
 
-        boolean success = gHoloMain.getServerUtil().connectPlayerToServer(player, arguments);
+    @Override
+    public @NotNull GInteractionActionTypeResult execute(@NotNull GHoloMain gHoloMain, @NotNull Player player, @NotNull GInteractType interactType, @NotNull String parameter) {
+
+        boolean success = gHoloMain.getServerUtil().connectPlayerToServer(player, parameter);
 
         return new GInteractionActionTypeResult(success);
     }

@@ -646,15 +646,13 @@ public class GHoloCommand implements CommandExecutor {
                             gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-rotate-value-error", "%Rotation%", args[rotateArg], "%Value%", args[rotateArg + 1]);
                             return true;
                         }
+                        break;
                     default:
                         gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-rotate-use-error");
                         return true;
                 }
-                if(rotationHoloRow == null) {
-                    gHoloMain.getHoloService().updateHoloRotation(holo, rotation);
-                } else {
-                    gHoloMain.getHoloService().updateHoloRowRotation(rotationHoloRow, rotation);
-                }
+                if(rotationHoloRow == null) gHoloMain.getHoloService().updateHoloRotation(holo, rotation);
+                else gHoloMain.getHoloService().updateHoloRowRotation(rotationHoloRow, rotation);
                 gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-rotate", "%Rotation%", args[rotateArg], "%Value%", args[rotateArg + 1]);
                 break;
             case "image":

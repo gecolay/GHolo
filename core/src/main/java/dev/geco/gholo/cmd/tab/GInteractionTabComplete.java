@@ -57,9 +57,12 @@ public class GInteractionTabComplete implements TabCompleter {
             if(args[0].equalsIgnoreCase("size")) {
                 complete.addAll(List.of("width", "height"));
             }
+            if(args[0].equalsIgnoreCase("addaction")) {
+                complete.addAll(gHoloMain.getInteractionActionService().getInteractionActions().keySet());
+            }
             if(args[0].equalsIgnoreCase("insertaction") || args[0].equalsIgnoreCase("setaction") || args[0].equalsIgnoreCase("removeaction")) {
                 GInteraction interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
-                if(interaction != null) for(int row = 1; row <= interaction.getActions().size(); row++) complete.add("" + row);
+                if(interaction != null) for(int position = 1; position <= interaction.getActions().size(); position++) complete.add("" + position);
             }
             if(args[0].equalsIgnoreCase("option")) {
                 complete.addAll(List.of("permission"));
@@ -77,6 +80,9 @@ public class GInteractionTabComplete implements TabCompleter {
             }
             if(args[0].equalsIgnoreCase("size")) {
                 complete.add("*");
+            }
+            if(args[0].equalsIgnoreCase("insertaction") || args[0].equalsIgnoreCase("setaction") || args[0].equalsIgnoreCase("removeaction")) {
+                complete.addAll(gHoloMain.getInteractionActionService().getInteractionActions().keySet());
             }
             if(args[0].equalsIgnoreCase("option") || args[0].equalsIgnoreCase("rotate")) {
                 complete.add("*");

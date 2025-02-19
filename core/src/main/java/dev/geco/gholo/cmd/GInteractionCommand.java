@@ -6,6 +6,7 @@ import dev.geco.gholo.object.interaction.GInteractionAction;
 import dev.geco.gholo.object.interaction.GInteractionData;
 import dev.geco.gholo.object.interaction.GInteractionSize;
 import dev.geco.gholo.object.interaction.GInteractionUpdateType;
+import dev.geco.gholo.object.interaction.action.GInteractionActionType;
 import dev.geco.gholo.object.interaction.exporter.GInteractionExporter;
 import dev.geco.gholo.object.interaction.exporter.GInteractionExporterResult;
 import dev.geco.gholo.object.interaction.importer.GInteractionImporter;
@@ -149,7 +150,7 @@ public class GInteractionCommand implements CommandExecutor {
                 gHoloMain.getMessageService().sendMessage(sender, "InteractionInfoCommand.location", "%X%", x.stripTrailingZeros().toPlainString(), "%Y%", y.stripTrailingZeros().toPlainString(), "%Z%", z.stripTrailingZeros().toPlainString(), "%World%", interactionInfoLocation.getWorld().getName());
                 int position = 1;
                 for(GInteractionAction interactionAction : interaction.getActions()) {
-                    gHoloMain.getMessageService().sendMessage(sender, "InteractionInfoCommand.action", "%Position%", position, "%Type%", interactionAction.getType(), "%Parameter%", interactionAction.getParameter());
+                    gHoloMain.getMessageService().sendMessage(sender, "InteractionInfoCommand.action", "%Position%", position, "%Type%", interactionAction.getInteractionActionType().getType(), "%Parameter%", interactionAction.getParameter());
                     position++;
                 }
                 gHoloMain.getMessageService().sendMessage(sender, "InteractionInfoCommand.footer", "%Interaction%", interaction.getId());
@@ -327,11 +328,20 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1]);
                     break;
                 }
-                String addActionType = args[2];
+                String addActionType = args[2].toLowerCase();
+                GInteractionActionType addInteractionActionType = gHoloMain.getInteractionActionService().getInteractionAction(addActionType);
+                if(addInteractionActionType == null) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-action-type-error", "%Type%", args[2]);
+                    break;
+                }
                 StringBuilder addActionParameter = new StringBuilder();
                 for(int arg = 3; arg <= args.length - 1; arg++) addActionParameter.append(args[arg]).append(" ");
                 addActionParameter.deleteCharAt(addActionParameter.length() - 1);
-                gHoloMain.getInteractionService().addInteractionAction(interaction, addActionType, addActionParameter.toString());
+                if(!addInteractionActionType.validateParameter(addActionParameter.toString())) {
+                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-action-parameter-error", "%Type%", args[2], "%Parameter%", addActionParameter.toString());
+                    break;
+                }
+                gHoloMain.getInteractionService().addInteractionAction(interaction, addInteractionActionType, addActionParameter.toString());
                 gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-addaction", "%Interaction%", interaction.getId(), "%Type%", addActionType.toLowerCase(), "%Parameter%", addActionParameter.toString());
                 break;
             case "insertaction":
@@ -350,11 +360,20 @@ public class GInteractionCommand implements CommandExecutor {
                         gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-action-error", "%Position%", args[2]);
                         break;
                     }
-                    String insertActionType = args[3];
+                    String insertActionType = args[3].toLowerCase();
+                    GInteractionActionType insertInteractionActionType = gHoloMain.getInteractionActionService().getInteractionAction(insertActionType);
+                    if(insertInteractionActionType == null) {
+                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-action-type-error", "%Type%", args[2]);
+                        break;
+                    }
                     StringBuilder insertActionParameter = new StringBuilder();
                     for(int arg = 4; arg <= args.length - 1; arg++) insertActionParameter.append(args[arg]).append(" ");
                     insertActionParameter.deleteCharAt(insertActionParameter.length() - 1);
-                    gHoloMain.getInteractionService().insertInteractionAction(interaction, interactionAction.getPosition(), insertActionType, insertActionParameter.toString());
+                    if(!insertInteractionActionType.validateParameter(insertActionParameter.toString())) {
+                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-action-parameter-error", "%Type%", args[3], "%Parameter%", insertActionParameter.toString());
+                        break;
+                    }
+                    gHoloMain.getInteractionService().insertInteractionAction(interaction, interactionAction.getPosition(), insertInteractionActionType, insertActionParameter.toString());
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-insertaction", "%Interaction%", interaction.getId(), "%Position%", Integer.parseInt(args[2]), "%Type%", insertActionType.toLowerCase(), "%Parameter%", insertActionParameter.toString());
                 } catch(NumberFormatException e) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-action-error", "%Position%", args[2]);
@@ -376,11 +395,20 @@ public class GInteractionCommand implements CommandExecutor {
                         gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-action-error", "%Position%", args[2]);
                         break;
                     }
-                    String setActionType = args[3];
+                    String setActionType = args[3].toLowerCase();
+                    GInteractionActionType setInteractionActionType = gHoloMain.getInteractionActionService().getInteractionAction(setActionType);
+                    if(setInteractionActionType == null) {
+                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-action-type-error", "%Type%", args[2]);
+                        break;
+                    }
                     StringBuilder setActionParameter = new StringBuilder();
                     for(int arg = 4; arg <= args.length - 1; arg++) setActionParameter.append(args[arg]).append(" ");
                     setActionParameter.deleteCharAt(setActionParameter.length() - 1);
-                    gHoloMain.getInteractionService().updateInteractionAction(interactionAction, setActionType, setActionParameter.toString());
+                    if(!setInteractionActionType.validateParameter(setActionParameter.toString())) {
+                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-action-parameter-error", "%Type%", args[3], "%Parameter%", setActionParameter.toString());
+                        break;
+                    }
+                    gHoloMain.getInteractionService().updateInteractionAction(interactionAction, setInteractionActionType, setActionParameter.toString());
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-setaction", "%Interaction%", interaction.getId(), "%Position%", Integer.parseInt(args[2]), "%Type%", setActionType.toLowerCase(), "%Parameter%", setActionParameter.toString());
                 } catch(NumberFormatException e) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-action-error", "%Position%", args[2]);
@@ -463,31 +491,31 @@ public class GInteractionCommand implements CommandExecutor {
                     break;
                 }
                 SimpleRotation rotation = interaction.getRotation();
-                int rotateArg = 2;
-                switch(args[rotateArg].toLowerCase()) {
+                switch(args[2].toLowerCase()) {
                     case "yaw":
                         try {
-                            if(args[rotateArg + 1].equalsIgnoreCase("*")) rotation.setYaw(null);
-                            else rotation.setYaw(Float.parseFloat(args[rotateArg + 1]));
+                            if(args[3].equalsIgnoreCase("*")) rotation.setYaw(null);
+                            else rotation.setYaw(Float.parseFloat(args[3]));
                         } catch(NumberFormatException e) {
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-rotate-value-error", "%Rotation%", args[rotateArg], "%Value%", args[rotateArg + 1]);
+                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-rotate-value-error", "%Rotation%", args[2], "%Value%", args[3]);
                             return true;
                         }
                         break;
                     case "pitch":
                         try {
-                            if(args[rotateArg + 1].equalsIgnoreCase("*")) rotation.setPitch(null);
-                            else rotation.setPitch(Float.parseFloat(args[rotateArg + 1]));
+                            if(args[3].equalsIgnoreCase("*")) rotation.setPitch(null);
+                            else rotation.setPitch(Float.parseFloat(args[3]));
                         } catch(NumberFormatException e) {
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-rotate-value-error", "%Rotation%", args[rotateArg], "%Value%", args[rotateArg + 1]);
+                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-rotate-value-error", "%Rotation%", args[2], "%Value%", args[3]);
                             return true;
                         }
+                        break;
                     default:
                         gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-rotate-use-error");
                         return true;
                 }
                 gHoloMain.getInteractionService().updateInteractionRotation(interaction, rotation);
-                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-rotate", "%Rotation%", args[rotateArg], "%Value%", args[rotateArg + 1].toLowerCase());
+                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-rotate", "%Rotation%", args[2], "%Value%", args[3]);
                 break;
             case "import":
                 if(args.length == 1) {

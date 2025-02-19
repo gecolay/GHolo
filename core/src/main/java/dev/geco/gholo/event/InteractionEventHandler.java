@@ -2,6 +2,7 @@ package dev.geco.gholo.event;
 
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.api.event.GPlayerInteractionEvent;
+import dev.geco.gholo.object.interaction.GInteractionAction;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -47,8 +48,9 @@ public class InteractionEventHandler implements Listener {
     @EventHandler
     public void playerInteractionEvent(GPlayerInteractionEvent event) {
         Player player = event.getPlayer();
-
-        player.sendMessage("INTERACTION: " + event.getInteraction().getId() + " " + event.getInteractType());
+        for(GInteractionAction interactionAction : event.getInteraction().getActions()) {
+            interactionAction.getInteractionActionType().execute(gHoloMain, player, event.getInteractType(), interactionAction.getParameter());
+        }
     }
 
 }

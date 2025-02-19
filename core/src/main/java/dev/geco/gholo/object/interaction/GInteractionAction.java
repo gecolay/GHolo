@@ -1,25 +1,26 @@
 package dev.geco.gholo.object.interaction;
 
+import dev.geco.gholo.object.interaction.action.GInteractionActionType;
 import org.jetbrains.annotations.NotNull;
 
 public class GInteractionAction {
 
     private final GInteraction interaction;
-    private String type;
+    private GInteractionActionType interactionActionType;
     private String parameter;
 
-    public GInteractionAction(@NotNull GInteraction interaction, @NotNull String type, @NotNull String parameter) {
+    public GInteractionAction(@NotNull GInteraction interaction, @NotNull GInteractionActionType interactionActionType, @NotNull String parameter) {
         this.interaction = interaction;
-        this.type = type;
+        this.interactionActionType = interactionActionType;
         this.parameter = parameter;
     }
 
     public @NotNull GInteraction getInteraction() { return interaction; }
 
-    public @NotNull String getType() { return type; }
+    public @NotNull GInteractionActionType getInteractionActionType() { return interactionActionType; }
 
-    public @NotNull GInteractionAction setType(String type) {
-        this.type = type;
+    public @NotNull GInteractionAction setInteractionActionType(GInteractionActionType interactionActionType) {
+        this.interactionActionType = interactionActionType;
         return this;
     }
 

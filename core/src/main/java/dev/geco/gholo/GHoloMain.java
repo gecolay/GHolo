@@ -17,6 +17,7 @@ import dev.geco.gholo.service.DataService;
 import dev.geco.gholo.service.HoloAnimationService;
 import dev.geco.gholo.service.HoloExporterService;
 import dev.geco.gholo.service.HoloImporterService;
+import dev.geco.gholo.service.InteractionActionService;
 import dev.geco.gholo.service.InteractionExporterService;
 import dev.geco.gholo.service.InteractionImporterService;
 import dev.geco.gholo.service.InteractionService;
@@ -58,6 +59,7 @@ public class GHoloMain extends JavaPlugin {
     private HoloImporterService holoImporterService;
     private HoloExporterService holoExporterService;
     private InteractionService interactionService;
+    private InteractionActionService interactionActionService;
     private InteractionImporterService interactionImporterService;
     private InteractionExporterService interactionExporterService;
     private IPacketHandler packetHandler;
@@ -94,6 +96,8 @@ public class GHoloMain extends JavaPlugin {
 
     public InteractionService getInteractionService() { return interactionService; }
 
+    public InteractionActionService getInteractionActionService() { return interactionActionService; }
+
     public InteractionImporterService getInteractionImporterService() { return interactionImporterService; }
 
     public InteractionExporterService getInteractionExporterService() { return interactionExporterService; }
@@ -127,6 +131,7 @@ public class GHoloMain extends JavaPlugin {
         holoImporterService = new HoloImporterService();
         holoExporterService = new HoloExporterService();
         interactionService = new InteractionService(this);
+        interactionActionService = new InteractionActionService();
         interactionImporterService = new InteractionImporterService();
         interactionExporterService = new InteractionExporterService();
 
@@ -168,14 +173,15 @@ public class GHoloMain extends JavaPlugin {
         if(!connectDatabase(sender)) return;
         holoImporterService.registerDefaultHoloImporters();
         holoExporterService.registerDefaultHoloExporters();
+        interactionActionService.registerDefaultInteractionActions();
+        interactionImporterService.registerDefaultInteractionImporters();
+        interactionExporterService.registerDefaultInteractionExporters();
         serverUtil.setupChannel();
         holoAnimationService.loadHoloAnimations();
         holoService.createTables();
         holoService.loadHolos();
         interactionService.createTables();
         interactionService.loadInteractions();
-        interactionImporterService.registerDefaultInteractionImporters();
-        interactionExporterService.registerDefaultInteractionExporters();
         ImageUtil.generateFolder();
         packetHandler.setupPlayerPacketHandlers();
     }
@@ -198,14 +204,15 @@ public class GHoloMain extends JavaPlugin {
 
     private void unload() {
         dataService.close();
-        holoImporterService.unregisterHoloImporters();
-        holoExporterService.unregisterHoloExporters();
         serverUtil.teardownChannel();
         packetHandler.removePlayerPacketHandlers();
         holoService.unloadHolos();
         interactionService.unloadInteractions();
         holoAnimationService.stopHoloAnimations();
         interactionService.clearInteractions();
+        holoImporterService.unregisterHoloImporters();
+        holoExporterService.unregisterHoloExporters();
+        interactionActionService.unregisterInteractionActions();
         interactionImporterService.unregisterInteractionImporters();
         interactionExporterService.unregisterInteractionExporters();
     }
