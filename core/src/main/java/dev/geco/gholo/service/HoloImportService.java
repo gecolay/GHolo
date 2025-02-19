@@ -183,6 +183,10 @@ public class HoloImportService {
                 gHoloMain.getHoloService().updateHoloData(holo, data);
 
                 List<String> rows = fileContent.getStringList("holograms." + hologram + ".text");
+                rows.replaceAll(row ->
+                    row.replaceAll("(?i)<#([0-9A-F]+)>", "#$1")
+                        .replaceAll("(?i)&#([0-9A-F]{6})[0-9A-F]*", "#$1")
+                );
 
                 gHoloMain.getHoloService().setHoloRows(holo, rows);
 
