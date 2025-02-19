@@ -3,6 +3,7 @@ package dev.geco.gholo.cmd.tab;
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.cmd.GHoloCommand;
 import dev.geco.gholo.object.GHolo;
+import dev.geco.gholo.object.GHoloRow;
 import dev.geco.gholo.util.ImageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -101,17 +102,21 @@ public class GHoloTabComplete implements TabCompleter {
                 for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);
                 complete.clear();
             }
+            if (args[0].equalsIgnoreCase("setrow")) {
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
+                holo.getRows().stream().filter(row -> row.getRowId() == Integer.parseInt(args[2]) - 1).findFirst().map(GHoloRow::getContent).ifPresent(complete::add);
+            }
         } else if(args.length == 5) {
             if(args[0].equalsIgnoreCase("data")) {
                 if(args[2].equalsIgnoreCase("default")) {
                     if(args[3].equalsIgnoreCase("text_shadow") || args[3].equalsIgnoreCase("see_through")) {
                         complete.addAll(List.of("true", "false"));
-                    }
-                    if(args[3].equalsIgnoreCase("text_alignment")) {
+                    } else if (args[3].equalsIgnoreCase("text_alignment")) {
                         complete.addAll(Arrays.stream(TextDisplay.TextAlignment.values()).map(ta -> ta.name().toLowerCase()).toList());
-                    }
-                    if(args[3].equalsIgnoreCase("billboard")) {
+                    } else if (args[3].equalsIgnoreCase("billboard")) {
                         complete.addAll(Arrays.stream(Display.Billboard.values()).map(b -> b.name().toLowerCase()).toList());
+                    } else if (args[3].equalsIgnoreCase("background_color")) {
+                        complete.addAll(List.of("transparent", "000000", "FFFFFF"));
                     }
                     complete.add("*");
                 }
