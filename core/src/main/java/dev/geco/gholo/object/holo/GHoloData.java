@@ -1,5 +1,7 @@
 package dev.geco.gholo.object.holo;
 
+import dev.geco.gholo.object.simple.SimpleRotation;
+import dev.geco.gholo.object.simple.SimpleSize;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 import org.json.simple.JSONObject;
@@ -17,8 +19,10 @@ public class GHoloData implements Cloneable {
     public static final String DEFAULT_BILLBOARD = "center";
     public static final boolean DEFAULT_CAN_SEE_THROUGH = false;
     public static final Vector3f DEFAULT_SCALE = new Vector3f(1f, 1f, 1f);
+    public static final SimpleRotation DEFAULT_ROTATION = new SimpleRotation(null, null);
     public static final Byte DEFAULT_BRIGHTNESS = null;
     public static final String DEFAULT_PERMISSION = null;
+    public static final SimpleSize DEFAULT_SIZE = new SimpleSize(1f, 1f);
 
     private Double range = DEFAULT_RANGE;
     private String backgroundColor = DEFAULT_BACKGROUND_COLOR;
@@ -28,8 +32,10 @@ public class GHoloData implements Cloneable {
     private String billboard = DEFAULT_BILLBOARD;
     private Boolean canSeeThrough = DEFAULT_CAN_SEE_THROUGH;
     private Vector3f scale = DEFAULT_SCALE;
+    private SimpleRotation rotation = DEFAULT_ROTATION;
     private Byte brightness = DEFAULT_BRIGHTNESS;
     private String permission = DEFAULT_PERMISSION;
+    private SimpleSize size = DEFAULT_SIZE;
 
     public Double getRange() { return range; }
 
@@ -82,8 +88,19 @@ public class GHoloData implements Cloneable {
 
     public Vector3f getScale() { return scale; }
 
+    public Vector3f getRawScale() { try { return (Vector3f) scale.clone(); } catch(CloneNotSupportedException e) { throw new Error(e); } }
+
     public GHoloData setScale(Vector3f scale) {
         this.scale = scale;
+        return this;
+    }
+
+    public SimpleRotation getRotation() { return rotation.clone(); }
+
+    public SimpleRotation getRawRotation() { return rotation; }
+
+    public GHoloData setRotation(SimpleRotation rotation) {
+        this.rotation = rotation.clone();
         return this;
     }
 
@@ -98,6 +115,15 @@ public class GHoloData implements Cloneable {
 
     public GHoloData setPermission(String permission) {
         this.permission = permission;
+        return this;
+    }
+
+    public SimpleSize getSize() { return size.clone(); }
+
+    public SimpleSize getRawSize() { return size; }
+
+    public GHoloData setSize(SimpleSize size) {
+        this.size = size.clone();
         return this;
     }
 
@@ -118,8 +144,20 @@ public class GHoloData implements Cloneable {
             scaleData.put("z", scale.z);
             data.put("scale", scaleData);
         }
+        if(!Objects.equals(rotation, DEFAULT_ROTATION)) {
+            JSONObject rotationData = new JSONObject();
+            rotationData.put("yaw", rotation.getYaw());
+            rotationData.put("pitch", rotation.getPitch());
+            data.put("rotation", rotationData);
+        }
         if(brightness != DEFAULT_BRIGHTNESS) data.put("brightness", brightness);
         if(!Objects.equals(permission, DEFAULT_PERMISSION)) data.put("permission", permission);
+        if(!Objects.equals(size, DEFAULT_SIZE)) {
+            JSONObject sizeData = new JSONObject();
+            sizeData.put("width", size.getWidth());
+            sizeData.put("height", size.getHeight());
+            data.put("size", sizeData);
+        }
         return data.toJSONString();
     }
 
@@ -141,8 +179,20 @@ public class GHoloData implements Cloneable {
                 float z = ((Number) scaleData.get("z")).floatValue();
                 scale = new Vector3f(x, y, z);
             }
+            if(data.containsKey("rotation")) {
+                JSONObject rotationData = (JSONObject) data.get("rotation");
+                float yaw = ((Number) rotationData.get("yaw")).floatValue();
+                float pitch = ((Number) rotationData.get("pitch")).floatValue();
+                rotation = new SimpleRotation(yaw, pitch);
+            }
             if(data.containsKey("brightness")) brightness = ((Number) data.get("brightness")).byteValue();
             if(data.containsKey("permission")) permission = (String) data.get("permission");
+            if(data.containsKey("size")) {
+                JSONObject sizeData = (JSONObject) data.get("size");
+                float width = ((Number) sizeData.get("width")).floatValue();
+                float height = ((Number) sizeData.get("height")).floatValue();
+                size = new SimpleSize(width, height);
+            }
         } catch(Throwable e) { e.printStackTrace(); }
         return this;
     }

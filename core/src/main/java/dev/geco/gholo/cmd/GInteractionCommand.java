@@ -4,15 +4,15 @@ import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.interaction.GInteraction;
 import dev.geco.gholo.object.interaction.GInteractionAction;
 import dev.geco.gholo.object.interaction.GInteractionData;
-import dev.geco.gholo.object.interaction.GInteractionSize;
+import dev.geco.gholo.object.simple.SimpleSize;
 import dev.geco.gholo.object.interaction.GInteractionUpdateType;
 import dev.geco.gholo.object.interaction.action.GInteractionActionType;
 import dev.geco.gholo.object.interaction.exporter.GInteractionExporter;
 import dev.geco.gholo.object.interaction.exporter.GInteractionExporterResult;
 import dev.geco.gholo.object.interaction.importer.GInteractionImporter;
 import dev.geco.gholo.object.interaction.importer.GInteractionImporterResult;
-import dev.geco.gholo.object.location.SimpleLocation;
-import dev.geco.gholo.object.location.SimpleRotation;
+import dev.geco.gholo.object.simple.SimpleLocation;
+import dev.geco.gholo.object.simple.SimpleRotation;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -292,8 +292,8 @@ public class GInteractionCommand implements CommandExecutor {
                     break;
                 }
                 String sizeType = args[2].toLowerCase();
-                GInteractionSize size = interaction.getSize();
-                switch (sizeType) {
+                SimpleSize size = interaction.getSize();
+                switch(sizeType) {
                     case "width":
                         try {
                             if(args[3].equalsIgnoreCase("*")) size.setWidth(1f);
@@ -379,6 +379,7 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-action-error", "%Position%", args[2]);
                 }
                 break;
+                // TODO: Fix setaction if there is no action -> error
             case "setaction":
                 if(args.length <= 4) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-setaction-use-error");
@@ -480,6 +481,7 @@ public class GInteractionCommand implements CommandExecutor {
                 interaction.getInteractionEntity().publishUpdate(optionUpdateType);
                 gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-option", "%Option%", args[optionArg], "%Value%", args[optionArg + 1]);
                 break;
+                // can be removed, can't rotate
             case "rotate":
                 if(args.length <= 3) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-rotate-use-error");

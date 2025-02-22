@@ -6,8 +6,8 @@ import dev.geco.gholo.object.holo.GHoloData;
 import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.importer.GHoloImporter;
 import dev.geco.gholo.object.holo.importer.GHoloImporterResult;
-import dev.geco.gholo.object.location.SimpleLocation;
-import dev.geco.gholo.object.location.SimpleRotation;
+import dev.geco.gholo.object.simple.SimpleLocation;
+import dev.geco.gholo.object.simple.SimpleRotation;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -50,13 +50,9 @@ public class FancyHologramsImporter extends GHoloImporter {
                 double x = fileContent.getDouble(locationPath + "x");
                 double y = fileContent.getDouble(locationPath + "y");
                 double z = fileContent.getDouble(locationPath + "z");
-                float yaw = (float) fileContent.getDouble(locationPath + "yaw");
-                float pitch = (float) fileContent.getDouble(locationPath + "pitch");
                 SimpleLocation location = new SimpleLocation(world, x, y ,z);
-                SimpleRotation rotation = new SimpleRotation(yaw, pitch);
 
                 GHolo holo = new GHolo(UUID.randomUUID(), id, location);
-                holo.setRotation(rotation);
                 GHoloData data = holo.getRawData();
 
                 double range = fileContent.getDouble("holograms." + id + ".visibility_distance", GHoloData.DEFAULT_RANGE);
@@ -82,6 +78,12 @@ public class FancyHologramsImporter extends GHoloImporter {
                 float scaleY = (float) fileContent.getDouble("holograms." + id + ".scale_y", defaultScale.y);
                 float scaleZ = (float) fileContent.getDouble("holograms." + id + ".scale_z", defaultScale.z);
                 if(scaleX != defaultScale.x || scaleY != defaultScale.y || scaleZ != defaultScale.z) data.setScale(new Vector3f(scaleX, scaleY, scaleZ));
+
+                SimpleRotation defaultRotation = GHoloData.DEFAULT_ROTATION;
+                float yaw = (float) fileContent.getDouble(locationPath + "yaw");
+                float pitch = (float) fileContent.getDouble(locationPath + "pitch");
+                SimpleRotation rotation = new SimpleRotation(yaw, pitch);
+                if(yaw != defaultRotation.getYaw() || pitch != defaultRotation.getPitch()) data.setRotation(rotation);
 
                 String brightness = fileContent.getString("holograms." + id + ".brightness");
                 if(brightness != null) data.setBrightness(Byte.parseByte(brightness));

@@ -12,5 +12,6 @@ public enum GHoloUpdateType {
     SEE_THROUGH,
     SCALE,
     BRIGHTNESS,
-    PERMISSION
+    PERMISSION,
+    SIZE
 }

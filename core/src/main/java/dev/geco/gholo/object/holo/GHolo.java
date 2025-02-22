@@ -1,7 +1,6 @@
 package dev.geco.gholo.object.holo;
 
-import dev.geco.gholo.object.location.SimpleLocation;
-import dev.geco.gholo.object.location.SimpleRotation;
+import dev.geco.gholo.object.simple.SimpleLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +13,6 @@ public class GHolo {
     private final UUID uuid;
     private String id;
     private SimpleLocation location;
-    private SimpleRotation rotation = new SimpleRotation(0f, 0f);
     private final List<GHoloRow> rows = new ArrayList<>();
     private GHoloData data = new GHoloData();
 
@@ -39,15 +37,6 @@ public class GHolo {
 
     public @NotNull GHolo setLocation(@NotNull SimpleLocation location) {
         this.location = location.clone();
-        return this;
-    }
-
-    public @NotNull SimpleRotation getRotation() { return rotation.clone(); }
-
-    public @NotNull SimpleRotation getRawRotation() { return rotation; }
-
-    public @NotNull GHolo setRotation(@NotNull SimpleRotation rotation) {
-        this.rotation = rotation.clone();
         return this;
     }
 

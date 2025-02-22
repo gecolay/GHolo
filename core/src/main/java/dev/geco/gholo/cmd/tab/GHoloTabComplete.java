@@ -31,7 +31,7 @@ public class GHoloTabComplete implements TabCompleter {
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         List<String> complete = new ArrayList<>(), completeStarted = new ArrayList<>();
 
-        List<String> holoIdArg = new ArrayList<>(List.of("info", "remove", "rename", "move", "tphere", "tp", "align", "addrow", "insertrow", "setrow", "removerow", "offsetrow", "copy", "option", "rotate", "image"));
+        List<String> holoIdArg = new ArrayList<>(List.of("info", "remove", "rename", "move", "tphere", "tp", "align", "addrow", "insertrow", "setrow", "removerow", "offsetrow", "copy", "option", "image"));
         if(!(sender instanceof Player)) holoIdArg.removeAll(List.of("tp", "tphere"));
 
         if(args.length == 1) {
@@ -68,9 +68,6 @@ public class GHoloTabComplete implements TabCompleter {
             if(args[0].equalsIgnoreCase("option")) {
                 complete.addAll(List.of("holo", "row"));
             }
-            if(args[0].equalsIgnoreCase("rotate")) {
-                complete.addAll(List.of("yaw", "pitch"));
-            }
             if(args[0].equalsIgnoreCase("image")) {
                 complete.addAll(ImageUtil.IMAGE_TYPES);
             }
@@ -84,15 +81,12 @@ public class GHoloTabComplete implements TabCompleter {
             }
             if(args[0].equalsIgnoreCase("option")) {
                 if(args[2].equalsIgnoreCase("holo")) {
-                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "text_alignment", "billboard", "see_through", "scale", "brightness", "permission"));
+                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "text_alignment", "billboard", "see_through", "scale", "rotation", "brightness", "permission", "size"));
                 }
                 if(args[2].equalsIgnoreCase("row")) {
                     GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                     if(holo != null) for(int row = 1; row <= holo.getRows().size(); row++) complete.add("" + row);
                 }
-            }
-            if(args[0].equalsIgnoreCase("rotate")) {
-                complete.add("*");
             }
             if(args[0].equalsIgnoreCase("image")) {
                 if(args[2].equalsIgnoreCase("file")) {
@@ -119,10 +113,14 @@ public class GHoloTabComplete implements TabCompleter {
                     if(args[3].equalsIgnoreCase("billboard")) {
                         complete.addAll(Arrays.stream(Display.Billboard.values()).map(b -> b.name().toLowerCase()).toList());
                     }
-                    complete.add("*");
+                    if(args[3].equalsIgnoreCase("rotation")) {
+                        complete.addAll(List.of("yaw", "pitch"));
+                    } else if(args[3].equalsIgnoreCase("size")) {
+                        complete.addAll(List.of("width", "height"));
+                    } else complete.add("*");
                 }
                 if(args[2].equalsIgnoreCase("row")) {
-                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "text_alignment", "billboard", "see_through", "scale", "brightness", "permission"));
+                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "text_alignment", "billboard", "see_through", "scale", "rotation", "brightness", "permission", "size"));
                 }
             }
             if(!args[args.length - 1].isEmpty()) {
@@ -131,6 +129,11 @@ public class GHoloTabComplete implements TabCompleter {
             }
         } else if(args.length == 6) {
             if(args[0].equalsIgnoreCase("option")) {
+                if(args[2].equalsIgnoreCase("holo")) {
+                    if(args[4].equalsIgnoreCase("rotation") || args[4].equalsIgnoreCase("size")) {
+                        complete.add("*");
+                    }
+                }
                 if(args[2].equalsIgnoreCase("row")) {
                     if(args[4].equalsIgnoreCase("text_shadow") || args[4].equalsIgnoreCase("see_through")) {
                         complete.addAll(List.of("true", "false"));
@@ -141,7 +144,23 @@ public class GHoloTabComplete implements TabCompleter {
                     if(args[4].equalsIgnoreCase("billboard")) {
                         complete.addAll(Arrays.stream(Display.Billboard.values()).map(b -> b.name().toLowerCase()).toList());
                     }
-                    complete.add("*");
+                    if(args[4].equalsIgnoreCase("rotation")) {
+                        complete.addAll(List.of("yaw", "pitch"));
+                    } else if(args[4].equalsIgnoreCase("size")) {
+                        complete.addAll(List.of("width", "height"));
+                    } else complete.add("*");
+                }
+            }
+            if(!args[args.length - 1].isEmpty()) {
+                for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);
+                complete.clear();
+            }
+        } else if(args.length == 7) {
+            if(args[0].equalsIgnoreCase("option")) {
+                if(args[2].equalsIgnoreCase("row")) {
+                    if(args[4].equalsIgnoreCase("rotation") || args[4].equalsIgnoreCase("size")) {
+                        complete.add("*");
+                    }
                 }
             }
             if(!args[args.length - 1].isEmpty()) {

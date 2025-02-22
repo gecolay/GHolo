@@ -5,7 +5,7 @@ import dev.geco.gholo.object.holo.GHolo;
 import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.importer.GHoloImporter;
 import dev.geco.gholo.object.holo.importer.GHoloImporterResult;
-import dev.geco.gholo.object.location.SimpleLocation;
+import dev.geco.gholo.object.simple.SimpleLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;

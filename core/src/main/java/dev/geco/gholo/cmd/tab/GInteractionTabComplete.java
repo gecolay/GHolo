@@ -81,7 +81,7 @@ public class GInteractionTabComplete implements TabCompleter {
             if(args[0].equalsIgnoreCase("size")) {
                 complete.add("*");
             }
-            if(args[0].equalsIgnoreCase("insertaction") || args[0].equalsIgnoreCase("setaction") || args[0].equalsIgnoreCase("removeaction")) {
+            if(args[0].equalsIgnoreCase("insertaction") || args[0].equalsIgnoreCase("setaction")) {
                 complete.addAll(gHoloMain.getInteractionActionService().getInteractionActions().keySet());
             }
             if(args[0].equalsIgnoreCase("option") || args[0].equalsIgnoreCase("rotate")) {

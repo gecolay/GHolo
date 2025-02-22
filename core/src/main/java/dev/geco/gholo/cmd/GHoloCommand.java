@@ -9,9 +9,8 @@ import dev.geco.gholo.object.holo.exporter.GHoloExporter;
 import dev.geco.gholo.object.holo.exporter.GHoloExporterResult;
 import dev.geco.gholo.object.holo.importer.GHoloImporter;
 import dev.geco.gholo.object.holo.importer.GHoloImporterResult;
-import dev.geco.gholo.object.location.SimpleLocation;
-import dev.geco.gholo.object.location.SimpleOffset;
-import dev.geco.gholo.object.location.SimpleRotation;
+import dev.geco.gholo.object.simple.SimpleLocation;
+import dev.geco.gholo.object.simple.SimpleOffset;
 import dev.geco.gholo.util.ImageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -34,7 +33,7 @@ import java.util.UUID;
 
 public class GHoloCommand implements CommandExecutor {
 
-    public static List<String> COMMAND_LIST = List.of("help", "list", "near", "create", "info", "remove", "rename", "move", "tphere", "tp", "align", "addrow", "insertrow", "setrow", "removerow", "offsetrow", "copy", "option", "rotate", "image", "import", "export");
+    public static List<String> COMMAND_LIST = List.of("help", "list", "near", "create", "info", "remove", "rename", "move", "tphere", "tp", "align", "addrow", "insertrow", "setrow", "removerow", "offsetrow", "copy", "option", "image", "import", "export");
 
     private final GHoloMain gHoloMain;
 
@@ -564,6 +563,33 @@ public class GHoloCommand implements CommandExecutor {
                             return true;
                         }
                         break;
+                    case "rotation":
+                        switch(args[optionArg + 1].toLowerCase()) {
+                            case "yaw":
+                                try {
+                                    if(args[optionArg + 2].equalsIgnoreCase("*")) data.getRawRotation().setYaw(null);
+                                    else data.getRawRotation().setYaw(Float.parseFloat(args[optionArg + 2]));
+                                    optionUpdateType = GHoloUpdateType.LOCATION;
+                                } catch(NumberFormatException e) {
+                                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-value-error", "%Option%", args[optionArg] + " " + args[optionArg + 1], "%Value%", args[optionArg + 2]);
+                                    return true;
+                                }
+                                break;
+                            case "pitch":
+                                try {
+                                    if(args[optionArg + 2].equalsIgnoreCase("*")) data.getRawRotation().setPitch(null);
+                                    else data.getRawRotation().setPitch(Float.parseFloat(args[optionArg + 2]));
+                                    optionUpdateType = GHoloUpdateType.LOCATION;
+                                } catch(NumberFormatException e) {
+                                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-value-error", "%Option%", args[optionArg] + " " + args[optionArg + 1], "%Value%", args[optionArg + 2]);
+                                    return true;
+                                }
+                                break;
+                            default:
+                                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-use-error");
+                                return true;
+                        }
+                        break;
                     case "brightness":
                         try {
                             if(args[optionArg + 1].equalsIgnoreCase("*")) data.setBrightness(GHoloData.DEFAULT_TEXT_OPACITY);
@@ -579,81 +605,46 @@ public class GHoloCommand implements CommandExecutor {
                         else data.setPermission(args[optionArg + 1]);
                         optionUpdateType = GHoloUpdateType.PERMISSION;
                         break;
+                    case "size":
+                        switch(args[optionArg + 1].toLowerCase()) {
+                            case "width":
+                                try {
+                                    sender.sendMessage(args[optionArg + 2].toUpperCase());
+                                    if(args[optionArg + 2].equalsIgnoreCase("*")) data.getRawSize().setWidth(1f);
+                                    else data.getRawSize().setWidth(Float.parseFloat(args[optionArg + 2]));
+                                    optionUpdateType = GHoloUpdateType.SIZE;
+                                } catch(NumberFormatException e) {
+                                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-value-error", "%Option%", args[optionArg] + " " + args[optionArg + 1], "%Value%", args[optionArg + 2]);
+                                    return true;
+                                }
+                                break;
+                            case "height":
+                                try {
+                                    if(args[optionArg + 2].equalsIgnoreCase("*")) data.getRawSize().setHeight(1f);
+                                    else data.getRawSize().setHeight(Float.parseFloat(args[optionArg + 2]));
+                                    optionUpdateType = GHoloUpdateType.SIZE;
+                                } catch(NumberFormatException e) {
+                                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-value-error", "%Option%", args[optionArg] + " " + args[optionArg + 1], "%Value%", args[optionArg + 2]);
+                                    return true;
+                                }
+                                break;
+                            default:
+                                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-use-error");
+                                return true;
+                        }
+                        break;
                     default:
                         gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-use-error");
                         return true;
                 }
                 if(optionHoloRow == null) {
                     gHoloMain.getHoloService().updateHoloData(holo, data);
-                    for(GHoloRow updateHoloRow : holo.getRows()) updateHoloRow.getHoloRowEntity().publishUpdate(optionUpdateType);
+                    for(GHoloRow updateHoloRow : holo.getRows()) updateHoloRow.getHoloRowContent().publishUpdate(optionUpdateType);
                 } else {
                     gHoloMain.getHoloService().updateHoloRowData(optionHoloRow, data);
-                    optionHoloRow.getHoloRowEntity().publishUpdate(optionUpdateType);
+                    optionHoloRow.getHoloRowContent().publishUpdate(optionUpdateType);
                 }
                 gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option", "%Option%", args[optionArg], "%Value%", args[optionArg + 1]);
-                break;
-            case "rotate":
-                if(args.length <= 4) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-rotate-use-error");
-                    break;
-                }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
-                if(holo == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1]);
-                    break;
-                }
-                SimpleRotation rotation = null;
-                int rotateArg = 3;
-                GHoloRow rotationHoloRow = null;
-                switch(args[2].toLowerCase()) {
-                    case "holo":
-                        rotation = holo.getRotation();
-                        break;
-                    case "row":
-                        try {
-                            rotationHoloRow = holo.getRow(Integer.parseInt(args[3]) - 1);
-                            if(rotationHoloRow == null) {
-                                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Position%", args[3]);
-                                return true;
-                            }
-                            rotation = rotationHoloRow.getRotation();
-                            rotateArg = 4;
-                        } catch(NumberFormatException e) {
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Position%", args[3]);
-                            return true;
-                        }
-                        break;
-                }
-                if(rotation == null) {
-                    gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-rotate-use-error");
-                    break;
-                }
-                switch(args[rotateArg].toLowerCase()) {
-                    case "yaw":
-                        try {
-                            if(args[rotateArg + 1].equalsIgnoreCase("*")) rotation.setYaw(null);
-                            else rotation.setYaw(Float.parseFloat(args[rotateArg + 1]));
-                        } catch(NumberFormatException e) {
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-rotate-value-error", "%Rotation%", args[rotateArg], "%Value%", args[rotateArg + 1]);
-                            return true;
-                        }
-                        break;
-                    case "pitch":
-                        try {
-                            if(args[rotateArg + 1].equalsIgnoreCase("*")) rotation.setPitch(null);
-                            else rotation.setPitch(Float.parseFloat(args[rotateArg + 1]));
-                        } catch(NumberFormatException e) {
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-rotate-value-error", "%Rotation%", args[rotateArg], "%Value%", args[rotateArg + 1]);
-                            return true;
-                        }
-                        break;
-                    default:
-                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-rotate-use-error");
-                        return true;
-                }
-                if(rotationHoloRow == null) gHoloMain.getHoloService().updateHoloRotation(holo, rotation);
-                else gHoloMain.getHoloService().updateHoloRowRotation(rotationHoloRow, rotation);
-                gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-rotate", "%Rotation%", args[rotateArg], "%Value%", args[rotateArg + 1]);
                 break;
             case "image":
                 if(args.length <= 3) {

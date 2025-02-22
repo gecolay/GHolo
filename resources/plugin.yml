@@ -15,12 +15,14 @@ commands:
     usage: /<command>
     aliases: [holo]
     description: Holo command
+    permission: GHolo.Holo
 
   ginteraction:
 
     usage: /<command>
     aliases: [interaction]
     description: Interaction command
+    permission: GHolo.Interaction
 
   gholoreload:
 

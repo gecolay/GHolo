@@ -66,7 +66,7 @@ public class HoloAnimationService {
             UUID taskId = gHoloMain.getTaskService().runAtFixedRate(() -> {
                 animation.updatePosition();
                 for(GHoloRow holoRow : animationSubscriber.get(animation.getId().toLowerCase())) {
-                    holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.CONTENT);
+                    holoRow.getHoloRowContent().publishUpdate(GHoloUpdateType.CONTENT);
                 }
             }, false, 0, animation.getTicks());
             taskIds.add(taskId);
@@ -74,7 +74,7 @@ public class HoloAnimationService {
         if(!gHoloMain.hasPlaceholderAPILink()) return;
         UUID placeholderAPITaskId = gHoloMain.getTaskService().runAtFixedRate(() -> {
             for(GHoloRow holoRow : placeholderAPISubscriber) {
-                holoRow.getHoloRowEntity().publishUpdate(GHoloUpdateType.CONTENT);
+                holoRow.getHoloRowContent().publishUpdate(GHoloUpdateType.CONTENT);
             }
         }, false, 0, 10);
         taskIds.add(placeholderAPITaskId);

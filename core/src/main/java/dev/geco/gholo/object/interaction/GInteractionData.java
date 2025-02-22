@@ -8,18 +8,9 @@ import java.util.Objects;
 
 public class GInteractionData implements Cloneable {
 
-    public static final double DEFAULT_RANGE = 15d;
     public static final String DEFAULT_PERMISSION = null;
 
-    private Double range = DEFAULT_RANGE;
     private String permission = DEFAULT_PERMISSION;
-
-    public Double getRange() { return range; }
-
-    public GInteractionData setRange(Double range) {
-        this.range = range;
-        return this;
-    }
 
     public String getPermission() { return permission; }
 
@@ -31,7 +22,6 @@ public class GInteractionData implements Cloneable {
     @Override
     public String toString() {
         JSONObject data = new JSONObject();
-        if(range != DEFAULT_RANGE) data.put("range", range);
         if(!Objects.equals(permission, DEFAULT_PERMISSION)) data.put("permission", permission);
         return data.toJSONString();
     }
@@ -40,7 +30,6 @@ public class GInteractionData implements Cloneable {
         JSONParser parser = new JSONParser();
         try {
             JSONObject data = (JSONObject) parser.parse(string);
-            if(data.containsKey("range")) range = ((Number) data.get("range")).doubleValue();
             if(data.containsKey("permission")) permission = (String) data.get("permission");
         } catch(Throwable e) { e.printStackTrace(); }
         return this;

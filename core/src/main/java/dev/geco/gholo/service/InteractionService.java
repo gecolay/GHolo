@@ -6,11 +6,11 @@ import dev.geco.gholo.object.interaction.GInteractType;
 import dev.geco.gholo.object.interaction.GInteraction;
 import dev.geco.gholo.object.interaction.GInteractionAction;
 import dev.geco.gholo.object.interaction.GInteractionData;
-import dev.geco.gholo.object.interaction.GInteractionSize;
+import dev.geco.gholo.object.simple.SimpleSize;
 import dev.geco.gholo.object.interaction.GInteractionUpdateType;
 import dev.geco.gholo.object.interaction.action.GInteractionActionType;
-import dev.geco.gholo.object.location.SimpleLocation;
-import dev.geco.gholo.object.location.SimpleRotation;
+import dev.geco.gholo.object.simple.SimpleLocation;
+import dev.geco.gholo.object.simple.SimpleRotation;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -82,7 +82,7 @@ public class InteractionService {
                         SimpleRotation rotation = SimpleRotation.fromString(resultSet.getString("rotation"));
                         if(rotation == null) throw new RuntimeException("Could not load interaction '" + id + "', invalid rotation");
                         GInteraction interaction = new GInteraction(uuid, id, location);
-                        GInteractionSize size = GInteractionSize.fromString(resultSet.getString("size"));
+                        SimpleSize size = SimpleSize.fromString(resultSet.getString("size"));
                         if(size == null) throw new RuntimeException("Could not load interaction '" + id + "', invalid size");
                         interaction.setSize(size);
 
@@ -224,7 +224,7 @@ public class InteractionService {
         } catch(Throwable e) { e.printStackTrace(); }
     }
 
-    public void updateInteractionSize(GInteraction interaction, GInteractionSize size) {
+    public void updateInteractionSize(GInteraction interaction, SimpleSize size) {
         try {
             gHoloMain.getDataService().execute("UPDATE gholo_interaction SET size = ? WHERE uuid = ?", size.toString(), interaction.getUuid().toString());
             interaction.setSize(size);

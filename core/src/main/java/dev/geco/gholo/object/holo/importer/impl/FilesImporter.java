@@ -6,9 +6,10 @@ import dev.geco.gholo.object.holo.GHoloData;
 import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.importer.GHoloImporter;
 import dev.geco.gholo.object.holo.importer.GHoloImporterResult;
-import dev.geco.gholo.object.location.SimpleLocation;
-import dev.geco.gholo.object.location.SimpleOffset;
-import dev.geco.gholo.object.location.SimpleRotation;
+import dev.geco.gholo.object.simple.SimpleLocation;
+import dev.geco.gholo.object.simple.SimpleOffset;
+import dev.geco.gholo.object.simple.SimpleRotation;
+import dev.geco.gholo.object.simple.SimpleSize;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -47,12 +48,7 @@ public class FilesImporter extends GHoloImporter {
                 double z = fileContent.getDouble("Holo.location.z", 0);
                 SimpleLocation location = new SimpleLocation(world, x, y, z);
 
-                float yaw = (float) fileContent.getDouble("Holo.rotation.yaw", 0);
-                float pitch = (float) fileContent.getDouble("Holo.rotation.pitch", 0);
-                SimpleRotation rotation = new SimpleRotation(yaw, pitch);
-
                 GHolo holo = new GHolo(UUID.randomUUID(), id, location);
-                holo.setRotation(rotation);
 
                 if(fileContent.get("Holo.data") != null) {
                     HashMap<String, Object> rawData = new HashMap<>();
@@ -74,13 +70,6 @@ public class FilesImporter extends GHoloImporter {
                             Double offsetY = (Double) offset.get("y");
                             Double offsetZ = (Double) offset.get("z");
                             row.setOffset(new SimpleOffset(offsetX != null ? offsetX : 0, offsetY != null ? offsetY : 0, offsetZ != null ? offsetZ : 0));
-                        }
-
-                        if(rowSection.containsKey("rotation")) {
-                            Map<?, ?> offset = (Map<?, ?>) rowSection.get("rotation");
-                            Double rowYaw = (Double) offset.get("yaw");
-                            Double rowPitch = (Double) offset.get("pitch");
-                            row.setRotation(new SimpleRotation(rowYaw != null ? rowYaw.floatValue() : 0, rowPitch != null ? rowPitch.floatValue() : 0));
                         }
 
                         if(rowSection.containsKey("data")) deserializeData(row.getRawData(), (HashMap<String, Object>) rowSection.get("data"));
@@ -114,8 +103,20 @@ public class FilesImporter extends GHoloImporter {
             float scaleZ = scaleMap.containsKey("z") ? ((Number) scaleMap.get("z")).floatValue() : 1f;
             data.setScale(new Vector3f(scaleX, scaleY, scaleZ));
         }
+        if(rawData.containsKey("rotation")) {
+            Map<?, ?> rotationMap = (Map<?, ?>) rawData.get("rotation");
+            Float rotationYaw = rotationMap.containsKey("yaw") ? ((Number) rotationMap.get("yaw")).floatValue() : null;
+            Float rotationPitch = rotationMap.containsKey("pitch") ? ((Number) rotationMap.get("pitch")).floatValue() : null;
+            data.setRotation(new SimpleRotation(rotationYaw, rotationPitch));
+        }
         if(rawData.containsKey("brightness")) data.setBrightness(((Number) rawData.get("brightness")).byteValue());
         if(rawData.containsKey("permission")) data.setPermission((String) rawData.get("permission"));
+        if(rawData.containsKey("size")) {
+            Map<?, ?> sizeMap = (Map<?, ?>) rawData.get("size");
+            float sizeWidth = sizeMap.containsKey("width") ? ((Number) sizeMap.get("width")).floatValue() : 1f;
+            float sizeHeight = sizeMap.containsKey("height") ? ((Number) sizeMap.get("height")).floatValue() : 1f;
+            data.setSize(new SimpleSize(sizeWidth, sizeHeight));
+        }
     }
 
 }

@@ -42,7 +42,7 @@ public class TeleportAction extends GInteractionActionType {
             float yaw = split.length > 4 ? (split[4].equalsIgnoreCase("~") ? (location != null ? location.getYaw() : 0) : Float.parseFloat(split[4])) : (location != null ? location.getYaw() : 0);
             float pitch = split.length > 5 ? (split[5].equalsIgnoreCase("~") ? (location != null ? location.getPitch() : 0) : Float.parseFloat(split[5])) : (location != null ? location.getPitch() : 0);
             return new Location(world, x, y, z, yaw, pitch);
-        } catch (NumberFormatException e) { }
+        } catch(NumberFormatException e) { }
         return null;
     }
 

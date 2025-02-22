@@ -6,9 +6,8 @@ import dev.geco.gholo.object.holo.GHoloData;
 import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.exporter.GHoloExporter;
 import dev.geco.gholo.object.holo.exporter.GHoloExporterResult;
-import dev.geco.gholo.object.location.SimpleLocation;
-import dev.geco.gholo.object.location.SimpleOffset;
-import dev.geco.gholo.object.location.SimpleRotation;
+import dev.geco.gholo.object.simple.SimpleLocation;
+import dev.geco.gholo.object.simple.SimpleOffset;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -51,7 +50,6 @@ public class FilesExporter extends GHoloExporter {
     private static FileConfiguration getHoloFileStructure(GHolo holo) {
         FileConfiguration structure = new YamlConfiguration();
         structure.set("Holo.location", serializeLocation(holo.getRawLocation()));
-        structure.set("Holo.rotation", serializeRotation(holo.getRawRotation()));
         Map<String, Object> holoData = serializeData(holo.getRawData());
         if(!holoData.isEmpty()) structure.set("Holo.data", holoData);
         List<Map<String, Object>> rows = new ArrayList<>();
@@ -60,8 +58,6 @@ public class FilesExporter extends GHoloExporter {
             rowMap.put("content", holoRow.getContent());
             Map<String, Object> offset = serializeOffset(holoRow.getRawOffset());
             if(!offset.isEmpty()) rowMap.put("offset", offset);
-            Map<String, Object> rotation = serializeRotation(holoRow.getRawRotation());
-            if(!rotation.isEmpty()) rowMap.put("rotation", rotation);
             Map<String, Object> rowData = serializeData(holoRow.getRawData());
             if(!rowData.isEmpty()) rowMap.put("data", rowData);
             rows.add(rowMap);
@@ -87,13 +83,6 @@ public class FilesExporter extends GHoloExporter {
         return offsetMap;
     }
 
-    private static Map<String, Object> serializeRotation(SimpleRotation rotation) {
-        Map<String, Object> rotationMap = new HashMap<>();
-        if(rotation.getYaw() != 0) rotationMap.put("yaw", rotation.getYaw());
-        if(rotation.getPitch() != 0) rotationMap.put("pitch", rotation.getPitch());
-        return rotationMap;
-    }
-
     private static Map<String, Object> serializeData(GHoloData data) {
         Map<String, Object> dataMap = new HashMap<>();
         if(data.getRange() != GHoloData.DEFAULT_RANGE) dataMap.put("range", data.getRange());
@@ -103,15 +92,27 @@ public class FilesExporter extends GHoloExporter {
         if(!Objects.equals(data.getTextAlignment(), GHoloData.DEFAULT_TEXT_ALIGNMENT)) dataMap.put("textAlignment", data.getTextAlignment());
         if(!Objects.equals(data.getBillboard(), GHoloData.DEFAULT_BILLBOARD)) dataMap.put("billboard", data.getBillboard());
         if(data.getSeeThrough() != GHoloData.DEFAULT_CAN_SEE_THROUGH) dataMap.put("seeThrough", data.getSeeThrough());
-        if(!Objects.equals(data.getScale(), GHoloData.DEFAULT_SCALE)) {
+        if(!Objects.equals(data.getRawScale(), GHoloData.DEFAULT_SCALE)) {
             Map<String, Object> scaleMap = new HashMap<>();
-            scaleMap.put("x", data.getScale().x);
-            scaleMap.put("y", data.getScale().y);
-            scaleMap.put("z", data.getScale().z);
+            scaleMap.put("x", data.getRawScale().x);
+            scaleMap.put("y", data.getRawScale().y);
+            scaleMap.put("z", data.getRawScale().z);
             dataMap.put("scale", scaleMap);
+        }
+        if(!Objects.equals(data.getRawRotation(), GHoloData.DEFAULT_ROTATION)) {
+            Map<String, Object> rotationMap = new HashMap<>();
+            rotationMap.put("yaw", data.getRawRotation().getYaw());
+            rotationMap.put("pitch", data.getRawRotation().getPitch());
+            dataMap.put("rotation", rotationMap);
         }
         if(data.getBrightness() != GHoloData.DEFAULT_BRIGHTNESS) dataMap.put("brightness", data.getBrightness());
         if(!Objects.equals(data.getPermission(), GHoloData.DEFAULT_PERMISSION)) dataMap.put("permission", data.getPermission());
+        if(!Objects.equals(data.getRawSize(), GHoloData.DEFAULT_SIZE)) {
+            Map<String, Object> sizeMap = new HashMap<>();
+            sizeMap.put("width", data.getRawSize().getWidth());
+            sizeMap.put("height", data.getRawSize().getHeight());
+            dataMap.put("size", sizeMap);
+        }
         return dataMap;
     }
 

@@ -17,7 +17,7 @@ public class FormatUtil {
         this.gHoloMain = gHoloMain;
     }
 
-    public String formatBase(String text) {
+    public String replaceSymbols(String text) {
         for(Map.Entry<String, String> symbol : gHoloMain.getConfigService().SYMBOLS.entrySet()) {
             String key = symbol.getKey();
             String value = symbol.getValue();
@@ -26,24 +26,26 @@ public class FormatUtil {
         return text;
     }
 
-    public String formatPlaceholders(String text, Player player) {
-        if(HoloAnimationService.countAnimationChars(text) < 2) return gHoloMain.getMessageService().toFormattedMessage(text);
-        text = formatPlaceholdersWithAnimations(text, player, gHoloMain.getHoloAnimationService().getAnimations());
-        return gHoloMain.getMessageService().toFormattedMessage(formatBase(text));
+    public String formatText(String text, Player player) {
+        if(HoloAnimationService.countAnimationChars(text) < 2) return text;
+        text = replaceAnimationsAndPlaceholders(text, player, gHoloMain.getHoloAnimationService().getAnimations());
+        return replaceSymbols(text);
     }
 
-    public Object formatPlaceholdersComponent(String text, Player player) {
-        if(HoloAnimationService.countAnimationChars(text) < 2) return gHoloMain.getMessageService().toFormattedComponent(text);
-        text = formatPlaceholdersWithAnimations(text, player, gHoloMain.getHoloAnimationService().getAnimations());
-        return gHoloMain.getMessageService().toFormattedComponent(formatBase(text));
+    public String toFormattedText(String text) {
+        return gHoloMain.getMessageService().toFormattedMessage(text);
     }
 
-    private String formatPlaceholdersWithAnimations(String text, Player player, Collection<GHoloAnimation> animations) {
+    public Object toFormattedComponent(String text) {
+        return gHoloMain.getMessageService().toFormattedComponent(text);
+    }
+
+    private String replaceAnimationsAndPlaceholders(String text, Player player, Collection<GHoloAnimation> animations) {
         for(GHoloAnimation animation : animations) text = text.replace(HoloAnimationService.AMIMATION_CHAR + animation.getId() + HoloAnimationService.AMIMATION_CHAR, animation.getCurrentContent());
-        return formatPlaceholdersWithoutAnimations(text, player);
+        return replacePlaceholders(text, player);
     }
 
-    private String formatPlaceholdersWithoutAnimations(String text, Player player) {
+    private String replacePlaceholders(String text, Player player) {
         if(gHoloMain.hasPlaceholderAPILink()) text = PlaceholderAPI.setPlaceholders(player, text);
         return text;
     }

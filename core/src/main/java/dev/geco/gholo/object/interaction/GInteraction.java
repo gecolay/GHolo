@@ -1,7 +1,8 @@
 package dev.geco.gholo.object.interaction;
 
-import dev.geco.gholo.object.location.SimpleLocation;
-import dev.geco.gholo.object.location.SimpleRotation;
+import dev.geco.gholo.object.simple.SimpleSize;
+import dev.geco.gholo.object.simple.SimpleLocation;
+import dev.geco.gholo.object.simple.SimpleRotation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +15,7 @@ public class GInteraction {
     private final UUID uuid;
     private String id;
     private SimpleLocation location;
-    private GInteractionSize size = new GInteractionSize(1f, 1f);
+    private SimpleSize size = new SimpleSize(1f, 1f);
     private SimpleRotation rotation = new SimpleRotation(null, null);
     private final List<GInteractionAction> actions = new ArrayList<>();
     private GInteractionData data = new GInteractionData();
@@ -44,11 +45,11 @@ public class GInteraction {
         return this;
     }
 
-    public @NotNull GInteractionSize getRawSize() { return size.clone(); }
+    public @NotNull SimpleSize getRawSize() { return size.clone(); }
 
-    public @NotNull GInteractionSize getSize() { return size; }
+    public @NotNull SimpleSize getSize() { return size; }
 
-    public @NotNull GInteraction setSize(@Nullable GInteractionSize size) {
+    public @NotNull GInteraction setSize(@Nullable SimpleSize size) {
         this.size = size;
         return this;
     }

@@ -1,7 +1,6 @@
 package dev.geco.gholo.object.holo;
 
-import dev.geco.gholo.object.location.SimpleOffset;
-import dev.geco.gholo.object.location.SimpleRotation;
+import dev.geco.gholo.object.simple.SimpleOffset;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,9 +9,8 @@ public class GHoloRow {
     private final GHolo holo;
     private String content;
     private SimpleOffset offset = new SimpleOffset(0, 0, 0);
-    private SimpleRotation rotation = new SimpleRotation(null, null);
     private GHoloData data = new GHoloData();
-    private IGHoloRowEntity holoRowEntity = null;
+    private IGHoloRowContent holoRowContent = null;
 
     public GHoloRow(@NotNull GHolo holo, @NotNull String content) {
         this.holo = holo;
@@ -39,15 +37,6 @@ public class GHoloRow {
         return this;
     }
 
-    public @NotNull SimpleRotation getRotation() { return rotation.clone(); }
-
-    public @NotNull SimpleRotation getRawRotation() { return rotation; }
-
-    public @NotNull GHoloRow setRotation(@NotNull SimpleRotation rotation) {
-        this.rotation = rotation.clone();
-        return this;
-    }
-
     public @NotNull GHoloData getData() { return data.clone(); }
 
     public @NotNull GHoloData getRawData() { return data; }
@@ -57,10 +46,10 @@ public class GHoloRow {
         return this;
     }
 
-    public @Nullable IGHoloRowEntity getHoloRowEntity() { return holoRowEntity; }
+    public @Nullable IGHoloRowContent getHoloRowContent() { return holoRowContent; }
 
-    public @NotNull GHoloRow setHoloRowEntity(@Nullable IGHoloRowEntity holoRowEntity) {
-        this.holoRowEntity = holoRowEntity;
+    public @NotNull GHoloRow setHoloRowContent(@Nullable IGHoloRowContent holoRowContent) {
+        this.holoRowContent = holoRowContent;
         return this;
     }
 
