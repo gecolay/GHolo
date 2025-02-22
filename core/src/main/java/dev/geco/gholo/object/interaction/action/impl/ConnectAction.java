@@ -12,12 +12,12 @@ public class ConnectAction extends GInteractionActionType {
     public @NotNull String getType() { return "connect"; }
 
     @Override
-    public boolean validateParameter(@NotNull String parameter) { return true; }
+    public boolean validateParameter(@NotNull GHoloMain gHoloMain, @NotNull String parameter) { return true; }
 
     @Override
     public @NotNull GInteractionActionTypeResult execute(@NotNull GHoloMain gHoloMain, @NotNull Player player, @NotNull GInteractType interactType, @NotNull String parameter) {
 
-        boolean success = gHoloMain.getServerUtil().connectPlayerToServer(player, parameter);
+        boolean success = gHoloMain.getServerConnectUtil().connectPlayerToServer(player, parameter);
 
         return new GInteractionActionTypeResult(success);
     }

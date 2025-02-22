@@ -6,6 +6,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
 public class PlayerEventHandler implements Listener {
 
@@ -23,14 +25,41 @@ public class PlayerEventHandler implements Listener {
 
         gHoloMain.getTaskService().runDelayed(() -> {
             gHoloMain.getHoloService().loadHolosForPlayer(player);
-        }, 1);
+
+            gHoloMain.getPacketHandler().setupPlayerPacketHandler(player);
+            gHoloMain.getInteractionService().loadInteractionsForPlayer(player);
+        }, false, player, 1);
+    }
+
+    @EventHandler
+    public void playerQuitEvent(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+
+        gHoloMain.getPacketHandler().removePlayerPacketHandler(player);
+        gHoloMain.getInteractionService().clearPlayerInteractions(player);
     }
 
     @EventHandler
     public void playerChangedWorldEvent(PlayerChangedWorldEvent event) {
+        Player player = event.getPlayer();
+
         gHoloMain.getTaskService().runDelayed(() -> {
-            gHoloMain.getHoloService().loadHolosForPlayer(event.getPlayer());
-        }, 1);
+            gHoloMain.getHoloService().loadHolosForPlayer(player);
+
+            gHoloMain.getInteractionService().loadInteractionsForPlayer(event.getPlayer());
+        }, false, player, 1);
+    }
+
+    @EventHandler
+    public void playerResourcePackStatusEvent(PlayerResourcePackStatusEvent event) {
+        if(event.getStatus() != PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED) return;
+
+        Player player = event.getPlayer();
+
+        gHoloMain.getTaskService().runDelayed(() -> {
+            gHoloMain.getHoloService().unloadHolosForPlayer(player);
+            gHoloMain.getHoloService().loadHolosForPlayer(player);
+        }, false, player, 1);
     }
 
 }

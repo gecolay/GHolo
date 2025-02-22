@@ -6,12 +6,12 @@ import dev.geco.gholo.GHoloMain;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class ServerUtil {
+public class ServerConnectUtil {
 
     private final GHoloMain gHoloMain;
     private static final String BUNGEE_CORD_CHANNEL = "BungeeCord";
 
-    public ServerUtil(GHoloMain gHoloMain) {
+    public ServerConnectUtil(GHoloMain gHoloMain) {
         this.gHoloMain = gHoloMain;
     }
 

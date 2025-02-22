@@ -18,10 +18,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 public class GHoloTabComplete implements TabCompleter {
 
     private final GHoloMain gHoloMain;
+    private final Set<String> REQUIRE_ID_SUBCOMMANDS = Set.of("info", "remove", "rename", "move", "tphere", "tp", "align", "addrow", "insertrow", "setrow", "removerow", "offsetrow", "copy", "option", "image");
+    private final Set<String> OPTIONS = Set.of("range", "background_color", "text_opacity", "text_shadow", "text_alignment", "billboard", "see_through", "scale", "rotation", "brightness", "permission", "size");
 
     public GHoloTabComplete(GHoloMain gHoloMain) {
         this.gHoloMain = gHoloMain;
@@ -31,12 +34,12 @@ public class GHoloTabComplete implements TabCompleter {
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         List<String> complete = new ArrayList<>(), completeStarted = new ArrayList<>();
 
-        List<String> holoIdArg = new ArrayList<>(List.of("info", "remove", "rename", "move", "tphere", "tp", "align", "addrow", "insertrow", "setrow", "removerow", "offsetrow", "copy", "option", "image"));
+        List<String> holoIdArg = new ArrayList<>(REQUIRE_ID_SUBCOMMANDS);
         if(!(sender instanceof Player)) holoIdArg.removeAll(List.of("tp", "tphere"));
 
         if(args.length == 1) {
             if(gHoloMain.getPermissionService().hasPermission(sender, "Holo")) {
-                complete.addAll(GHoloCommand.COMMAND_LIST);
+                complete.addAll(GHoloCommand.SUBCOMMANDS);
                 if(!(sender instanceof Player)) complete.removeAll(List.of("create", "tp", "tphere"));
             }
             if(!args[args.length - 1].isEmpty()) {
@@ -46,11 +49,9 @@ public class GHoloTabComplete implements TabCompleter {
         } else if(args.length == 2) {
             if(holoIdArg.contains(args[0].toLowerCase())) {
                 complete.addAll(gHoloMain.getHoloService().getHolos().stream().map(GHolo::getId).toList());
-            }
-            if(args[0].equalsIgnoreCase("import")) {
+            } else if(args[0].equalsIgnoreCase("import")) {
                 complete.addAll(gHoloMain.getHoloImporterService().getHoloImporters().keySet());
-            }
-            if(args[0].equalsIgnoreCase("export")) {
+            } else if(args[0].equalsIgnoreCase("export")) {
                 complete.addAll(gHoloMain.getHoloExporterService().getHoloExporters().keySet());
             }
             if(!args[args.length - 1].isEmpty()) {
@@ -58,17 +59,17 @@ public class GHoloTabComplete implements TabCompleter {
                 complete.clear();
             }
         } else if(args.length == 3) {
-            if(args[0].equalsIgnoreCase("align")) {
+            if(args[0].equalsIgnoreCase("move")) {
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
+                if(holo != null) complete.addAll(List.of("" + holo.getRawLocation().getX(), "~"));
+            } else if(args[0].equalsIgnoreCase("align")) {
                 complete.addAll(gHoloMain.getHoloService().getHolos().stream().map(GHolo::getId).filter(holoId -> !holoId.equalsIgnoreCase(args[1])).toList());
-            }
-            if(args[0].equalsIgnoreCase("insertrow") || args[0].equalsIgnoreCase("setrow") || args[0].equalsIgnoreCase("removerow") || args[0].equalsIgnoreCase("offsetrow")) {
+            } else if(args[0].equalsIgnoreCase("insertrow") || args[0].equalsIgnoreCase("setrow") || args[0].equalsIgnoreCase("removerow") || args[0].equalsIgnoreCase("offsetrow")) {
                 GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo != null) for(int position = 1; position <= holo.getRows().size(); position++) complete.add("" + position);
-            }
-            if(args[0].equalsIgnoreCase("option")) {
+            } else if(args[0].equalsIgnoreCase("option")) {
                 complete.addAll(List.of("holo", "row"));
-            }
-            if(args[0].equalsIgnoreCase("image")) {
+            } else if(args[0].equalsIgnoreCase("image")) {
                 complete.addAll(ImageUtil.IMAGE_TYPES);
             }
             if(!args[args.length - 1].isEmpty()) {
@@ -76,24 +77,37 @@ public class GHoloTabComplete implements TabCompleter {
                 complete.clear();
             }
         } else if(args.length == 4) {
-            if(args[0].equalsIgnoreCase("align") || args[0].equalsIgnoreCase("offsetrow")) {
+            if(args[0].equalsIgnoreCase("move")) {
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
+                if(holo != null) complete.addAll(List.of("" + holo.getRawLocation().getY(), "~"));
+            } else if(args[0].equalsIgnoreCase("align")) {
                 complete.addAll(List.of("x", "y", "z", "xy", "xz", "yz", "xyz"));
-            }
-            if(args[0].equalsIgnoreCase("option")) {
-                if(args[2].equalsIgnoreCase("holo")) {
-                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "text_alignment", "billboard", "see_through", "scale", "rotation", "brightness", "permission", "size"));
+            } else if(args[0].equalsIgnoreCase("setrow")) {
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
+                if(holo != null) {
+                    try {
+                        complete.add(holo.getRow(Integer.parseInt(args[2]) - 1).getContent());
+                    } catch(Throwable ignored) { }
                 }
-                if(args[2].equalsIgnoreCase("row")) {
+            } else if(args[0].equalsIgnoreCase("offsetrow")) {
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
+                if(holo != null) {
+                    try {
+                        complete.addAll(List.of("" + holo.getRow(Integer.parseInt(args[2]) - 1).getRawOffset().getX(), "~", "*"));
+                    } catch(Throwable ignored) { }
+                }
+            } else if(args[0].equalsIgnoreCase("option")) {
+                if(args[2].equalsIgnoreCase("holo")) {
+                    complete.addAll(OPTIONS);
+                } else if(args[2].equalsIgnoreCase("row")) {
                     GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                     if(holo != null) for(int row = 1; row <= holo.getRows().size(); row++) complete.add("" + row);
                 }
-            }
-            if(args[0].equalsIgnoreCase("image")) {
+            } else if(args[0].equalsIgnoreCase("image")) {
                 if(args[2].equalsIgnoreCase("file")) {
                     File[] files = ImageUtil.IMAGE_FOLDER.listFiles();
                     if(files != null) complete.addAll(Arrays.stream(files).map(File::getName).toList());
-                }
-                if(args[2].equalsIgnoreCase("avatar") || args[2].equalsIgnoreCase("helm")) {
+                } else if(args[2].equalsIgnoreCase("avatar") || args[2].equalsIgnoreCase("helm")) {
                     complete.addAll(Arrays.stream(Bukkit.getOfflinePlayers()).map(OfflinePlayer::getName).toList());
                 }
             }
@@ -102,25 +116,33 @@ public class GHoloTabComplete implements TabCompleter {
                 complete.clear();
             }
         } else if(args.length == 5) {
-            if(args[0].equalsIgnoreCase("option")) {
+            if(args[0].equalsIgnoreCase("move")) {
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
+                if(holo != null) complete.addAll(List.of("" + holo.getRawLocation().getZ(), "~"));
+            } else if(args[0].equalsIgnoreCase("offsetrow")) {
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
+                if(holo != null) {
+                    try {
+                        complete.addAll(List.of("" + holo.getRow(Integer.parseInt(args[2]) - 1).getRawOffset().getY(), "~", "*"));
+                    } catch(Throwable ignored) { }
+                }
+            } else if(args[0].equalsIgnoreCase("option")) {
                 if(args[2].equalsIgnoreCase("holo")) {
-                    if(args[3].equalsIgnoreCase("text_shadow") || args[3].equalsIgnoreCase("see_through")) {
+                    if(args[3].equalsIgnoreCase("background_color")) {
+                        complete.addAll(List.of("transparent", "#000000", "#00000000", "000000", "00000000", "#ffffff", "#ffffffff", "ffffff", "ffffffff"));
+                    } else if(args[3].equalsIgnoreCase("text_shadow") || args[3].equalsIgnoreCase("see_through")) {
                         complete.addAll(List.of("true", "false"));
-                    }
-                    if(args[3].equalsIgnoreCase("text_alignment")) {
+                    } else if(args[3].equalsIgnoreCase("text_alignment")) {
                         complete.addAll(Arrays.stream(TextDisplay.TextAlignment.values()).map(ta -> ta.name().toLowerCase()).toList());
-                    }
-                    if(args[3].equalsIgnoreCase("billboard")) {
+                    } else if(args[3].equalsIgnoreCase("billboard")) {
                         complete.addAll(Arrays.stream(Display.Billboard.values()).map(b -> b.name().toLowerCase()).toList());
-                    }
-                    if(args[3].equalsIgnoreCase("rotation")) {
+                    } else if(args[3].equalsIgnoreCase("rotation")) {
                         complete.addAll(List.of("yaw", "pitch"));
                     } else if(args[3].equalsIgnoreCase("size")) {
                         complete.addAll(List.of("width", "height"));
                     } else complete.add("*");
-                }
-                if(args[2].equalsIgnoreCase("row")) {
-                    complete.addAll(List.of("range", "background_color", "text_opacity", "text_shadow", "text_alignment", "billboard", "see_through", "scale", "rotation", "brightness", "permission", "size"));
+                } else if(args[2].equalsIgnoreCase("row")) {
+                    complete.addAll(OPTIONS);
                 }
             }
             if(!args[args.length - 1].isEmpty()) {
@@ -128,23 +150,28 @@ public class GHoloTabComplete implements TabCompleter {
                 complete.clear();
             }
         } else if(args.length == 6) {
-            if(args[0].equalsIgnoreCase("option")) {
+            if(args[0].equalsIgnoreCase("offsetrow")) {
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
+                if(holo != null) {
+                    try {
+                        complete.addAll(List.of("" + holo.getRow(Integer.parseInt(args[2]) - 1).getRawOffset().getZ(), "~", "*"));
+                    } catch(Throwable ignored) { }
+                }
+            } else if(args[0].equalsIgnoreCase("option")) {
                 if(args[2].equalsIgnoreCase("holo")) {
                     if(args[4].equalsIgnoreCase("rotation") || args[4].equalsIgnoreCase("size")) {
                         complete.add("*");
                     }
-                }
-                if(args[2].equalsIgnoreCase("row")) {
-                    if(args[4].equalsIgnoreCase("text_shadow") || args[4].equalsIgnoreCase("see_through")) {
+                } else if(args[2].equalsIgnoreCase("row")) {
+                    if(args[3].equalsIgnoreCase("background_color")) {
+                        complete.addAll(List.of("transparent", "#000000", "#00000000", "000000", "00000000", "#ffffff", "#ffffffff", "ffffff", "ffffffff"));
+                    } else if(args[4].equalsIgnoreCase("text_shadow") || args[4].equalsIgnoreCase("see_through")) {
                         complete.addAll(List.of("true", "false"));
-                    }
-                    if(args[4].equalsIgnoreCase("text_alignment")) {
+                    } else if(args[4].equalsIgnoreCase("text_alignment")) {
                         complete.addAll(Arrays.stream(TextDisplay.TextAlignment.values()).map(ta -> ta.name().toLowerCase()).toList());
-                    }
-                    if(args[4].equalsIgnoreCase("billboard")) {
+                    } else if(args[4].equalsIgnoreCase("billboard")) {
                         complete.addAll(Arrays.stream(Display.Billboard.values()).map(b -> b.name().toLowerCase()).toList());
-                    }
-                    if(args[4].equalsIgnoreCase("rotation")) {
+                    } else if(args[4].equalsIgnoreCase("rotation")) {
                         complete.addAll(List.of("yaw", "pitch"));
                     } else if(args[4].equalsIgnoreCase("size")) {
                         complete.addAll(List.of("width", "height"));

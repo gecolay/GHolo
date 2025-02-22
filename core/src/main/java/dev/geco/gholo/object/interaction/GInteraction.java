@@ -43,19 +43,19 @@ public class GInteraction {
 
     public @NotNull List<GInteractionAction> getActions() { return actions; }
 
-    public @Nullable GInteractionAction getAction(int position) { return actions.get(position); }
+    public @Nullable GInteractionAction getAction(int position) throws IndexOutOfBoundsException { return actions.get(position); }
 
     public @NotNull GInteraction addAction(@NotNull GInteractionAction interactionAction) {
         actions.add(interactionAction);
         return this;
     }
 
-    public @NotNull GInteraction insertAction(@NotNull GInteractionAction interactionAction, int position) {
+    public @NotNull GInteraction insertAction(@NotNull GInteractionAction interactionAction, int position) throws IndexOutOfBoundsException {
         actions.add(position, interactionAction);
         return this;
     }
 
-    public @NotNull GInteraction removeAction(int position) {
+    public @NotNull GInteraction removeAction(int position) throws IndexOutOfBoundsException {
         actions.remove(position);
         return this;
     }

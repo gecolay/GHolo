@@ -25,7 +25,7 @@ import java.util.List;
 
 public class GInteractionCommand implements CommandExecutor {
 
-    public static List<String> COMMAND_LIST = List.of("help", "list", "near", "create", "info", "remove", "rename", "move", "tphere", "tp", "align", "addaction", "insertaction", "setaction", "removeaction", "copy", "option", "import", "export");
+    public static List<String> SUBCOMMANDS = List.of("help", "list", "near", "create", "info", "remove", "rename", "move", "tphere", "tp", "align", "addaction", "insertaction", "setaction", "removeaction", "copy", "option", "import", "export");
 
     private final GHoloMain gHoloMain;
 
@@ -45,11 +45,10 @@ public class GInteractionCommand implements CommandExecutor {
             return true;
         }
 
-        GInteraction interaction;
         switch(args[0].toLowerCase()) {
             case "help" -> {
                 gHoloMain.getMessageService().sendMessage(sender, "InteractionHelpCommand.header");
-                for(String helpRow : COMMAND_LIST) {
+                for(String helpRow : SUBCOMMANDS) {
                     gHoloMain.getMessageService().sendMessage(sender, "InteractionHelpCommand." + helpRow.toLowerCase());
                 }
                 gHoloMain.getMessageService().sendMessage(sender, "InteractionHelpCommand.footer");
@@ -120,7 +119,7 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-create-use-error");
                     break;
                 }
-                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                GInteraction interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
                 if(interaction != null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-create-exist-error", "%Interaction%", interaction.getId());
                     break;
@@ -133,7 +132,7 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-info-use-error");
                     break;
                 }
-                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                GInteraction interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
                 if(interaction == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1]);
                     break;
@@ -156,7 +155,7 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-remove-use-error");
                     break;
                 }
-                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                GInteraction interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
                 if(interaction == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1]);
                     break;
@@ -169,7 +168,7 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-rename-use-error");
                     break;
                 }
-                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                GInteraction interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
                 if(interaction == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1]);
                     break;
@@ -188,14 +187,17 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-move-use-error");
                     break;
                 }
-                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                GInteraction interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
                 if(interaction == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1]);
                     break;
                 }
                 try {
                     SimpleLocation location = interaction.getLocation();
-                    location.set(Double.parseDouble(args[2]), Double.parseDouble(args[3]), Double.parseDouble(args[4]));
+                    double x = gHoloMain.getLocationUtil().parseLocationInput(args[2], location.getX());
+                    double y = gHoloMain.getLocationUtil().parseLocationInput(args[3], location.getY());
+                    double z = gHoloMain.getLocationUtil().parseLocationInput(args[4], location.getZ());
+                    location.set(x, y, z);
                     gHoloMain.getInteractionService().updateInteractionLocation(interaction, location);
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-move", "%Interaction%", interaction.getId());
                 } catch(NumberFormatException e) {
@@ -211,7 +213,7 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-tphere-use-error");
                     break;
                 }
-                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                GInteraction interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
                 if(interaction == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1]);
                     break;
@@ -228,7 +230,7 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-tp-use-error");
                     break;
                 }
-                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                GInteraction interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
                 if(interaction == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1]);
                     break;
@@ -244,7 +246,7 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-align-use-error");
                     break;
                 }
-                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                GInteraction interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
                 if(interaction == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1]);
                     break;
@@ -282,7 +284,7 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-addaction-use-error");
                     break;
                 }
-                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                GInteraction interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
                 if(interaction == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1]);
                     break;
@@ -296,7 +298,7 @@ public class GInteractionCommand implements CommandExecutor {
                 StringBuilder addActionParameter = new StringBuilder();
                 for(int arg = 3; arg <= args.length - 1; arg++) addActionParameter.append(args[arg]).append(" ");
                 addActionParameter.deleteCharAt(addActionParameter.length() - 1);
-                if(!addInteractionActionType.validateParameter(addActionParameter.toString())) {
+                if(!addInteractionActionType.validateParameter(gHoloMain, addActionParameter.toString())) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-action-parameter-error", "%Type%", args[2], "%Parameter%", addActionParameter.toString());
                     break;
                 }
@@ -308,7 +310,7 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-insertaction-use-error");
                     break;
                 }
-                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                GInteraction interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
                 if(interaction == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1]);
                     break;
@@ -328,7 +330,7 @@ public class GInteractionCommand implements CommandExecutor {
                     StringBuilder insertActionParameter = new StringBuilder();
                     for(int arg = 4; arg <= args.length - 1; arg++) insertActionParameter.append(args[arg]).append(" ");
                     insertActionParameter.deleteCharAt(insertActionParameter.length() - 1);
-                    if(!insertInteractionActionType.validateParameter(insertActionParameter.toString())) {
+                    if(!insertInteractionActionType.validateParameter(gHoloMain, insertActionParameter.toString())) {
                         gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-action-parameter-error", "%Type%", args[3], "%Parameter%", insertActionParameter.toString());
                         break;
                     }
@@ -343,7 +345,7 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-setaction-use-error");
                     break;
                 }
-                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                GInteraction interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
                 if(interaction == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1]);
                     break;
@@ -363,7 +365,7 @@ public class GInteractionCommand implements CommandExecutor {
                     StringBuilder setActionParameter = new StringBuilder();
                     for(int arg = 4; arg <= args.length - 1; arg++) setActionParameter.append(args[arg]).append(" ");
                     setActionParameter.deleteCharAt(setActionParameter.length() - 1);
-                    if(!setInteractionActionType.validateParameter(setActionParameter.toString())) {
+                    if(!setInteractionActionType.validateParameter(gHoloMain, setActionParameter.toString())) {
                         gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-action-parameter-error", "%Type%", args[3], "%Parameter%", setActionParameter.toString());
                         break;
                     }
@@ -378,7 +380,7 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-removeaction-use-error");
                     break;
                 }
-                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                GInteraction interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
                 if(interaction == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1]);
                     break;
@@ -400,7 +402,7 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-copy-use-error");
                     break;
                 }
-                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                GInteraction interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
                 if(interaction == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1]);
                     break;
@@ -417,7 +419,7 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-option-use-error");
                     break;
                 }
-                interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
+                GInteraction interaction = gHoloMain.getInteractionService().getInteraction(args[1]);
                 if(interaction == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-exist-error", "%Interaction%", args[1]);
                     break;

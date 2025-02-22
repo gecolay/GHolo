@@ -9,7 +9,7 @@ public abstract class GInteractionActionType {
 
     public abstract @NotNull String getType();
 
-    public abstract boolean validateParameter(@NotNull String parameter);
+    public abstract boolean validateParameter(@NotNull GHoloMain gHoloMain, @NotNull String parameter);
 
     public abstract @NotNull GInteractionActionTypeResult execute(@NotNull GHoloMain gHoloMain, @NotNull Player player, @NotNull GInteractType interactType, @NotNull String parameter);
 

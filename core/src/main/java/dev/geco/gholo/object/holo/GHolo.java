@@ -42,19 +42,19 @@ public class GHolo {
 
     public @NotNull List<GHoloRow> getRows() { return rows; }
 
-    public @Nullable GHoloRow getRow(int position) { return rows.get(position); }
+    public @Nullable GHoloRow getRow(int position) throws IndexOutOfBoundsException { return rows.get(position); }
 
     public @NotNull GHolo addRow(@NotNull GHoloRow holoRow) {
         rows.add(holoRow);
         return this;
     }
 
-    public @NotNull GHolo insertRow(@NotNull GHoloRow holoRow, int position) {
+    public @NotNull GHolo insertRow(@NotNull GHoloRow holoRow, int position) throws IndexOutOfBoundsException {
         rows.add(position, holoRow);
         return this;
     }
 
-    public @NotNull GHolo removeRow(int position) {
+    public @NotNull GHolo removeRow(int position) throws IndexOutOfBoundsException {
         rows.remove(position);
         return this;
     }

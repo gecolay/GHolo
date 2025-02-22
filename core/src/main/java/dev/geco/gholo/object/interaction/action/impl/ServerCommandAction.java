@@ -13,7 +13,7 @@ public class ServerCommandAction extends GInteractionActionType {
     public @NotNull String getType() { return "server_command"; }
 
     @Override
-    public boolean validateParameter(@NotNull String parameter) { return true; }
+    public boolean validateParameter(@NotNull GHoloMain gHoloMain, @NotNull String parameter) { return true; }
 
     @Override
     public @NotNull GInteractionActionTypeResult execute(@NotNull GHoloMain gHoloMain, @NotNull Player player, @NotNull GInteractType interactType, @NotNull String parameter) {

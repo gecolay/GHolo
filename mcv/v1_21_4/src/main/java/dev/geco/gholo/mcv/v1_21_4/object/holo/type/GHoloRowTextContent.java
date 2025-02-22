@@ -80,7 +80,7 @@ public class GHoloRowTextContent extends Display.TextDisplay implements IGHoloRo
         List<SynchedEntityData.DataValue<?>> defaultResetData = getEntityData().packDirty();
         if(defaultResetData != null) data.addAll(defaultResetData);
         if(content != null) {
-            Component textData = gHoloMain.supportsPaperFeature() ? PaperAdventure.asVanilla((net.kyori.adventure.text.Component) gHoloMain.getFormatUtil().toFormattedComponent(content)) : CraftChatMessage.fromString(gHoloMain.getFormatUtil().toFormattedText(content), false, true)[0];
+            Component textData = gHoloMain.supportsPaperFeature() ? PaperAdventure.asVanilla((net.kyori.adventure.text.Component) gHoloMain.getTextFormatUtil().toFormattedComponent(content)) : CraftChatMessage.fromString(gHoloMain.getTextFormatUtil().toFormattedText(content), false, true)[0];
             data.add(new SynchedEntityData.DataValue<>(holoTextData.id(), holoTextData.serializer(), textData));
         }
         return new ClientboundSetEntityDataPacket(getId(), data);
@@ -155,6 +155,10 @@ public class GHoloRowTextContent extends Display.TextDisplay implements IGHoloRo
     }
 
     private void setBackgroundColor(String color) {
+        if(color.equalsIgnoreCase("transparent")) {
+            entityData.set(DATA_BACKGROUND_COLOR_ID, 0);
+            return;
+        }
         color = color.startsWith("#") ? color.substring(1) : color;
         if(color.length() == 6) color = color + "40";
         color = color.substring(color.length() - 2) + color.substring(0, color.length() - 2);

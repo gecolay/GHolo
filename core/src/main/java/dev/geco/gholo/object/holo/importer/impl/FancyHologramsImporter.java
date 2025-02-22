@@ -91,6 +91,7 @@ public class FancyHologramsImporter extends GHoloImporter {
                 gHoloMain.getHoloService().writeHolo(holo, override);
 
                 List<String> rows = fileContent.getStringList("holograms." + id + ".text");
+                rows.replaceAll(rowContent -> rowContent.replaceAll("(?i)<#([0-9A-F]+)>", "#$1").replaceAll("(?i)&#([0-9A-F]{6})[0-9A-F]*", "#$1"));
                 for(String rowContent : rows) {
                     GHoloRow row = new GHoloRow(holo, rowContent);
                     gHoloMain.getHoloService().writeHoloRow(row, row.getPosition());

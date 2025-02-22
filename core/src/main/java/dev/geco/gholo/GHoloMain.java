@@ -29,10 +29,11 @@ import dev.geco.gholo.service.UpdateService;
 import dev.geco.gholo.service.VersionService;
 import dev.geco.gholo.service.message.PaperMessageService;
 import dev.geco.gholo.service.message.SpigotMessageService;
-import dev.geco.gholo.util.FormatUtil;
+import dev.geco.gholo.util.LocationUtil;
+import dev.geco.gholo.util.TextFormatUtil;
 import dev.geco.gholo.util.IEntityUtil;
 import dev.geco.gholo.util.ImageUtil;
-import dev.geco.gholo.util.ServerUtil;
+import dev.geco.gholo.util.ServerConnectUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
@@ -63,9 +64,10 @@ public class GHoloMain extends JavaPlugin {
     private InteractionImporterService interactionImporterService;
     private InteractionExporterService interactionExporterService;
     private IPacketHandler packetHandler;
-    private FormatUtil formatUtil;
+    private TextFormatUtil textFormatUtil;
     private IEntityUtil entityUtil;
-    private ServerUtil serverUtil;
+    private LocationUtil locationUtil;
+    private ServerConnectUtil serverConnectUtil;
     private boolean placeholderAPILink = false;
     private boolean supportsPaperFeature = false;
     private boolean supportsTaskFeature = false;
@@ -104,11 +106,13 @@ public class GHoloMain extends JavaPlugin {
 
     public IPacketHandler getPacketHandler() { return packetHandler; }
 
-    public FormatUtil getFormatUtil() { return formatUtil; }
+    public TextFormatUtil getTextFormatUtil() { return textFormatUtil; }
 
     public IEntityUtil getEntityUtil() { return entityUtil; }
 
-    public ServerUtil getServerUtil() { return serverUtil; }
+    public LocationUtil getLocationUtil() { return locationUtil; }
+
+    public ServerConnectUtil getServerConnectUtil() { return serverConnectUtil; }
 
     public boolean hasPlaceholderAPILink() { return placeholderAPILink; }
 
@@ -135,8 +139,9 @@ public class GHoloMain extends JavaPlugin {
         interactionImporterService = new InteractionImporterService();
         interactionExporterService = new InteractionExporterService();
 
-        formatUtil = new FormatUtil(this);
-        serverUtil = new ServerUtil(this);
+        textFormatUtil = new TextFormatUtil(this);
+        locationUtil = new LocationUtil();
+        serverConnectUtil = new ServerConnectUtil(this);
 
         loadFeatures();
 
@@ -176,7 +181,7 @@ public class GHoloMain extends JavaPlugin {
         interactionActionService.registerDefaultInteractionActions();
         interactionImporterService.registerDefaultInteractionImporters();
         interactionExporterService.registerDefaultInteractionExporters();
-        serverUtil.setupChannel();
+        serverConnectUtil.setupChannel();
         holoAnimationService.loadHoloAnimations();
         holoService.createTables();
         holoService.loadHolos();
@@ -204,7 +209,7 @@ public class GHoloMain extends JavaPlugin {
 
     private void unload() {
         dataService.close();
-        serverUtil.teardownChannel();
+        serverConnectUtil.teardownChannel();
         packetHandler.removePlayerPacketHandlers();
         holoService.unloadHolos();
         interactionService.unloadInteractions();

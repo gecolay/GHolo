@@ -39,7 +39,7 @@ public class GHoloRowContent implements IGHoloRowContent {
         for(Player player : holoRow.getHolo().getRawLocation().getWorld().getPlayers()) {
             if(permission != null && !gHoloMain.getPermissionService().hasPermission(player, permission)) continue;
             String content = holoRow.getContent();
-            content = gHoloMain.getFormatUtil().formatText(content, player);
+            content = gHoloMain.getTextFormatUtil().formatText(content, player);
             updateContent(content, player);
         }
     }
@@ -50,7 +50,7 @@ public class GHoloRowContent implements IGHoloRowContent {
         String permission = getPermission();
         if(permission != null && !gHoloMain.getPermissionService().hasPermission(player, permission)) return;
         String content = holoRow.getContent();
-        content = gHoloMain.getFormatUtil().formatText(content, player);
+        content = gHoloMain.getTextFormatUtil().formatText(content, player);
         updateContent(content, player);
     }
 
@@ -76,16 +76,15 @@ public class GHoloRowContent implements IGHoloRowContent {
             }
             default -> {
                 if(textContent == null) textContent = new GHoloRowTextContent(holoRow, gHoloMain);
-                contentSplit[1] = content;
                 yield textContent;
             }
         };
         IGHoloRowContentType currentContentType = currentContentTypes.get(playerUuid);
         if(currentContentType != contentType) {
             if(currentContentType != null) currentContentType.unload(player);
-            contentType.load(player, contentSplit[1], true);
+            contentType.load(player, contentType instanceof GHoloRowTextContent ? content : contentSplit[1], true);
             currentContentTypes.put(playerUuid, contentType);
-        } else contentType.load(player, contentSplit[1], false);
+        } else contentType.load(player, contentType instanceof GHoloRowTextContent ? content : contentSplit[1], false);
     }
 
     @Override

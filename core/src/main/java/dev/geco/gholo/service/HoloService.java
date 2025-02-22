@@ -79,7 +79,7 @@ public class HoloService {
 
                             while(rowResultSet.next()) {
                                 int position = rowResultSet.getInt("position");
-                                String content = gHoloMain.getFormatUtil().replaceSymbols(rowResultSet.getString("content"));
+                                String content = gHoloMain.getTextFormatUtil().replaceSymbols(rowResultSet.getString("content"));
                                 SimpleOffset offset = SimpleOffset.fromString(rowResultSet.getString("offset"));
                                 if(offset == null) throw new RuntimeException("Could not load holo row '" + position + "' of holo '" + id + "', invalid location");
                                 GHoloRow holoRow = new GHoloRow(holo, content);
@@ -105,13 +105,15 @@ public class HoloService {
 
     public void loadHolosForPlayer(Player player) { for(GHolo holo : holos) loadHoloForPlayer(holo, player); }
 
-    public void loadHolo(GHolo holo) { for(GHoloRow row : holo.getRows()) if(row.getHoloRowContent() != null) row.getHoloRowContent().loadHoloRow(); }
+    public void loadHolo(GHolo holo) { for(Player player : holo.getRawLocation().getWorld().getPlayers()) loadHoloForPlayer(holo, player); }
 
     public void loadHoloForPlayer(GHolo holo, Player player) { for(GHoloRow row : holo.getRows()) if(row.getHoloRowContent() != null) row.getHoloRowContent().loadHoloRow(player); }
 
+    public void unloadHolosForPlayer(Player player) { for(GHolo holo : holos) unloadHoloForPlayer(holo, player); }
+
     public void unloadHolo(GHolo holo) { for(Player player : holo.getRawLocation().getWorld().getPlayers()) unloadHoloForPlayer(holo, player); }
 
-    public void unloadHoloForPlayer(GHolo holo, Player player) { for(GHoloRow row : holo.getRows()) if(row.getHoloRowContent() != null) row.getHoloRowContent().unloadHoloRow(); }
+    public void unloadHoloForPlayer(GHolo holo, Player player) { for(GHoloRow row : holo.getRows()) if(row.getHoloRowContent() != null) row.getHoloRowContent().unloadHoloRow(player); }
 
     public GHolo createHolo(String holoId, SimpleLocation location) {
         try {
@@ -130,7 +132,7 @@ public class HoloService {
             double rowOffset = sizeBetweenRows * position;
             SimpleOffset offset = new SimpleOffset(0, -rowOffset, 0);
 
-            GHoloRow holoRow = new GHoloRow(holo, gHoloMain.getFormatUtil().replaceSymbols(content));
+            GHoloRow holoRow = new GHoloRow(holo, gHoloMain.getTextFormatUtil().replaceSymbols(content));
             holoRow.setOffset(offset);
             writeHoloRow(holoRow, position);
             holo.addRow(holoRow);
@@ -169,7 +171,7 @@ public class HoloService {
 
             gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET position = position + 1 WHERE holo_uuid = ? AND position >= ?", holo.getUuid().toString(), position);
 
-            GHoloRow holoRow = new GHoloRow(holo, gHoloMain.getFormatUtil().replaceSymbols(content));
+            GHoloRow holoRow = new GHoloRow(holo, gHoloMain.getTextFormatUtil().replaceSymbols(content));
             holoRow.setOffset(offset);
             writeHoloRow(holoRow, position);
             holo.insertRow(holoRow, position);
@@ -185,7 +187,7 @@ public class HoloService {
     public void updateHoloRowContent(GHoloRow holoRow, String content) {
         try {
             gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET content = ? WHERE position = ? AND holo_uuid = ?", content, holoRow.getPosition(), holoRow.getHolo().getUuid().toString());
-            holoRow.setContent(gHoloMain.getFormatUtil().replaceSymbols(content));
+            holoRow.setContent(gHoloMain.getTextFormatUtil().replaceSymbols(content));
             if(holoRow.getHoloRowContent() != null) holoRow.getHoloRowContent().publishUpdate(GHoloUpdateType.CONTENT);
             gHoloMain.getHoloAnimationService().updateSubscriptionStatus(holoRow);
         } catch(Throwable e) { e.printStackTrace(); }

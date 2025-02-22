@@ -9,11 +9,11 @@ import org.bukkit.entity.Player;
 import java.util.Collection;
 import java.util.Map;
 
-public class FormatUtil {
+public class TextFormatUtil {
 
     private final GHoloMain gHoloMain;
 
-    public FormatUtil(GHoloMain gHoloMain) {
+    public TextFormatUtil(GHoloMain gHoloMain) {
         this.gHoloMain = gHoloMain;
     }
 

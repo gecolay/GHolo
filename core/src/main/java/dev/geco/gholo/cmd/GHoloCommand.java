@@ -33,7 +33,7 @@ import java.util.UUID;
 
 public class GHoloCommand implements CommandExecutor {
 
-    public static List<String> COMMAND_LIST = List.of("help", "list", "near", "create", "info", "remove", "rename", "move", "tphere", "tp", "align", "addrow", "insertrow", "setrow", "removerow", "offsetrow", "copy", "option", "image", "import", "export");
+    public static List<String> SUBCOMMANDS = List.of("help", "list", "near", "create", "info", "remove", "rename", "move", "tphere", "tp", "align", "addrow", "insertrow", "setrow", "removerow", "offsetrow", "copy", "option", "image", "import", "export");
 
     private final GHoloMain gHoloMain;
 
@@ -53,11 +53,10 @@ public class GHoloCommand implements CommandExecutor {
             return true;
         }
 
-        GHolo holo;
         switch(args[0].toLowerCase()) {
             case "help" -> {
                 gHoloMain.getMessageService().sendMessage(sender, "HoloHelpCommand.header");
-                for(String helpRow : COMMAND_LIST) {
+                for(String helpRow : SUBCOMMANDS) {
                     gHoloMain.getMessageService().sendMessage(sender, "HoloHelpCommand." + helpRow.toLowerCase());
                 }
                 gHoloMain.getMessageService().sendMessage(sender, "HoloHelpCommand.footer");
@@ -129,7 +128,7 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-create-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo != null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-create-exist-error", "%Holo%", holo.getId());
                     break;
@@ -142,7 +141,7 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-info-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1]);
                     break;
@@ -165,7 +164,7 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-remove-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1]);
                     break;
@@ -178,7 +177,7 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-rename-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1]);
                     break;
@@ -197,14 +196,17 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-move-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1]);
                     break;
                 }
                 try {
                     SimpleLocation location = holo.getLocation();
-                    location.set(Double.parseDouble(args[2]), Double.parseDouble(args[3]), Double.parseDouble(args[4]));
+                    double x = gHoloMain.getLocationUtil().parseLocationInput(args[2], location.getX());
+                    double y = gHoloMain.getLocationUtil().parseLocationInput(args[3], location.getY());
+                    double z = gHoloMain.getLocationUtil().parseLocationInput(args[4], location.getZ());
+                    location.set(x, y, z);
                     gHoloMain.getHoloService().updateHoloLocation(holo, location);
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-move", "%Holo%", holo.getId());
                 } catch(NumberFormatException e) {
@@ -220,7 +222,7 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-tphere-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1]);
                     break;
@@ -237,7 +239,7 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-tp-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1]);
                     break;
@@ -253,7 +255,7 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-align-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1]);
                     break;
@@ -291,7 +293,7 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-addrow-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1]);
                     break;
@@ -309,7 +311,7 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-insertrow-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1]);
                     break;
@@ -336,7 +338,7 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-setrow-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1]);
                     break;
@@ -363,7 +365,7 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-removerow-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1]);
                     break;
@@ -381,11 +383,11 @@ public class GHoloCommand implements CommandExecutor {
                 }
             }
             case "offsetrow" -> {
-                if(args.length <= 4) {
+                if(args.length <= 5) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-offsetrow-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1]);
                     break;
@@ -398,29 +400,17 @@ public class GHoloCommand implements CommandExecutor {
                     }
                     try {
                         SimpleOffset offset = holoRow.getOffset();
-                        double applyOffset = Double.parseDouble(args[4]);
-                        String appliedOffset = "";
-                        String offsets = args[3].toLowerCase();
-                        if(offsets.contains("x")) {
-                            offset.setX(applyOffset);
-                            appliedOffset += "x";
-                        }
-                        if(offsets.contains("y")) {
-                            offset.setY(applyOffset);
-                            appliedOffset += "y";
-                        }
-                        if(offsets.contains("z")) {
-                            offset.setZ(applyOffset);
-                            appliedOffset += "z";
-                        }
-                        if(appliedOffset.isEmpty()) {
-                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-offsetrow-offset-error", "%Offset%", offsets);
-                            break;
-                        }
+                        offset.setX(args[3].equalsIgnoreCase("*") ? 0 : gHoloMain.getLocationUtil().parseLocationInput(args[3], offset.getX()));
+                        if(args[4].equalsIgnoreCase("*")) {
+                            double sizeBetweenRows = gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
+                            double rowOffset = sizeBetweenRows * holoRow.getPosition();
+                            offset.setY(-rowOffset);
+                        } else offset.setY(gHoloMain.getLocationUtil().parseLocationInput(args[4], offset.getY()));
+                        offset.setZ(args[5].equalsIgnoreCase("*") ? 0 : gHoloMain.getLocationUtil().parseLocationInput(args[5], offset.getZ()));
                         gHoloMain.getHoloService().updateHoloRowOffset(holoRow, offset);
-                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-offsetrow", "%Holo%", holo.getId(), "%Offset%", appliedOffset);
+                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-offsetrow", "%Holo%", holo.getId());
                     } catch(NumberFormatException e) {
-                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-offsetrow-value-error", "%Value%", args[4]);
+                        gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-offsetrow-offset-error");
                     }
                 } catch(NumberFormatException e) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Position%", args[2]);
@@ -431,7 +421,7 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-copy-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1]);
                     break;
@@ -448,7 +438,7 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1]);
                     break;
@@ -494,11 +484,13 @@ public class GHoloCommand implements CommandExecutor {
                     case "background_color" -> {
                         if(args[optionArg + 1].equalsIgnoreCase("*")) data.setBackgroundColor(GHoloData.DEFAULT_BACKGROUND_COLOR);
                         else {
-                            String backgroundColor = args[optionArg + 1];
-                            if(!backgroundColor.matches("^#?[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$")) {
+                            String backgroundColor = args[optionArg + 1].toLowerCase();
+                            if(backgroundColor.matches("^#?[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$") || backgroundColor.equalsIgnoreCase("transparent")) {
+                                data.setBackgroundColor(backgroundColor);
+                            } else {
                                 gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-value-error", "%Option%", args[optionArg], "%Value%", backgroundColor);
                                 return true;
-                            } else data.setBackgroundColor(backgroundColor);
+                            }
                         }
                         optionUpdateType = GHoloUpdateType.BACKGROUND_COLOR;
                     }
@@ -654,7 +646,7 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-image-use-error");
                     break;
                 }
-                holo = gHoloMain.getHoloService().getHolo(args[1]);
+                GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo == null) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-exist-error", "%Holo%", args[1]);
                     break;
