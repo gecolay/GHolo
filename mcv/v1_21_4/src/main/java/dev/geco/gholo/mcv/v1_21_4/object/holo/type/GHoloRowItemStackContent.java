@@ -102,7 +102,7 @@ public class GHoloRowItemStackContent extends ItemEntity implements IGHoloRowCon
         GHoloData rowData = holoRow.getRawData();
         GHoloData holoData = holoRow.getHolo().getRawData();
         switch(updateType) {
-            case LOCATION:
+            case LOCATION -> {
                 SimpleLocation location = holoRow.getHolo().getLocation();
                 SimpleOffset offset = holoRow.getRawOffset();
                 location.add(offset);
@@ -110,7 +110,7 @@ public class GHoloRowItemStackContent extends ItemEntity implements IGHoloRowCon
                 float yaw = rowData.getRotation().getYaw() != null ? rowData.getRotation().getYaw() : (holoData.getRotation().getYaw() != null ? holoData.getRotation().getYaw() : 0f);
                 float pitch = rowData.getRotation().getPitch() != null ? rowData.getRotation().getPitch() : (holoData.getRotation().getPitch() != null ? holoData.getRotation().getPitch() : 0f);
                 setRot(yaw, pitch);
-                break;
+            }
         }
     }
 

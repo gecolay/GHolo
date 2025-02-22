@@ -112,7 +112,7 @@ public class GHoloRowBlockContent extends Display.BlockDisplay implements IGHolo
         GHoloData rowData = holoRow.getRawData();
         GHoloData holoData = holoRow.getHolo().getRawData();
         switch(updateType) {
-            case LOCATION:
+            case LOCATION -> {
                 SimpleLocation location = holoRow.getHolo().getLocation();
                 SimpleOffset offset = holoRow.getRawOffset();
                 location.add(offset);
@@ -120,26 +120,28 @@ public class GHoloRowBlockContent extends Display.BlockDisplay implements IGHolo
                 float yaw = rowData.getRotation().getYaw() != null ? rowData.getRotation().getYaw() : (holoData.getRotation().getYaw() != null ? holoData.getRotation().getYaw() : 0f);
                 float pitch = rowData.getRotation().getPitch() != null ? rowData.getRotation().getPitch() : (holoData.getRotation().getPitch() != null ? holoData.getRotation().getPitch() : 0f);
                 setRot(yaw, pitch);
-                break;
-            case RANGE:
+            }
+            case RANGE -> {
                 double range = rowData.getRange() != GHoloData.DEFAULT_RANGE ? rowData.getRange() : (holoData.getRange() != GHoloData.DEFAULT_RANGE ? holoData.getRange() : GHoloData.DEFAULT_RANGE);
                 setViewRange((float) (range / 64));
-                break;
-            case BILLBOARD:
+            }
+            case BILLBOARD -> {
                 String billboard = !Objects.equals(rowData.getBillboard(), GHoloData.DEFAULT_BILLBOARD) ? rowData.getBillboard() : (!Objects.equals(holoData.getBillboard(), GHoloData.DEFAULT_BILLBOARD) ? holoData.getBillboard() : GHoloData.DEFAULT_BILLBOARD);
                 setBillboard(billboard);
-                break;
-            case SCALE:
+            }
+            case SCALE -> {
                 Vector3f scale = !Objects.equals(rowData.getRawScale(), GHoloData.DEFAULT_SCALE) ? rowData.getRawScale() : (!Objects.equals(holoData.getRawScale(), GHoloData.DEFAULT_SCALE) ? holoData.getRawScale() : GHoloData.DEFAULT_SCALE);
                 entityData.set(holoScaleData, scale);
-                break;
-            case BRIGHTNESS:
-                Byte brigthness = rowData.getBrightness() != GHoloData.DEFAULT_BRIGHTNESS ? rowData.getBrightness() : (holoData.getBrightness() != GHoloData.DEFAULT_BRIGHTNESS ? holoData.getBrightness() : GHoloData.DEFAULT_BRIGHTNESS);
-                setBrightnessOverride(brigthness != null ? new Brightness(brigthness, Brightness.FULL_BRIGHT.sky()) : null);
-            case SIZE:
+            }
+            case BRIGHTNESS -> {
+                Byte brightness = rowData.getBrightness() != GHoloData.DEFAULT_BRIGHTNESS ? rowData.getBrightness() : (holoData.getBrightness() != GHoloData.DEFAULT_BRIGHTNESS ? holoData.getBrightness() : GHoloData.DEFAULT_BRIGHTNESS);
+                setBrightnessOverride(brightness != null ? new Brightness(brightness, Brightness.FULL_BRIGHT.sky()) : null);
+            }
+            case SIZE -> {
                 SimpleSize size = !Objects.equals(rowData.getRawSize(), GHoloData.DEFAULT_SIZE) ? rowData.getRawSize() : (!Objects.equals(holoData.getRawSize(), GHoloData.DEFAULT_SIZE) ? holoData.getRawSize() : GHoloData.DEFAULT_SIZE);
                 setWidth(size.getWidth());
                 setHeight(size.getHeight());
+            }
         }
     }
 

@@ -52,12 +52,20 @@ public class GInteractionEntity extends Interaction implements IGInteractionEnti
 
     @Override
     public void loadInteraction(@NotNull Player player) {
-        ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-        if(!serverPlayer.level().equals(level())) return;
+        if(!player.getWorld().equals(interaction.getRawLocation().getWorld())) return;
         String permission = getPermission();
         if(permission != null && !gHoloMain.getPermissionService().hasPermission(player, permission)) return;
+        ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
         serverPlayer.connection.send(new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYHeadRot()));
         serverPlayer.connection.send(getDataPacket());
+    }
+
+    private ClientboundSetEntityDataPacket getDataPacket() {
+        List<SynchedEntityData.DataValue<?>> data = getEntityData().getNonDefaultValues();
+        if(data == null) data = new ArrayList<>();
+        List<SynchedEntityData.DataValue<?>> defaultResetData = getEntityData().packDirty();
+        if(defaultResetData != null) data.addAll(defaultResetData);
+        return new ClientboundSetEntityDataPacket(getId(), data);
     }
 
     @Override
@@ -81,18 +89,16 @@ public class GInteractionEntity extends Interaction implements IGInteractionEnti
     }
 
     private void handleUpdate(GInteractionUpdateType updateType) {
+        GInteractionData data = interaction.getRawData();
         switch(updateType) {
-            case LOCATION:
+            case LOCATION -> {
                 SimpleLocation location = interaction.getLocation();
                 setPos(location.getX(), location.getY(), location.getZ());
-                float yaw = interaction.getRotation().getYaw() != null ? interaction.getRotation().getYaw() : 0f;
-                float pitch = interaction.getRotation().getYaw() != null ? interaction.getRotation().getYaw() : 0f;
-                setRot(yaw, pitch);
-                break;
-            case SIZE:
-                setWidth(interaction.getRawSize().getWidth());
-                setHeight(interaction.getRawSize().getHeight());
-                break;
+            }
+            case SIZE -> {
+                setWidth(data.getRawSize().getWidth());
+                setHeight(data.getRawSize().getHeight());
+            }
         }
     }
 
@@ -109,14 +115,6 @@ public class GInteractionEntity extends Interaction implements IGInteractionEnti
     private String getPermission() {
         GInteractionData interactionData = interaction.getRawData();
         return interactionData.getPermission() != null ? interactionData.getPermission() : GInteractionData.DEFAULT_PERMISSION;
-    }
-
-    private ClientboundSetEntityDataPacket getDataPacket() {
-        List<SynchedEntityData.DataValue<?>> data = getEntityData().getNonDefaultValues();
-        if(data == null) data = new ArrayList<>();
-        List<SynchedEntityData.DataValue<?>> defaultResetData = getEntityData().packDirty();
-        if(defaultResetData != null) data.addAll(defaultResetData);
-        return new ClientboundSetEntityDataPacket(getId(), data);
     }
 
     @Override

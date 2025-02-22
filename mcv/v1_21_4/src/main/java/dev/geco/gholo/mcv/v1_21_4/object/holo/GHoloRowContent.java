@@ -56,36 +56,36 @@ public class GHoloRowContent implements IGHoloRowContent {
 
     private void updateContent(String content, Player player) {
         UUID playerUuid = player.getUniqueId();
-        IGHoloRowContentType contentType;
         String[] contentSplit = content.split(":", 2);
-        contentType = switch (contentSplit[0].toLowerCase()) {
+        IGHoloRowContentType contentType = switch(contentSplit[0].toLowerCase()) {
             case "entity" -> {
-                if (entityContent == null) entityContent = new GHoloRowEntityContent(holoRow, gHoloMain);
+                if(entityContent == null) entityContent = new GHoloRowEntityContent(holoRow, gHoloMain);
                 yield entityContent;
             }
             case "block" -> {
-                if (blockContent == null) blockContent = new GHoloRowBlockContent(holoRow, gHoloMain);
+                if(blockContent == null) blockContent = new GHoloRowBlockContent(holoRow, gHoloMain);
                 yield blockContent;
             }
             case "item" -> {
-                if (itemContent == null) itemContent = new GHoloRowItemContent(holoRow, gHoloMain);
+                if(itemContent == null) itemContent = new GHoloRowItemContent(holoRow, gHoloMain);
                 yield itemContent;
             }
             case "itemstack" -> {
-                if (itemStackContent == null) itemStackContent = new GHoloRowItemStackContent(holoRow, gHoloMain);
+                if(itemStackContent == null) itemStackContent = new GHoloRowItemStackContent(holoRow, gHoloMain);
                 yield itemStackContent;
             }
             default -> {
-                if (textContent == null) textContent = new GHoloRowTextContent(holoRow, gHoloMain);
+                if(textContent == null) textContent = new GHoloRowTextContent(holoRow, gHoloMain);
+                contentSplit[1] = content;
                 yield textContent;
             }
         };
         IGHoloRowContentType currentContentType = currentContentTypes.get(playerUuid);
         if(currentContentType != contentType) {
             if(currentContentType != null) currentContentType.unload(player);
-            contentType.load(player, contentType instanceof GHoloRowTextContent ? content : contentSplit[1], true);
+            contentType.load(player, contentSplit[1], true);
             currentContentTypes.put(playerUuid, contentType);
-        } else contentType.load(player, contentType instanceof GHoloRowTextContent ? content : contentSplit[1], false);
+        } else contentType.load(player, contentSplit[1], false);
     }
 
     @Override

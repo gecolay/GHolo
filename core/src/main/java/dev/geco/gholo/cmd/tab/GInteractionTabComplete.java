@@ -24,7 +24,7 @@ public class GInteractionTabComplete implements TabCompleter {
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         List<String> complete = new ArrayList<>(), completeStarted = new ArrayList<>();
 
-        List<String> interactionIdArg = new ArrayList<>(List.of("info", "remove", "rename", "move", "tphere", "tp", "align", "size", "addaction", "insertaction", "setaction", "removeaction", "copy", "option", "rotate"));
+        List<String> interactionIdArg = new ArrayList<>(List.of("info", "remove", "rename", "move", "tphere", "tp", "align", "addaction", "insertaction", "setaction", "removeaction", "copy", "option"));
         if(!(sender instanceof Player)) interactionIdArg.removeAll(List.of("tp", "tphere"));
 
         if(args.length == 1) {
@@ -54,9 +54,6 @@ public class GInteractionTabComplete implements TabCompleter {
             if(args[0].equalsIgnoreCase("align")) {
                 complete.addAll(gHoloMain.getInteractionService().getInteractions().stream().map(GInteraction::getId).filter(interactionId -> !interactionId.equalsIgnoreCase(args[1])).toList());
             }
-            if(args[0].equalsIgnoreCase("size")) {
-                complete.addAll(List.of("width", "height"));
-            }
             if(args[0].equalsIgnoreCase("addaction")) {
                 complete.addAll(gHoloMain.getInteractionActionService().getInteractionActions().keySet());
             }
@@ -65,10 +62,7 @@ public class GInteractionTabComplete implements TabCompleter {
                 if(interaction != null) for(int position = 1; position <= interaction.getActions().size(); position++) complete.add("" + position);
             }
             if(args[0].equalsIgnoreCase("option")) {
-                complete.addAll(List.of("permission"));
-            }
-            if(args[0].equalsIgnoreCase("rotate")) {
-                complete.addAll(List.of("yaw", "pitch"));
+                complete.addAll(List.of("permission", "size"));
             }
             if(!args[args.length - 1].isEmpty()) {
                 for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);
@@ -78,14 +72,23 @@ public class GInteractionTabComplete implements TabCompleter {
             if(args[0].equalsIgnoreCase("align")) {
                 complete.addAll(List.of("x", "y", "z", "xy", "xz", "yz", "xyz"));
             }
-            if(args[0].equalsIgnoreCase("size")) {
-                complete.add("*");
-            }
             if(args[0].equalsIgnoreCase("insertaction") || args[0].equalsIgnoreCase("setaction")) {
                 complete.addAll(gHoloMain.getInteractionActionService().getInteractionActions().keySet());
             }
-            if(args[0].equalsIgnoreCase("option") || args[0].equalsIgnoreCase("rotate")) {
-                complete.add("*");
+            if(args[0].equalsIgnoreCase("option")) {
+                if(args[3].equalsIgnoreCase("size")) {
+                    complete.addAll(List.of("width", "height"));
+                } else complete.add("*");
+            }
+            if(!args[args.length - 1].isEmpty()) {
+                for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);
+                complete.clear();
+            }
+        } else if(args.length == 5) {
+            if(args[0].equalsIgnoreCase("option")) {
+                if(args[3].equalsIgnoreCase("size")) {
+                    complete.add("*");
+                }
             }
             if(!args[args.length - 1].isEmpty()) {
                 for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);

@@ -6,11 +6,9 @@ import dev.geco.gholo.object.interaction.GInteractType;
 import dev.geco.gholo.object.interaction.GInteraction;
 import dev.geco.gholo.object.interaction.GInteractionAction;
 import dev.geco.gholo.object.interaction.GInteractionData;
-import dev.geco.gholo.object.simple.SimpleSize;
 import dev.geco.gholo.object.interaction.GInteractionUpdateType;
 import dev.geco.gholo.object.interaction.action.GInteractionActionType;
 import dev.geco.gholo.object.simple.SimpleLocation;
-import dev.geco.gholo.object.simple.SimpleRotation;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -44,8 +42,6 @@ public class InteractionService {
                     uuid TEXT,
                     id TEXT,
                     location TEXT,
-                    size TEXT,
-                    rotation TEXT,
                     data TEXT
                 );
             """);
@@ -79,12 +75,7 @@ public class InteractionService {
                         String id = resultSet.getString("id");
                         SimpleLocation location = SimpleLocation.fromString(resultSet.getString("location"));
                         if(location == null) throw new RuntimeException("Could not load interaction '" + id + "', invalid location");
-                        SimpleRotation rotation = SimpleRotation.fromString(resultSet.getString("rotation"));
-                        if(rotation == null) throw new RuntimeException("Could not load interaction '" + id + "', invalid rotation");
                         GInteraction interaction = new GInteraction(uuid, id, location);
-                        SimpleSize size = SimpleSize.fromString(resultSet.getString("size"));
-                        if(size == null) throw new RuntimeException("Could not load interaction '" + id + "', invalid size");
-                        interaction.setSize(size);
 
                         String dataString = resultSet.getString("data");
                         interaction.getRawData().loadString(dataString);
@@ -213,25 +204,6 @@ public class InteractionService {
         } catch(Throwable e) { e.printStackTrace(); }
     }
 
-    public void updateInteractionRotation(GInteraction interaction, SimpleRotation rotation) {
-        try {
-            gHoloMain.getDataService().execute("UPDATE gholo_interaction SET rotation = ? WHERE uuid = ?",
-                    rotation.toString(),
-                    interaction.getUuid().toString()
-            );
-            interaction.setRotation(rotation);
-            if(interaction.getInteractionEntity() != null) interaction.getInteractionEntity().publishUpdate(GInteractionUpdateType.LOCATION);
-        } catch(Throwable e) { e.printStackTrace(); }
-    }
-
-    public void updateInteractionSize(GInteraction interaction, SimpleSize size) {
-        try {
-            gHoloMain.getDataService().execute("UPDATE gholo_interaction SET size = ? WHERE uuid = ?", size.toString(), interaction.getUuid().toString());
-            interaction.setSize(size);
-            if(interaction.getInteractionEntity() != null) interaction.getInteractionEntity().publishUpdate(GInteractionUpdateType.SIZE);
-        } catch(Throwable e) { e.printStackTrace(); }
-    }
-
     public void updateInteractionData(GInteraction interaction, GInteractionData data) {
         try {
             gHoloMain.getDataService().execute("UPDATE gholo_interaction SET data = ? WHERE uuid = ?", data.toString(), interaction.getUuid().toString());
@@ -243,7 +215,6 @@ public class InteractionService {
         try {
             GInteraction newInteraction = new GInteraction(UUID.randomUUID(), interactionId, interaction.getLocation());
             newInteraction.setData(interaction.getData());
-            newInteraction.setRotation(interaction.getRotation());
             writeInteraction(newInteraction, false);
             interactions.add(newInteraction);
             for(GInteractionAction interactionAction : interaction.getActions()) {
@@ -279,12 +250,10 @@ public class InteractionService {
                 gHoloMain.getDataService().execute("DELETE FROM gholo_interaction_action WHERE interaction_uuid = ?", uuid);
             }
         }
-        gHoloMain.getDataService().execute("INSERT INTO gholo_interaction (uuid, id, location, size, rotation, data) VALUES (?, ?, ?, ?, ?, ?)",
+        gHoloMain.getDataService().execute("INSERT INTO gholo_interaction (uuid, id, location, data) VALUES (?, ?, ?, ?)",
                 interaction.getUuid().toString(),
                 interaction.getId(),
                 interaction.getRawLocation().toString(),
-                interaction.getSize().toString(),
-                interaction.getRotation().toString(),
                 interaction.getData().toString()
         );
     }
