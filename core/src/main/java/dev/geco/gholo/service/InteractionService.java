@@ -1,7 +1,7 @@
 package dev.geco.gholo.service;
 
 import dev.geco.gholo.GHoloMain;
-import dev.geco.gholo.api.event.GPlayerInteractionEvent;
+import dev.geco.gholo.api.event.GInteractionPlayerEvent;
 import dev.geco.gholo.object.interaction.GInteractType;
 import dev.geco.gholo.object.interaction.GInteraction;
 import dev.geco.gholo.object.interaction.GInteractionAction;
@@ -285,7 +285,7 @@ public class InteractionService {
             Long lastInteractionTime = lastInteractions.get(playerId);
             if(lastInteractionTime != null && (currentTime - lastInteractionTime) < INTERACTION_COOLDOWN_MILLIS) return;
             GInteractType interactType = mainHand ? (secondaryAction ? GInteractType.SHIFT_LEFT_CLICK : GInteractType.LEFT_CLICK) : (secondaryAction ? GInteractType.SHIFT_RIGHT_CLICK : GInteractType.RIGHT_CLICK);
-            GPlayerInteractionEvent interactionEvent = new GPlayerInteractionEvent(interaction, player, interactType);
+            GInteractionPlayerEvent interactionEvent = new GInteractionPlayerEvent(interaction, player, interactType);
             Bukkit.getPluginManager().callEvent(interactionEvent);
             if(!interactionEvent.isCancelled()) lastInteractions.put(playerId, currentTime);
         }, true);
