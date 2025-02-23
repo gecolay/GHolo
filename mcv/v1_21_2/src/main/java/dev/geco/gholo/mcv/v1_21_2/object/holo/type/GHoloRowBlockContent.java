@@ -4,6 +4,7 @@ import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.holo.GHoloData;
 import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.GHoloUpdateType;
+import dev.geco.gholo.object.holo.IGHoloRowContentType;
 import dev.geco.gholo.object.simple.SimpleLocation;
 import dev.geco.gholo.object.simple.SimpleOffset;
 import dev.geco.gholo.object.simple.SimpleSize;

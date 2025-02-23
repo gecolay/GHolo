@@ -310,6 +310,10 @@ public class HoloService {
 
     public void unloadHoloForPlayer(GHolo holo, Player player) { for(GHoloRow row : holo.getRows()) if(row.getHoloRowContent() != null) row.getHoloRowContent().unloadHoloRow(player); }
 
+    public void clearHolosCurrentContentForPlayer(Player player) { for(GHolo holo : holos) clearHoloCurrentContentForPlayer(holo, player); }
+
+    private void clearHoloCurrentContentForPlayer(GHolo holo, Player player) { for(GHoloRow row : holo.getRows()) if(row.getHoloRowContent() != null) row.getHoloRowContent().getCurrentContentTypes().remove(player.getUniqueId()); }
+
     public void unloadHolos() {
         for(GHolo holo : holos) {
             for(GHoloRow holoRow : holo.getRows()) gHoloMain.getHoloAnimationService().unsubscribe(holoRow);

@@ -10,7 +10,7 @@ import dev.geco.gholo.object.holo.GHoloData;
 import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.GHoloUpdateType;
 import dev.geco.gholo.object.holo.IGHoloRowContent;
-import dev.geco.gholo.mcv.v1_20_5.object.holo.type.IGHoloRowContentType;
+import dev.geco.gholo.object.holo.IGHoloRowContentType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -111,6 +111,9 @@ public class GHoloRowContent implements IGHoloRowContent {
         holoRowContentType.unload(player);
         currentContentTypes.remove(player.getUniqueId());
     }
+
+    @Override
+    public HashMap<UUID, IGHoloRowContentType> getCurrentContentTypes() { return currentContentTypes; }
 
     private String getPermission() {
         GHoloData rowData = holoRow.getRawData();

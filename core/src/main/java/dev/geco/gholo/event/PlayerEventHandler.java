@@ -35,6 +35,8 @@ public class PlayerEventHandler implements Listener {
     public void playerQuitEvent(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
+        gHoloMain.getHoloService().clearHolosCurrentContentForPlayer(player);
+
         gHoloMain.getPacketHandler().removePlayerPacketHandler(player);
         gHoloMain.getInteractionService().clearPlayerInteractions(player);
     }
@@ -42,6 +44,8 @@ public class PlayerEventHandler implements Listener {
     @EventHandler
     public void playerChangedWorldEvent(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
+
+        gHoloMain.getHoloService().clearHolosCurrentContentForPlayer(player);
 
         gHoloMain.getTaskService().runDelayed(() -> {
             gHoloMain.getHoloService().loadHolosForPlayer(player);
