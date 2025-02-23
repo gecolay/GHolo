@@ -26,7 +26,7 @@ public class HolographicDisplaysImporter extends GHoloImporter {
         int imported = 0;
 
         File contentFile = new File("plugins/HolographicDisplays/database.yml");
-        if(!contentFile.exists()) return new GHoloImporterResult(false, 0);
+        if(!contentFile.exists()) return new GHoloImporterResult(true, 0);
 
         FileConfiguration fileContent = YamlConfiguration.loadConfiguration(contentFile);
         for(String id : fileContent.getConfigurationSection("").getKeys(false)) {

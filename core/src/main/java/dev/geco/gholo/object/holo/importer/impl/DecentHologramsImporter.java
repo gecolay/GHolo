@@ -28,7 +28,7 @@ public class DecentHologramsImporter extends GHoloImporter {
         int imported = 0;
 
         File hologramsDir = new File("plugins/DecentHolograms/holograms");
-        if(!hologramsDir.exists()) return new GHoloImporterResult(false, 0);
+        if(!hologramsDir.exists()) return new GHoloImporterResult(true, 0);
 
         for(File file : hologramsDir.listFiles()) {
             try {

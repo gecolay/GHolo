@@ -29,11 +29,11 @@ public class FancyHologramsImporter extends GHoloImporter {
         int imported = 0;
 
         File contentFile = new File("plugins/FancyHolograms/holograms.yml");
-        if(!contentFile.exists()) return new GHoloImporterResult(false, 0);
+        if(!contentFile.exists()) return new GHoloImporterResult(true, 0);
 
         FileConfiguration fileContent = YamlConfiguration.loadConfiguration(contentFile);
         int version = fileContent.getInt("version");
-        if(version != 2) return new GHoloImporterResult(false, 0);
+        if(version != 2) return new GHoloImporterResult(true, 0);
 
         for(String id : fileContent.getConfigurationSection("holograms").getKeys(false)) {
             try {
