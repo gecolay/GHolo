@@ -167,7 +167,7 @@ public class GHoloTabComplete implements TabCompleter {
                         complete.add("*");
                     }
                 } else if(args[2].equalsIgnoreCase("row")) {
-                    if(args[3].equalsIgnoreCase("background_color")) {
+                    if(args[4].equalsIgnoreCase("background_color")) {
                         complete.addAll(List.of("transparent", "#000000", "#00000000", "000000", "00000000", "#ffffff", "#ffffffff", "ffffff", "ffffffff"));
                     } else if(args[4].equalsIgnoreCase("text_shadow") || args[4].equalsIgnoreCase("see_through")) {
                         complete.addAll(List.of("true", "false"));
