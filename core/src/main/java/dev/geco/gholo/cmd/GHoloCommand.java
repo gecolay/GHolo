@@ -376,7 +376,9 @@ public class GHoloCommand implements CommandExecutor {
                         gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Position%", args[2]);
                         break;
                     }
-                    gHoloMain.getHoloService().removeHoloRow(holoRow, true);
+                    boolean updateOffsets = true;
+                    if(args.length > 3) updateOffsets = Boolean.parseBoolean(args[3]);
+                    gHoloMain.getHoloService().removeHoloRow(holoRow, updateOffsets);
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-removerow", "%Holo%", holo.getId(), "%Position%", Integer.parseInt(args[2]));
                 } catch(NumberFormatException e) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Position%", args[2]);
@@ -704,7 +706,9 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import-exist-error", "%Type%", args[1]);
                     break;
                 }
-                GHoloImporterResult importerResult = holoImporter.importHolos(gHoloMain, true);
+                boolean override = true;
+                if(args.length > 2) override = Boolean.parseBoolean(args[2]);
+                GHoloImporterResult importerResult = holoImporter.importHolos(gHoloMain, override);
                 gHoloMain.getHoloService().unloadHolos();
                 gHoloMain.getHoloService().loadHolos();
                 if(!importerResult.hasSucceeded()) {
@@ -723,7 +727,9 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-export-exist-error", "%Type%", args[1]);
                     break;
                 }
-                GHoloExporterResult exporterResult = holoExporter.exportHolos(gHoloMain, true);
+                boolean override = true;
+                if(args.length > 2) override = Boolean.parseBoolean(args[2]);
+                GHoloExporterResult exporterResult = holoExporter.exportHolos(gHoloMain, override);
                 if(!exporterResult.hasSucceeded()) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-export-export-error", "%Type%", args[1]);
                     break;

@@ -481,7 +481,9 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-import-exist-error", "%Type%", args[1]);
                     break;
                 }
-                GInteractionImporterResult importerResult = interactionImporter.importInteractions(gHoloMain, true);
+                boolean override = true;
+                if(args.length > 2) override = Boolean.parseBoolean(args[2]);
+                GInteractionImporterResult importerResult = interactionImporter.importInteractions(gHoloMain, override);
                 gHoloMain.getInteractionService().unloadInteractions();
                 gHoloMain.getInteractionService().loadInteractions();
                 if(!importerResult.hasSucceeded()) {
@@ -500,7 +502,9 @@ public class GInteractionCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-export-exist-error", "%Type%", args[1]);
                     break;
                 }
-                GInteractionExporterResult exporterResult = interactionExporter.exportInteractions(gHoloMain, true);
+                boolean override = true;
+                if(args.length > 2) override = Boolean.parseBoolean(args[2]);
+                GInteractionExporterResult exporterResult = interactionExporter.exportInteractions(gHoloMain, override);
                 if(!exporterResult.hasSucceeded()) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-export-export-error", "%Type%", args[1]);
                     break;

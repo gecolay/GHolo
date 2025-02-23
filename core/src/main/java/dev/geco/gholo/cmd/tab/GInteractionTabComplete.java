@@ -63,6 +63,8 @@ public class GInteractionTabComplete implements TabCompleter {
                 if(interaction != null) for(int position = 1; position <= interaction.getActions().size(); position++) complete.add("" + position);
             } else if(args[0].equalsIgnoreCase("option")) {
                 complete.addAll(List.of("permission", "size"));
+            } else if(args[0].equalsIgnoreCase("import") || args[0].equalsIgnoreCase("export")) {
+                complete.addAll(List.of("true", "false"));
             }
             if(!args[args.length - 1].isEmpty()) {
                 for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);

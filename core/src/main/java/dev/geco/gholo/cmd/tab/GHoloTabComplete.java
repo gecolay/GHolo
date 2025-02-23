@@ -71,6 +71,8 @@ public class GHoloTabComplete implements TabCompleter {
                 complete.addAll(List.of("holo", "row"));
             } else if(args[0].equalsIgnoreCase("image")) {
                 complete.addAll(ImageUtil.IMAGE_TYPES);
+            } else if(args[0].equalsIgnoreCase("import") || args[0].equalsIgnoreCase("export")) {
+                complete.addAll(List.of("true", "false"));
             }
             if(!args[args.length - 1].isEmpty()) {
                 for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);
@@ -89,6 +91,8 @@ public class GHoloTabComplete implements TabCompleter {
                         complete.add(holo.getRow(Integer.parseInt(args[2]) - 1).getContent());
                     } catch(Throwable ignored) { }
                 }
+            } else if(args[0].equalsIgnoreCase("removerow")) {
+                complete.addAll(List.of("true", "false"));
             } else if(args[0].equalsIgnoreCase("offsetrow")) {
                 GHolo holo = gHoloMain.getHoloService().getHolo(args[1]);
                 if(holo != null) {
