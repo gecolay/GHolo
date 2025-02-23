@@ -43,6 +43,8 @@ public class DataService {
         return reconnect();
     }
 
+    public String getType() { return type; }
+
     public boolean isConnected() {
         try {
             if(connection != null && !connection.isClosed()) return true;
@@ -71,13 +73,11 @@ public class DataService {
     }
 
     private Connection getConnection(boolean withDatabase) throws SQLException {
-        switch(type) {
-            case "mysql":
-                return DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + (withDatabase ? "/" + database : ""), user, password);
-            case "sqlite":
-                return DriverManager.getConnection("jdbc:sqlite:" + new File(gHoloMain.getDataFolder(), "data/data.db").getPath());
-        }
-        return null;
+        return switch (type) {
+            case "mysql" -> DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + (withDatabase ? "/" + database : ""), user, password);
+            case "sqlite" -> DriverManager.getConnection("jdbc:sqlite:" + new File(gHoloMain.getDataFolder(), "data/data.db").getPath());
+            default -> null;
+        };
     }
 
     public void execute(String query, Object... parameters) throws SQLException {

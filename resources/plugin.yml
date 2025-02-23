@@ -6,7 +6,7 @@ website: https://www.spigotmc.org/resources/121144
 main: ${main}
 api-version: 1.19
 folia-supported: true
-softdepend: [PlaceholderAPI]
+softdepend: [Multiverse-Core, PlaceholderAPI]
 
 commands:
 
@@ -15,6 +15,14 @@ commands:
     usage: /<command>
     aliases: [holo]
     description: Holo command
+    permission: GHolo.Holo
+
+  ginteraction:
+
+    usage: /<command>
+    aliases: [interaction]
+    description: Interaction command
+    permission: GHolo.Interaction
 
   gholoreload:
 
@@ -30,12 +38,17 @@ permissions:
     description: GHolo | Permissions
     children:
       GHolo.Holo: true
+      GHolo.Interaction: true
       GHolo.Update: true
       GHolo.Reload: true
 
   GHolo.Holo:
     default: op
     description: Holo command | Permission
+
+  GHolo.Interaction:
+    default: op
+    description: Interaction command | Permission
 
   GHolo.Update:
     default: op

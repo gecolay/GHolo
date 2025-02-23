@@ -16,20 +16,18 @@ public class VersionService {
         VERSION_MAPPING.put("v1_21_1", "v1_21");
         VERSION_MAPPING.put("v1_21_3", "v1_21_2");
     }
-    private final GHoloMain gHoloMain;
     private final String serverVersion;
     private String packagePath;
     private boolean available;
 
     public VersionService(GHoloMain gHoloMain) {
-        this.gHoloMain = gHoloMain;
         String rawServerVersion = Bukkit.getServer().getBukkitVersion();
         serverVersion = rawServerVersion.substring(0, rawServerVersion.indexOf('-'));
         packagePath = gHoloMain.getClass().getPackage().getName() + ".mcv." + getPackageVersion();
-        available = hasPackageClass("object.GHoloRowEntity");
+        available = hasPackageClass("util.EntityUtil");
         if(available) return;
         packagePath = gHoloMain.getClass().getPackage().getName() + ".mcv." + LATEST_VERSION;
-        available = hasPackageClass("object.GHoloRowEntity");
+        available = hasPackageClass("util.EntityUtil");
     }
 
     public String getServerVersion() { return serverVersion; }
