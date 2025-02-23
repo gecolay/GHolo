@@ -1,9 +1,12 @@
 package dev.geco.gholo.object.simple;
 
+import dev.geco.gholo.GHoloMain;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+
+import java.util.logging.Level;
 
 public class SimpleOffset implements Cloneable {
 
@@ -55,7 +58,7 @@ public class SimpleOffset implements Cloneable {
             double y = data.get("y") != null ? ((Number) data.get("y")).doubleValue() : 0;
             double z = data.get("z") != null ? ((Number) data.get("z")).doubleValue() : 0;
             return new SimpleOffset(x, y, z);
-        } catch(Throwable ignored) { }
+        } catch(Throwable e) { GHoloMain.getInstance().getLogger().log(Level.SEVERE, "Could not load offset data!", e); }
         return null;
     }
 

@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Level;
 
 public class GHoloRowItemContent extends Display.ItemDisplay implements IGHoloRowContentType {
 
@@ -56,7 +57,7 @@ public class GHoloRowItemContent extends Display.ItemDisplay implements IGHoloRo
             Field field = fieldList.getFirst();
             field.setAccessible(true);
             itemAccessor = (EntityDataAccessor<ItemStack>) field.get(this);
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not load field", e); }
         holoItemData = itemAccessor;
         EntityDataAccessor<Vector3f> scaleAccessor = null;
         try {
@@ -65,7 +66,7 @@ public class GHoloRowItemContent extends Display.ItemDisplay implements IGHoloRo
             Field field = fieldList.get(4);
             field.setAccessible(true);
             scaleAccessor = (EntityDataAccessor<Vector3f>) field.get(this);
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not load field", e); }
         holoScaleData = scaleAccessor;
         for(GHoloUpdateType updateType : GHoloUpdateType.values()) handleUpdate(updateType);
     }

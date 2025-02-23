@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 public class GHoloRowItemStackContent extends ItemEntity implements IGHoloRowContentType {
 
@@ -51,7 +52,7 @@ public class GHoloRowItemStackContent extends ItemEntity implements IGHoloRowCon
             Field field = fieldList.get(0);
             field.setAccessible(true);
             itemAccessor = (EntityDataAccessor<ItemStack>) field.get(this);
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not load field", e); }
         holoItemData = itemAccessor;
         for(GHoloUpdateType updateType : GHoloUpdateType.values()) handleUpdate(updateType);
     }

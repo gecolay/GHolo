@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
 
 public class HoloAnimationService {
 
@@ -39,11 +40,16 @@ public class HoloAnimationService {
         FileConfiguration animationsData = YamlConfiguration.loadConfiguration(animationsFile);
         try {
             for(String id : animationsData.getConfigurationSection("Animations").getKeys(false)) {
-                animations.put(id.toLowerCase(), new GHoloAnimation(id.toLowerCase(), animationsData.getLong("Animations." + id + ".ticks", 20), animationsData.getStringList("Animations." + id + ".content")));
+                long ticks = animationsData.getLong("Animations." + id + ".ticks");
+                if(ticks <= 0) {
+                    gHoloMain.getLogger().warning("Could not load animation '" + id + "', ticks must be greater than 0!");
+                    continue;
+                }
+                animations.put(id.toLowerCase(), new GHoloAnimation(id.toLowerCase(), ticks, animationsData.getStringList("Animations." + id + ".content")));
                 animationSubscriber.put(id.toLowerCase(), new ConcurrentLinkedQueue<>());
             }
             startHoloAnimations();
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not load animations!", e); }
     }
 
     public void updateSubscriptionStatus(GHoloRow holoRow) {

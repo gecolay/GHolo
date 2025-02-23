@@ -1,9 +1,12 @@
 package dev.geco.gholo.object.simple;
 
+import dev.geco.gholo.GHoloMain;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+
+import java.util.logging.Level;
 
 public class SimpleRotation implements Cloneable {
 
@@ -44,7 +47,7 @@ public class SimpleRotation implements Cloneable {
             Float yaw = data.get("yaw") != null ? ((Number) data.get("yaw")).floatValue() : null;
             Float pitch = data.get("pitch") != null ? ((Number) data.get("pitch")).floatValue() : null;
             return new SimpleRotation(yaw, pitch);
-        } catch(Throwable ignored) { }
+        } catch(Throwable e) { GHoloMain.getInstance().getLogger().log(Level.SEVERE, "Could not load rotation data!", e); }
         return null;
     }
 

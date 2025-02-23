@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class HolographicDisplaysImporter extends GHoloImporter {
 
@@ -61,7 +62,7 @@ public class HolographicDisplaysImporter extends GHoloImporter {
                 }
 
                 imported++;
-            } catch(Throwable e) { e.printStackTrace(); }
+            } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not import holo '" + id + "'!", e); }
         }
 
         return new GHoloImporterResult(true, imported);

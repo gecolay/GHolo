@@ -1,5 +1,6 @@
 package dev.geco.gholo.object.holo;
 
+import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.simple.SimpleRotation;
 import dev.geco.gholo.object.simple.SimpleSize;
 import org.jetbrains.annotations.NotNull;
@@ -9,6 +10,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.util.Objects;
+import java.util.logging.Level;
 
 public class GHoloData implements Cloneable {
 
@@ -194,7 +196,7 @@ public class GHoloData implements Cloneable {
                 float height = sizeData.get("height") != null ? ((Number) sizeData.get("height")).floatValue() : DEFAULT_SIZE.getWidth();
                 size = new SimpleSize(width, height);
             }
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { GHoloMain.getInstance().getLogger().log(Level.SEVERE, "Could not load holo data!", e); }
         return this;
     }
 

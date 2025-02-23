@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,7 +64,7 @@ abstract public class MessageService {
                     lang.save(langFile);
                 } else if(!langFile.exists()) gHoloMain.saveResource(jarEntry.getName(), false);
             }
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not load messages!", e); }
         File langFolder = new File(gHoloMain.getDataFolder(), "lang");
         for(File langFile : Objects.requireNonNull(langFolder.listFiles())) messages.put(langFile.getName().replaceFirst("lang/", "").replaceFirst(".yml", ""), YamlConfiguration.loadConfiguration(langFile));
         defaultLanguage = messages.containsKey(gHoloMain.getConfigService().L_LANG) ? gHoloMain.getConfigService().L_LANG : "en_us";

@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class DecentHologramsImporter extends GHoloImporter {
 
@@ -31,8 +32,8 @@ public class DecentHologramsImporter extends GHoloImporter {
         if(!hologramsDir.exists()) return new GHoloImporterResult(true, 0);
 
         for(File file : hologramsDir.listFiles()) {
+            String id = file.getName().replace(" ", "").replace(".yml", "");
             try {
-                String id = file.getName().replace(" ", "").replace(".yml", "");
                 if(!override && gHoloMain.getHoloService().getHolo(id) != null) continue;
 
                 FileConfiguration fileContent = YamlConfiguration.loadConfiguration(file);
@@ -66,7 +67,7 @@ public class DecentHologramsImporter extends GHoloImporter {
                 for(GHoloRow row : holo.getRows()) gHoloMain.getHoloService().writeHoloRow(row, row.getPosition());
 
                 imported++;
-            } catch(Throwable e) { e.printStackTrace(); }
+            } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not import holo '" + id + "'!", e); }
         }
 
         return new GHoloImporterResult(true, imported);

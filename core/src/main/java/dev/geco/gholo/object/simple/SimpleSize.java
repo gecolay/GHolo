@@ -1,9 +1,12 @@
 package dev.geco.gholo.object.simple;
 
+import dev.geco.gholo.GHoloMain;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+
+import java.util.logging.Level;
 
 public class SimpleSize implements Cloneable {
 
@@ -44,7 +47,7 @@ public class SimpleSize implements Cloneable {
             float width = ((Number) data.get("width")).floatValue();
             float height = ((Number) data.get("height")).floatValue();
             return new SimpleSize(width, height);
-        } catch(Throwable ignored) { }
+        } catch(Throwable e) { GHoloMain.getInstance().getLogger().log(Level.SEVERE, "Could not load size data!", e); }
         return null;
     }
 

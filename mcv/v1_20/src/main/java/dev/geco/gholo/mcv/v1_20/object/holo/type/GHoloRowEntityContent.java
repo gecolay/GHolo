@@ -120,12 +120,12 @@ public class GHoloRowEntityContent extends Entity implements IGHoloRowContentTyp
     }
 
     @Override
-    protected void defineSynchedData() {}
+    protected void defineSynchedData() { }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag compoundTag) {}
+    protected void readAdditionalSaveData(CompoundTag compoundTag) { }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag compoundTag) {}
+    protected void addAdditionalSaveData(CompoundTag compoundTag) { }
 
 }

@@ -18,6 +18,7 @@ import org.joml.Vector3f;
 import java.io.File;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class FancyHologramsImporter extends GHoloImporter {
 
@@ -98,7 +99,7 @@ public class FancyHologramsImporter extends GHoloImporter {
                 }
 
                 imported++;
-            } catch(Throwable e) { e.printStackTrace(); }
+            } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not import holo '" + id + "'!", e); }
         }
 
         return new GHoloImporterResult(true, imported);

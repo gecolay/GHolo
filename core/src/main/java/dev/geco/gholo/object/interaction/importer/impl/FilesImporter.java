@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class FilesImporter extends GInteractionImporter {
 
@@ -33,8 +34,8 @@ public class FilesImporter extends GInteractionImporter {
         if(!interactionFileDir.exists()) return new GInteractionImporterResult(false, 0);
 
         for(File file : interactionFileDir.listFiles()) {
+            String id = file.getName().replace(" ", "").replace(".yml", "");
             try {
-                String id = file.getName().replace(" ", "").replace(".yml", "");
                 if(!override && gHoloMain.getInteractionService().getInteraction(id) != null) continue;
 
                 FileConfiguration fileContent = YamlConfiguration.loadConfiguration(file);
@@ -74,7 +75,7 @@ public class FilesImporter extends GInteractionImporter {
                 for(GInteractionAction action : interaction.getActions()) gHoloMain.getInteractionService().writeInteractionAction(action, action.getPosition());
 
                 imported++;
-            } catch(Throwable e) { e.printStackTrace(); }
+            } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not import holo '" + id + "'!", e); }
         }
 
         return new GInteractionImporterResult(true, imported);

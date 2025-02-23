@@ -6,6 +6,8 @@ import dev.geco.gholo.GHoloMain;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.logging.Level;
+
 public class ServerConnectUtil {
 
     private final GHoloMain gHoloMain;
@@ -26,7 +28,7 @@ public class ServerConnectUtil {
             out.writeUTF(server);
             player.sendPluginMessage(gHoloMain, BUNGEE_CORD_CHANNEL, out.toByteArray());
             return true;
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not send player '" + player.getName() + "' to server '" + server + "'!", e); }
         return false;
     }
 

@@ -54,7 +54,7 @@ public class InteractionService {
                     parameter TEXT
                 );
             """);
-        } catch(SQLException e) { e.printStackTrace(); }
+        } catch(SQLException e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not create interaction database tables!", e); }
     }
 
     public List<GInteraction> getInteractions() { return new ArrayList<>(interactions); }
@@ -75,7 +75,7 @@ public class InteractionService {
             gHoloMain.getEntityUtil().createInteractionEntity(interaction);
             interactionMap.put(interaction.getInteractionEntity().getId(), interaction);
             return interaction;
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(SQLException e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not create interaction '" + interactionId + "'!", e); }
         return null;
     }
 
@@ -88,7 +88,7 @@ public class InteractionService {
             interaction.addAction(interactionAction);
 
             return interactionAction;
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(SQLException e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not create interaction action for interaction '" + interaction.getId() + "'!", e); }
         return null;
     }
 
@@ -101,7 +101,7 @@ public class InteractionService {
             interaction.insertAction(interactionAction, position);
 
             return interactionAction;
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(SQLException e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not insert interaction action for interaction '" + interaction.getId() + "'!", e); }
         return null;
     }
 
@@ -110,7 +110,7 @@ public class InteractionService {
             gHoloMain.getDataService().execute("UPDATE gholo_interaction_action SET type = ?, parameter = ? WHERE interaction_uuid = ? AND position = ?", interactionActionType.getType(), parameter, interactionAction.getInteraction().getUuid().toString(), interactionAction.getPosition());
             interactionAction.setInteractionActionType(interactionActionType);
             interactionAction.setParameter(parameter);
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(SQLException e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not update interaction action type / parameter of interaction '" + interactionAction.getInteraction().getId() + "'!", e); }
     }
 
     public void removeInteractionAction(GInteractionAction interactionAction) {
@@ -120,14 +120,14 @@ public class InteractionService {
             gHoloMain.getDataService().execute("DELETE FROM gholo_interaction_action where interaction_uuid = ? AND position = ?", interaction.getUuid().toString(), position);
             gHoloMain.getDataService().execute("UPDATE gholo_interaction_action SET position = position - 1 WHERE interaction_uuid = ? AND position > ?", interaction.getUuid().toString(), position);
             interaction.removeAction(position);
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(SQLException e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not remove interaction action of interaction '" + interactionAction.getInteraction().getId() + "'!", e); }
     }
 
     public void updateInteractionId(GInteraction interaction, String interactionId) {
         try {
             gHoloMain.getDataService().execute("UPDATE gholo_interaction SET id = ? WHERE uuid = ?", interactionId, interaction.getUuid().toString());
             interaction.setId(interactionId);
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(SQLException e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not rename interaction '" + interaction.getId() + "' to '" + interactionId + "'!", e); }
     }
 
     public void updateInteractionLocation(GInteraction interaction, SimpleLocation location) {
@@ -144,14 +144,14 @@ public class InteractionService {
             }
             interaction.setLocation(location);
             if(interaction.getInteractionEntity() != null) interaction.getInteractionEntity().publishUpdate(GInteractionUpdateType.LOCATION);
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(SQLException e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not update interaction location of interaction '" + interaction.getId() + "'!", e); }
     }
 
     public void updateInteractionData(GInteraction interaction, GInteractionData data) {
         try {
             gHoloMain.getDataService().execute("UPDATE gholo_interaction SET data = ? WHERE uuid = ?", data.toString(), interaction.getUuid().toString());
             interaction.setData(data);
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(SQLException e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not update interaction data of interaction '" + interaction.getId() + "'!", e); }
     }
 
     public void copyInteraction(GInteraction interaction, String interactionId) {
@@ -165,7 +165,7 @@ public class InteractionService {
                 writeInteractionAction(newInteractionAction, interactionAction.getPosition());
                 newInteraction.addAction(newInteractionAction);
             }
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(SQLException e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not copy interaction '" + interaction.getId() + "' to '" + interactionId + "'!", e); }
     }
 
     public void removeInteraction(GInteraction interaction) {
@@ -176,19 +176,19 @@ public class InteractionService {
             unloadInteraction(interaction);
             interactionMap.remove(interaction.getInteractionEntity().getId());
             lastInteractionMap.remove(interaction.getInteractionEntity().getId());
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(SQLException e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not remove interaction '" + interaction.getId() + "'!", e); }
     }
 
     public void loadInteractions() {
         try {
             try(ResultSet resultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_interaction")) {
                 interactionwhile: while(resultSet.next()) {
+                    String id = resultSet.getString("id");
                     try {
                         UUID uuid = UUID.fromString(resultSet.getString("uuid"));
-                        String id = resultSet.getString("id");
                         SimpleLocation location = SimpleLocation.fromString(resultSet.getString("location"));
                         if(location == null) {
-                            gHoloMain.getLogger().log(Level.WARNING, "Could not load interaction '" + id + "', invalid location!");
+                            gHoloMain.getLogger().warning("Could not load interaction '" + id + "', invalid location!");
                             continue;
                         }
                         GInteraction interaction = new GInteraction(uuid, id, location);
@@ -204,7 +204,7 @@ public class InteractionService {
                                 String type = rowResultSet.getString("type");
                                 GInteractionActionType interactionActionType = gHoloMain.getInteractionActionService().getInteractionAction(type);
                                 if(interactionActionType == null) {
-                                    gHoloMain.getLogger().log(Level.WARNING, "Could not load interaction action '" + position + "' of interaction '" + id + "', invalid type!");
+                                    gHoloMain.getLogger().warning("Could not load interaction action '" + position + "' of interaction '" + id + "', invalid type!");
                                     continue interactionwhile;
                                 }
                                 String parameter = rowResultSet.getString("parameter");
@@ -222,10 +222,10 @@ public class InteractionService {
                         interactions.add(interaction);
                         gHoloMain.getEntityUtil().createInteractionEntity(interaction);
                         interactionMap.put(interaction.getInteractionEntity().getId(), interaction);
-                    } catch(Throwable e) { e.printStackTrace(); }
+                    } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not load interaction '" + id + "'!", e); }
                 }
             }
-        } catch(SQLException e) { e.printStackTrace(); }
+        } catch(SQLException e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not load interactions!", e); }
     }
 
     public void loadInteractionsForPlayer(Player player) { for(GInteraction interaction : interactions) loadInteractionForPlayer(interaction, player); }

@@ -1,5 +1,6 @@
 package dev.geco.gholo.object.simple;
 
+import dev.geco.gholo.GHoloMain;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -7,6 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+
+import java.util.logging.Level;
 
 public class SimpleLocation extends Location {
 
@@ -34,12 +37,12 @@ public class SimpleLocation extends Location {
         try {
             JSONObject data = (JSONObject) parser.parse(string);
             World world = Bukkit.getWorld((String) data.get("world"));
-            if(world == null) throw new IllegalArgumentException("World '" + data.get("world") + "' does not exist!");
+            if(world == null) return null;
             double x = ((Number) data.get("x")).doubleValue();
             double y = ((Number) data.get("y")).doubleValue();
             double z = ((Number) data.get("z")).doubleValue();
             return new SimpleLocation(world, x, y, z);
-        } catch(Throwable ignored) { }
+        } catch(Throwable e) { GHoloMain.getInstance().getLogger().log(Level.SEVERE, "Could not load location data!", e); }
         return null;
     }
 

@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
 
 public class FilesExporter extends GInteractionExporter {
 
@@ -38,7 +39,7 @@ public class FilesExporter extends GInteractionExporter {
                 File interactionFile = new File(interactionFileDir.getPath(), interaction.getId() + ".yml");
                 if(!override && interactionFile.exists()) continue;
                 getInteractionFileStructure(interaction).save(interactionFile);
-            } catch(Throwable e) { e.printStackTrace(); }
+            } catch(Throwable e) { gHoloMain.getLogger().log(Level.WARNING, "Could not export interaction '" + interaction.getId() + "'!", e); }
         }
 
         return new GInteractionExporterResult(true, exported);

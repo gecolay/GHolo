@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
 
 public class FilesExporter extends GHoloExporter {
 
@@ -39,7 +40,7 @@ public class FilesExporter extends GHoloExporter {
                 File holoFile = new File(holoFileDir.getPath(), holo.getId() + ".yml");
                 if(!override && holoFile.exists()) continue;
                 getHoloFileStructure(holo).save(holoFile);
-            } catch(Throwable e) { e.printStackTrace(); }
+            } catch(Throwable e) { gHoloMain.getLogger().log(Level.WARNING, "Could not export holo '" + holo.getId() + "'!", e); }
         }
 
         return new GHoloExporterResult(true, exported);

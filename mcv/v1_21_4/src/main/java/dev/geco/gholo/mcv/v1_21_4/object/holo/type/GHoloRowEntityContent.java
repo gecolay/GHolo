@@ -126,15 +126,15 @@ public class GHoloRowEntityContent extends Entity implements IGHoloRowContentTyp
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {}
+    protected void defineSynchedData(SynchedEntityData.Builder builder) { }
 
     @Override
     public boolean hurtServer(ServerLevel serverLevel, DamageSource damageSource, float value) { return false; }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag compoundTag) {}
+    protected void readAdditionalSaveData(CompoundTag compoundTag) { }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag compoundTag) {}
+    protected void addAdditionalSaveData(CompoundTag compoundTag) { }
 
 }

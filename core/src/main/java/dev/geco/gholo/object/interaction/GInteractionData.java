@@ -1,5 +1,6 @@
 package dev.geco.gholo.object.interaction;
 
+import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.simple.SimpleSize;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -7,6 +8,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.util.Objects;
+import java.util.logging.Level;
 
 public class GInteractionData implements Cloneable {
 
@@ -56,7 +58,7 @@ public class GInteractionData implements Cloneable {
                 float height = sizeData.get("height") != null ? ((Number) sizeData.get("height")).floatValue() : DEFAULT_SIZE.getWidth();
                 size = new SimpleSize(width, height);
             }
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { GHoloMain.getInstance().getLogger().log(Level.SEVERE, "Could not load interaction data!", e); }
         return this;
     }
 
