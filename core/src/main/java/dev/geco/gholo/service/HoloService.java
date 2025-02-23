@@ -295,7 +295,7 @@ public class HoloService {
                     } catch(Throwable e) { e.printStackTrace(); }
                 }
             }
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(SQLException e) { e.printStackTrace(); }
     }
 
     public void loadHolosForPlayer(Player player) { for(GHolo holo : holos) loadHoloForPlayer(holo, player); }

@@ -29,14 +29,14 @@ public class MigrationV1Importer extends GHoloImporter {
         int imported = 0;
 
         try {
-            ResultSet migrateTableSet = gHoloMain.getDataService().executeAndGet("""
+            ResultSet migrateTableSet = gHoloMain.getDataService().executeAndGet(gHoloMain.getDataService().getType().equalsIgnoreCase("sqlite") ? """
                         SELECT name
                         FROM sqlite_master
                         WHERE type='table' AND name='holo'
-                        UNION ALL
+                    """ : """
                         SELECT table_name
                         FROM information_schema.tables
-                        WHERE table_schema = DATABASE() AND table_name = 'holo';
+                        WHERE table_schema = DATABASE() AND table_name = 'holo'
                     """);
 
             if(!migrateTableSet.next()) return new GHoloImporterResult(true, imported);
@@ -105,9 +105,12 @@ public class MigrationV1Importer extends GHoloImporter {
                 }
             }
 
+            gHoloMain.getDataService().close();
+            gHoloMain.getDataService().connect();
+
             gHoloMain.getDataService().execute("DROP TABLE holo");
             gHoloMain.getDataService().execute("DROP TABLE holo_row");
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(SQLException e) { e.printStackTrace(); }
 
         return new GHoloImporterResult(true, imported);
     }

@@ -219,7 +219,7 @@ public class InteractionService {
                     } catch(Throwable e) { e.printStackTrace(); }
                 }
             }
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(SQLException e) { e.printStackTrace(); }
     }
 
     public void loadInteractionsForPlayer(Player player) { for(GInteraction interaction : interactions) loadInteractionForPlayer(interaction, player); }
