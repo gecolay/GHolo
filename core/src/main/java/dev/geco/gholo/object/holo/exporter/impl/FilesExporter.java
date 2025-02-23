@@ -21,8 +21,6 @@ import java.util.Objects;
 
 public class FilesExporter extends GHoloExporter {
 
-    private final String FILE_FORMAT = ".yml";
-
     @Override
     public @NotNull String getType() { return "files"; }
 
@@ -38,7 +36,7 @@ public class FilesExporter extends GHoloExporter {
 
         for(GHolo holo : holos) {
             try {
-                File holoFile = new File(holoFileDir.getPath(), holo.getId() + FILE_FORMAT);
+                File holoFile = new File(holoFileDir.getPath(), holo.getId() + ".yml");
                 if(!override && holoFile.exists()) continue;
                 getHoloFileStructure(holo).save(holoFile);
             } catch(Throwable e) { e.printStackTrace(); }

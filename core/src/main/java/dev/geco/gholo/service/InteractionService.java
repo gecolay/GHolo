@@ -66,60 +66,6 @@ public class InteractionService {
 
     public int getInteractionActionCount() { return interactions.stream().mapToInt(interaction -> interaction.getActions().size()).sum(); }
 
-    public void loadInteractions() {
-        try {
-            try(ResultSet resultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_interaction")) {
-                while(resultSet.next()) {
-                    try {
-                        UUID uuid = UUID.fromString(resultSet.getString("uuid"));
-                        String id = resultSet.getString("id");
-                        SimpleLocation location = SimpleLocation.fromString(resultSet.getString("location"));
-                        if(location == null) throw new RuntimeException("Could not load interaction '" + id + "', invalid location");
-                        GInteraction interaction = new GInteraction(uuid, id, location);
-
-                        String dataString = resultSet.getString("data");
-                        interaction.getRawData().loadString(dataString);
-
-                        interactions.add(interaction);
-
-                        try(ResultSet rowResultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_interaction_action where interaction_uuid = ?", uuid.toString())) {
-                            TreeMap<Integer, GInteractionAction> interactionActionMap = new TreeMap<>();
-
-                            while(rowResultSet.next()) {
-                                int position = rowResultSet.getInt("position");
-                                String type = rowResultSet.getString("type");
-                                GInteractionActionType interactionActionType = gHoloMain.getInteractionActionService().getInteractionAction(type);
-                                if(interactionActionType == null) throw new RuntimeException("Could not load interaction action '" + position + "' of interaction '" + id + "', invalid type");
-                                String parameter = rowResultSet.getString("parameter");
-
-                                GInteractionAction holoRow = new GInteractionAction(interaction, interactionActionType, parameter);
-
-                                interactionActionMap.put(position, holoRow);
-                            }
-
-                            for(GInteractionAction interactionAction : interactionActionMap.values()) {
-                                interaction.addAction(interactionAction);
-                            }
-                        }
-
-                        gHoloMain.getEntityUtil().createInteractionEntity(interaction);
-                        interactionMap.put(interaction.getInteractionEntity().getId(), interaction);
-                    } catch(Throwable e) { e.printStackTrace(); }
-                }
-            }
-        } catch(Throwable e) { e.printStackTrace(); }
-    }
-
-    public void loadInteractionsForPlayer(Player player) { for(GInteraction interaction : interactions) loadInteractionForPlayer(interaction, player); }
-
-    public void loadInteraction(GInteraction interaction) { for(Player player : interaction.getRawLocation().getWorld().getPlayers()) loadInteractionForPlayer(interaction, player); }
-
-    public void loadInteractionForPlayer(GInteraction interaction, Player player) { if(interaction.getInteractionEntity() != null) interaction.getInteractionEntity().loadInteraction(player); }
-
-    public void unloadInteraction(GInteraction interaction) { for(Player player : interaction.getRawLocation().getWorld().getPlayers()) unloadInteractionForPlayer(interaction, player); }
-
-    public void unloadInteractionForPlayer(GInteraction interaction, Player player) { if(interaction.getInteractionEntity() != null) interaction.getInteractionEntity().unloadInteraction(player); }
-
     public GInteraction createInteraction(String interactionId, SimpleLocation location) {
         try {
             GInteraction interaction = new GInteraction(UUID.randomUUID(), interactionId, location);
@@ -158,16 +104,12 @@ public class InteractionService {
         return null;
     }
 
-    public GInteractionAction updateInteractionAction(GInteractionAction interactionAction, GInteractionActionType interactionActionType, String parameter) {
+    public void updateInteractionAction(GInteractionAction interactionAction, GInteractionActionType interactionActionType, String parameter) {
         try {
             gHoloMain.getDataService().execute("UPDATE gholo_interaction_action SET type = ?, parameter = ? WHERE interaction_uuid = ? AND position = ?", interactionActionType.getType(), parameter, interactionAction.getInteraction().getUuid().toString(), interactionAction.getPosition());
-
             interactionAction.setInteractionActionType(interactionActionType);
             interactionAction.setParameter(parameter);
-
-            return interactionAction;
         } catch(Throwable e) { e.printStackTrace(); }
-        return null;
     }
 
     public void removeInteractionAction(GInteractionAction interactionAction) {
@@ -235,6 +177,62 @@ public class InteractionService {
             lastInteractionMap.remove(interaction.getInteractionEntity().getId());
         } catch(Throwable e) { e.printStackTrace(); }
     }
+
+    public void loadInteractions() {
+        try {
+            try(ResultSet resultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_interaction")) {
+                while(resultSet.next()) {
+                    try {
+                        UUID uuid = UUID.fromString(resultSet.getString("uuid"));
+                        String id = resultSet.getString("id");
+                        SimpleLocation location = SimpleLocation.fromString(resultSet.getString("location"));
+                        if(location == null) throw new RuntimeException("Could not load interaction '" + id + "', invalid location");
+                        GInteraction interaction = new GInteraction(uuid, id, location);
+
+                        String dataString = resultSet.getString("data");
+                        interaction.getRawData().loadString(dataString);
+
+                        interactions.add(interaction);
+
+                        try(ResultSet rowResultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_interaction_action where interaction_uuid = ?", uuid.toString())) {
+                            TreeMap<Integer, GInteractionAction> interactionActionMap = new TreeMap<>();
+
+                            while(rowResultSet.next()) {
+                                int position = rowResultSet.getInt("position");
+                                String type = rowResultSet.getString("type");
+                                GInteractionActionType interactionActionType = gHoloMain.getInteractionActionService().getInteractionAction(type);
+                                if(interactionActionType == null) throw new RuntimeException("Could not load interaction action '" + position + "' of interaction '" + id + "', invalid type");
+                                String parameter = rowResultSet.getString("parameter");
+
+                                GInteractionAction holoRow = new GInteractionAction(interaction, interactionActionType, parameter);
+
+                                interactionActionMap.put(position, holoRow);
+                            }
+
+                            for(GInteractionAction interactionAction : interactionActionMap.values()) {
+                                interaction.addAction(interactionAction);
+                            }
+                        }
+
+                        gHoloMain.getEntityUtil().createInteractionEntity(interaction);
+                        interactionMap.put(interaction.getInteractionEntity().getId(), interaction);
+                    } catch(Throwable e) { e.printStackTrace(); }
+                }
+            }
+        } catch(Throwable e) { e.printStackTrace(); }
+    }
+
+    public void loadInteractionsForPlayer(Player player) { for(GInteraction interaction : interactions) loadInteractionForPlayer(interaction, player); }
+
+    public void loadInteraction(GInteraction interaction) { for(Player player : interaction.getRawLocation().getWorld().getPlayers()) loadInteractionForPlayer(interaction, player); }
+
+    public void loadInteractionForPlayer(GInteraction interaction, Player player) { if(interaction.getInteractionEntity() != null) interaction.getInteractionEntity().loadInteraction(player); }
+
+    public void unloadInteractionsForPlayer(Player player) { for(GInteraction interaction : interactions) unloadInteractionForPlayer(interaction, player); }
+
+    public void unloadInteraction(GInteraction interaction) { for(Player player : interaction.getRawLocation().getWorld().getPlayers()) unloadInteractionForPlayer(interaction, player); }
+
+    public void unloadInteractionForPlayer(GInteraction interaction, Player player) { if(interaction.getInteractionEntity() != null) interaction.getInteractionEntity().unloadInteraction(player); }
 
     public void unloadInteractions() {
         for(GInteraction interaction : interactions) unloadInteraction(interaction);

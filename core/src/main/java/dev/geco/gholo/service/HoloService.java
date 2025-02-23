@@ -58,63 +58,6 @@ public class HoloService {
 
     public int getHoloRowCount() { return holos.stream().mapToInt(holo -> holo.getRows().size()).sum(); }
 
-    public void loadHolos() {
-        try {
-            try(ResultSet resultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_holo")) {
-                while(resultSet.next()) {
-                    try {
-                        UUID uuid = UUID.fromString(resultSet.getString("uuid"));
-                        String id = resultSet.getString("id");
-                        SimpleLocation location = SimpleLocation.fromString(resultSet.getString("location"));
-                        if(location == null) throw new RuntimeException("Could not load holo '" + id + "', invalid location");
-                        GHolo holo = new GHolo(uuid, id, location);
-
-                        String dataString = resultSet.getString("data");
-                        holo.getRawData().loadString(dataString);
-
-                        holos.add(holo);
-
-                        try(ResultSet rowResultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_holo_row where holo_uuid = ?", uuid.toString())) {
-                            TreeMap<Integer, GHoloRow> holoRowMap = new TreeMap<>();
-
-                            while(rowResultSet.next()) {
-                                int position = rowResultSet.getInt("position");
-                                String content = gHoloMain.getTextFormatUtil().replaceSymbols(rowResultSet.getString("content"));
-                                SimpleOffset offset = SimpleOffset.fromString(rowResultSet.getString("offset"));
-                                if(offset == null) throw new RuntimeException("Could not load holo row '" + position + "' of holo '" + id + "', invalid location");
-                                GHoloRow holoRow = new GHoloRow(holo, content);
-                                holoRow.setOffset(offset);
-
-                                String rowDataString = rowResultSet.getString("data");
-                                holoRow.getRawData().loadString(rowDataString);
-
-                                holoRowMap.put(position, holoRow);
-                            }
-
-                            for(GHoloRow holoRow : holoRowMap.values()) {
-                                holo.addRow(holoRow);
-                                gHoloMain.getEntityUtil().createHoloRowEntity(holoRow);
-                                gHoloMain.getHoloAnimationService().updateSubscriptionStatus(holoRow);
-                            }
-                        }
-                    } catch(Throwable e) { e.printStackTrace(); }
-                }
-            }
-        } catch(Throwable e) { e.printStackTrace(); }
-    }
-
-    public void loadHolosForPlayer(Player player) { for(GHolo holo : holos) loadHoloForPlayer(holo, player); }
-
-    public void loadHolo(GHolo holo) { for(Player player : holo.getRawLocation().getWorld().getPlayers()) loadHoloForPlayer(holo, player); }
-
-    public void loadHoloForPlayer(GHolo holo, Player player) { for(GHoloRow row : holo.getRows()) if(row.getHoloRowContent() != null) row.getHoloRowContent().loadHoloRow(player); }
-
-    public void unloadHolosForPlayer(Player player) { for(GHolo holo : holos) unloadHoloForPlayer(holo, player); }
-
-    public void unloadHolo(GHolo holo) { for(Player player : holo.getRawLocation().getWorld().getPlayers()) unloadHoloForPlayer(holo, player); }
-
-    public void unloadHoloForPlayer(GHolo holo, Player player) { for(GHoloRow row : holo.getRows()) if(row.getHoloRowContent() != null) row.getHoloRowContent().unloadHoloRow(player); }
-
     public GHolo createHolo(String holoId, SimpleLocation location) {
         try {
             GHolo holo = new GHolo(UUID.randomUUID(), holoId, location);
@@ -309,6 +252,63 @@ public class HoloService {
             unloadHolo(holo);
         } catch(Throwable e) { e.printStackTrace(); }
     }
+
+    public void loadHolos() {
+        try {
+            try(ResultSet resultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_holo")) {
+                while(resultSet.next()) {
+                    try {
+                        UUID uuid = UUID.fromString(resultSet.getString("uuid"));
+                        String id = resultSet.getString("id");
+                        SimpleLocation location = SimpleLocation.fromString(resultSet.getString("location"));
+                        if(location == null) throw new RuntimeException("Could not load holo '" + id + "', invalid location");
+                        GHolo holo = new GHolo(uuid, id, location);
+
+                        String dataString = resultSet.getString("data");
+                        holo.getRawData().loadString(dataString);
+
+                        holos.add(holo);
+
+                        try(ResultSet rowResultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_holo_row where holo_uuid = ?", uuid.toString())) {
+                            TreeMap<Integer, GHoloRow> holoRowMap = new TreeMap<>();
+
+                            while(rowResultSet.next()) {
+                                int position = rowResultSet.getInt("position");
+                                String content = gHoloMain.getTextFormatUtil().replaceSymbols(rowResultSet.getString("content"));
+                                SimpleOffset offset = SimpleOffset.fromString(rowResultSet.getString("offset"));
+                                if(offset == null) throw new RuntimeException("Could not load holo row '" + position + "' of holo '" + id + "', invalid location");
+                                GHoloRow holoRow = new GHoloRow(holo, content);
+                                holoRow.setOffset(offset);
+
+                                String rowDataString = rowResultSet.getString("data");
+                                holoRow.getRawData().loadString(rowDataString);
+
+                                holoRowMap.put(position, holoRow);
+                            }
+
+                            for(GHoloRow holoRow : holoRowMap.values()) {
+                                holo.addRow(holoRow);
+                                gHoloMain.getEntityUtil().createHoloRowEntity(holoRow);
+                                gHoloMain.getHoloAnimationService().updateSubscriptionStatus(holoRow);
+                            }
+                        }
+                    } catch(Throwable e) { e.printStackTrace(); }
+                }
+            }
+        } catch(Throwable e) { e.printStackTrace(); }
+    }
+
+    public void loadHolosForPlayer(Player player) { for(GHolo holo : holos) loadHoloForPlayer(holo, player); }
+
+    public void loadHolo(GHolo holo) { for(Player player : holo.getRawLocation().getWorld().getPlayers()) loadHoloForPlayer(holo, player); }
+
+    public void loadHoloForPlayer(GHolo holo, Player player) { for(GHoloRow row : holo.getRows()) if(row.getHoloRowContent() != null) row.getHoloRowContent().loadHoloRow(player); }
+
+    public void unloadHolosForPlayer(Player player) { for(GHolo holo : holos) unloadHoloForPlayer(holo, player); }
+
+    public void unloadHolo(GHolo holo) { for(Player player : holo.getRawLocation().getWorld().getPlayers()) unloadHoloForPlayer(holo, player); }
+
+    public void unloadHoloForPlayer(GHolo holo, Player player) { for(GHoloRow row : holo.getRows()) if(row.getHoloRowContent() != null) row.getHoloRowContent().unloadHoloRow(player); }
 
     public void unloadHolos() {
         for(GHolo holo : holos) {

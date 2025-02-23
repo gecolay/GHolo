@@ -132,11 +132,11 @@ public class GHoloMain extends JavaPlugin {
         dataService = new DataService(this);
         holoService = new HoloService(this);
         holoAnimationService = new HoloAnimationService(this);
-        holoImporterService = new HoloImporterService();
+        holoImporterService = new HoloImporterService(this);
         holoExporterService = new HoloExporterService();
         interactionService = new InteractionService(this);
         interactionActionService = new InteractionActionService();
-        interactionImporterService = new InteractionImporterService();
+        interactionImporterService = new InteractionImporterService(this);
         interactionExporterService = new InteractionExporterService();
 
         textFormatUtil = new TextFormatUtil(this);
