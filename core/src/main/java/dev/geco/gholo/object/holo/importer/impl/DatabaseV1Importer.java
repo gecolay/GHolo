@@ -19,10 +19,10 @@ import java.sql.SQLException;
 import java.util.TreeMap;
 import java.util.UUID;
 
-public class MigrationV1Importer extends GHoloImporter {
+public class DatabaseV1Importer extends GHoloImporter {
 
     @Override
-    public @NotNull String getType() { return "migration-v1"; }
+    public @NotNull String getType() { return "database-v1"; }
 
     @Override
     public @NotNull GHoloImporterResult importHolos(@NotNull GHoloMain gHoloMain, boolean override) {

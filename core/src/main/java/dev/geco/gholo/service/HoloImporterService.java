@@ -6,7 +6,7 @@ import dev.geco.gholo.object.holo.importer.impl.DecentHologramsImporter;
 import dev.geco.gholo.object.holo.importer.impl.FancyHologramsImporter;
 import dev.geco.gholo.object.holo.importer.impl.FilesImporter;
 import dev.geco.gholo.object.holo.importer.impl.HolographicDisplaysImporter;
-import dev.geco.gholo.object.holo.importer.impl.MigrationV1Importer;
+import dev.geco.gholo.object.holo.importer.impl.DatabaseV1Importer;
 
 import java.io.File;
 import java.util.HashMap;
@@ -34,7 +34,7 @@ public class HoloImporterService {
         registerHoloImporter(new DecentHologramsImporter());
         registerHoloImporter(new HolographicDisplaysImporter());
         registerHoloImporter(new FancyHologramsImporter());
-        registerHoloImporter(new MigrationV1Importer());
+        registerHoloImporter(new DatabaseV1Importer());
     }
 
     public void unregisterHoloImporters() { holoImporters.clear(); }
