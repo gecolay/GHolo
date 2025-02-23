@@ -17,20 +17,20 @@ public class SimpleSize implements Cloneable {
 
     public float getWidth() { return width; }
 
-    public SimpleSize setWidth(float width) {
+    public @NotNull SimpleSize setWidth(float width) {
         this.width = width;
         return this;
     }
 
     public float getHeight() { return height; }
 
-    public SimpleSize setHeight(float height) {
+    public @NotNull SimpleSize setHeight(float height) {
         this.height = height;
         return this;
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         JSONObject interactionSize = new JSONObject();
         interactionSize.put("width", width);
         interactionSize.put("height", height);
@@ -44,7 +44,7 @@ public class SimpleSize implements Cloneable {
             float width = ((Number) data.get("width")).floatValue();
             float height = ((Number) data.get("height")).floatValue();
             return new SimpleSize(width, height);
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(Throwable ignored) { }
         return null;
     }
 

@@ -52,7 +52,7 @@ public class GHoloRowEntityContent extends Entity implements IGHoloRowContentTyp
             EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(resourceLocation);
             if(create || currentEntityTypes.get(player.getUniqueId()) != entityType) {
                 currentEntityTypes.put(player.getUniqueId(), entityType);
-                serverPlayer.connection.send(new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), entityType, 0, getDeltaMovement(), getYHeadRot()));
+                serverPlayer.connection.send(new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), entityType, 0, getDeltaMovement(), getYRot()));
             }
             serverPlayer.connection.send(getDataPacket());
         } catch(Throwable ignored) { }

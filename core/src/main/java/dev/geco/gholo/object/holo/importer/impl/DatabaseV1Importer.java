@@ -56,7 +56,7 @@ public class DatabaseV1Importer extends GHoloImporter {
                             UUID worldUuid = UUID.fromString(worldString);
                             world = Bukkit.getWorld(worldUuid);
                             if(world == null) continue;
-                        } catch (IllegalArgumentException e) {
+                        } catch(IllegalArgumentException e) {
                             world = Bukkit.getWorld(worldString);
                         }
                         if(world == null) continue;

@@ -2,6 +2,7 @@ package dev.geco.gholo.object.interaction;
 
 import dev.geco.gholo.object.simple.SimpleSize;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -13,29 +14,29 @@ public class GInteractionData implements Cloneable {
     public static final SimpleSize DEFAULT_SIZE = new SimpleSize(1f, 1f);
 
     private String permission = DEFAULT_PERMISSION;
-    private SimpleSize size = DEFAULT_SIZE;
+    private SimpleSize size = new SimpleSize(1f, 1f);
 
-    public String getPermission() { return permission; }
+    public @Nullable String getPermission() { return permission; }
 
-    public GInteractionData setPermission(String permission) {
+    public @NotNull GInteractionData setPermission(@Nullable String permission) {
         this.permission = permission;
         return this;
     }
 
-    public SimpleSize getSize() { return size.clone(); }
+    public @NotNull SimpleSize getSize() { return size.clone(); }
 
-    public SimpleSize getRawSize() { return size; }
+    public @NotNull SimpleSize getRawSize() { return size; }
 
-    public GInteractionData setSize(SimpleSize size) {
+    public @NotNull GInteractionData setSize(@NotNull SimpleSize size) {
         this.size = size.clone();
         return this;
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         JSONObject data = new JSONObject();
         if(!Objects.equals(permission, DEFAULT_PERMISSION)) data.put("permission", permission);
-        if(!Objects.equals(size, DEFAULT_SIZE)) {
+        if(size.getWidth() != DEFAULT_SIZE.getWidth() || size.getHeight() != DEFAULT_SIZE.getHeight()) {
             JSONObject sizeData = new JSONObject();
             sizeData.put("width", size.getWidth());
             sizeData.put("height", size.getHeight());
@@ -48,11 +49,11 @@ public class GInteractionData implements Cloneable {
         JSONParser parser = new JSONParser();
         try {
             JSONObject data = (JSONObject) parser.parse(string);
-            if(data.containsKey("permission")) permission = (String) data.get("permission");
-            if(data.containsKey("size")) {
+            if(data.get("permission") != null) permission = (String) data.get("permission");
+            if(data.get("size") != null) {
                 JSONObject sizeData = (JSONObject) data.get("size");
-                float width = ((Number) sizeData.get("width")).floatValue();
-                float height = ((Number) sizeData.get("height")).floatValue();
+                float width = sizeData.get("width") != null ? ((Number) sizeData.get("width")).floatValue() : DEFAULT_SIZE.getWidth();
+                float height = sizeData.get("height") != null ? ((Number) sizeData.get("height")).floatValue() : DEFAULT_SIZE.getWidth();
                 size = new SimpleSize(width, height);
             }
         } catch(Throwable e) { e.printStackTrace(); }

@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class InteractionService {
 
@@ -181,18 +182,19 @@ public class InteractionService {
     public void loadInteractions() {
         try {
             try(ResultSet resultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_interaction")) {
-                while(resultSet.next()) {
+                interactionwhile: while(resultSet.next()) {
                     try {
                         UUID uuid = UUID.fromString(resultSet.getString("uuid"));
                         String id = resultSet.getString("id");
                         SimpleLocation location = SimpleLocation.fromString(resultSet.getString("location"));
-                        if(location == null) throw new RuntimeException("Could not load interaction '" + id + "', invalid location");
+                        if(location == null) {
+                            gHoloMain.getLogger().log(Level.WARNING, "Could not load interaction '" + id + "', invalid location!");
+                            continue;
+                        }
                         GInteraction interaction = new GInteraction(uuid, id, location);
 
                         String dataString = resultSet.getString("data");
                         interaction.getRawData().loadString(dataString);
-
-                        interactions.add(interaction);
 
                         try(ResultSet rowResultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_interaction_action where interaction_uuid = ?", uuid.toString())) {
                             TreeMap<Integer, GInteractionAction> interactionActionMap = new TreeMap<>();
@@ -201,7 +203,10 @@ public class InteractionService {
                                 int position = rowResultSet.getInt("position");
                                 String type = rowResultSet.getString("type");
                                 GInteractionActionType interactionActionType = gHoloMain.getInteractionActionService().getInteractionAction(type);
-                                if(interactionActionType == null) throw new RuntimeException("Could not load interaction action '" + position + "' of interaction '" + id + "', invalid type");
+                                if(interactionActionType == null) {
+                                    gHoloMain.getLogger().log(Level.WARNING, "Could not load interaction action '" + position + "' of interaction '" + id + "', invalid type!");
+                                    continue interactionwhile;
+                                }
                                 String parameter = rowResultSet.getString("parameter");
 
                                 GInteractionAction holoRow = new GInteractionAction(interaction, interactionActionType, parameter);
@@ -214,6 +219,7 @@ public class InteractionService {
                             }
                         }
 
+                        interactions.add(interaction);
                         gHoloMain.getEntityUtil().createInteractionEntity(interaction);
                         interactionMap.put(interaction.getInteractionEntity().getId(), interaction);
                     } catch(Throwable e) { e.printStackTrace(); }

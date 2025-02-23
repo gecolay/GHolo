@@ -10,27 +10,27 @@ public class SimpleRotation implements Cloneable {
     private Float yaw;
     private Float pitch;
 
-    public SimpleRotation(Float yaw, Float pitch) {
+    public SimpleRotation(@Nullable Float yaw, @Nullable Float pitch) {
         this.yaw = yaw;
         this.pitch = pitch;
     }
 
-    public Float getYaw() { return yaw; }
+    public @Nullable Float getYaw() { return yaw; }
 
-    public SimpleRotation setYaw(Float yaw) {
+    public @NotNull SimpleRotation setYaw(@Nullable Float yaw) {
         this.yaw = yaw;
         return this;
     }
 
-    public Float getPitch() { return pitch; }
+    public @Nullable Float getPitch() { return pitch; }
 
-    public SimpleRotation setPitch(Float pitch) {
+    public @NotNull SimpleRotation setPitch(@Nullable Float pitch) {
         this.pitch = pitch;
         return this;
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         JSONObject simpleRotation = new JSONObject();
         if(yaw != null) simpleRotation.put("yaw", yaw);
         if(pitch != null) simpleRotation.put("pitch", pitch);
@@ -41,10 +41,10 @@ public class SimpleRotation implements Cloneable {
         JSONParser parser = new JSONParser();
         try {
             JSONObject data = (JSONObject) parser.parse(string);
-            Float yaw = data.containsKey("yaw") ? ((Number) data.get("yaw")).floatValue() : null;
-            Float pitch = data.containsKey("pitch") ? ((Number) data.get("pitch")).floatValue() : null;
+            Float yaw = data.get("yaw") != null ? ((Number) data.get("yaw")).floatValue() : null;
+            Float pitch = data.get("pitch") != null ? ((Number) data.get("pitch")).floatValue() : null;
             return new SimpleRotation(yaw, pitch);
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(Throwable ignored) { }
         return null;
     }
 

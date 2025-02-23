@@ -50,7 +50,7 @@ public class FilesExporter extends GInteractionExporter {
         Map<String, Object> interactionData = serializeData(interaction.getRawData());
         if(!interactionData.isEmpty()) structure.set("Interaction.data", interactionData);
         List<Map<String, Object>> actions = new ArrayList<>();
-        for (GInteractionAction interactionAction : interaction.getActions()) {
+        for(GInteractionAction interactionAction : interaction.getActions()) {
             Map<String, Object> actionMap = new HashMap<>();
             actionMap.put("type", interactionAction.getInteractionActionType().getType());
             actionMap.put("parameter", interactionAction.getParameter());
@@ -72,10 +72,10 @@ public class FilesExporter extends GInteractionExporter {
     private static Map<String, Object> serializeData(GInteractionData data) {
         Map<String, Object> dataMap = new HashMap<>();
         if(!Objects.equals(data.getPermission(), GInteractionData.DEFAULT_PERMISSION)) dataMap.put("permission", data.getPermission());
-        if(!Objects.equals(data.getRawSize(), GInteractionData.DEFAULT_SIZE)) {
+        if(data.getRawSize().getWidth() != GInteractionData.DEFAULT_SIZE.getWidth() || data.getRawSize().getHeight() != GInteractionData.DEFAULT_SIZE.getHeight()) {
             Map<String, Object> sizeMap = new HashMap<>();
-            sizeMap.put("width", data.getRawSize().getWidth());
-            sizeMap.put("height", data.getRawSize().getHeight());
+            if(data.getRawSize().getWidth() != GInteractionData.DEFAULT_SIZE.getWidth()) sizeMap.put("width", data.getRawSize().getWidth());
+            if(data.getRawSize().getHeight() != GInteractionData.DEFAULT_SIZE.getHeight()) sizeMap.put("height", data.getRawSize().getHeight());
             dataMap.put("size", sizeMap);
         }
         return dataMap;

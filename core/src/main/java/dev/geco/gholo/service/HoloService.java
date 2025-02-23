@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class HoloService {
 
@@ -256,18 +257,19 @@ public class HoloService {
     public void loadHolos() {
         try {
             try(ResultSet resultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_holo")) {
-                while(resultSet.next()) {
+                holowhile: while(resultSet.next()) {
                     try {
                         UUID uuid = UUID.fromString(resultSet.getString("uuid"));
                         String id = resultSet.getString("id");
                         SimpleLocation location = SimpleLocation.fromString(resultSet.getString("location"));
-                        if(location == null) throw new RuntimeException("Could not load holo '" + id + "', invalid location");
+                        if(location == null) {
+                            gHoloMain.getLogger().log(Level.WARNING, "Could not load holo '" + id + "', invalid location!");
+                            continue;
+                        }
                         GHolo holo = new GHolo(uuid, id, location);
 
                         String dataString = resultSet.getString("data");
                         holo.getRawData().loadString(dataString);
-
-                        holos.add(holo);
 
                         try(ResultSet rowResultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_holo_row where holo_uuid = ?", uuid.toString())) {
                             TreeMap<Integer, GHoloRow> holoRowMap = new TreeMap<>();
@@ -276,7 +278,10 @@ public class HoloService {
                                 int position = rowResultSet.getInt("position");
                                 String content = gHoloMain.getTextFormatUtil().replaceSymbols(rowResultSet.getString("content"));
                                 SimpleOffset offset = SimpleOffset.fromString(rowResultSet.getString("offset"));
-                                if(offset == null) throw new RuntimeException("Could not load holo row '" + position + "' of holo '" + id + "', invalid location");
+                                if(offset == null) {
+                                    gHoloMain.getLogger().log(Level.WARNING, "Could not load holo row '" + position + "' of holo '" + id + "', invalid location!");
+                                    continue holowhile;
+                                }
                                 GHoloRow holoRow = new GHoloRow(holo, content);
                                 holoRow.setOffset(offset);
 
@@ -292,6 +297,8 @@ public class HoloService {
                                 gHoloMain.getHoloAnimationService().updateSubscriptionStatus(holoRow);
                             }
                         }
+
+                        holos.add(holo);
                     } catch(Throwable e) { e.printStackTrace(); }
                 }
             }

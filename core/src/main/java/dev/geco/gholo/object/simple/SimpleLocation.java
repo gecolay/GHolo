@@ -14,13 +14,13 @@ public class SimpleLocation extends Location {
         super(world, x, y, z);
     }
 
-    public SimpleLocation add(SimpleOffset offset) {
+    public @NotNull SimpleLocation add(@NotNull SimpleOffset offset) {
         set(getX() + offset.getX(), getY() + offset.getY(), getZ() + offset.getZ());
         return this;
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         JSONObject simpleLocation = new JSONObject();
         simpleLocation.put("world", getWorld().getName());
         simpleLocation.put("x", getX());
@@ -39,7 +39,7 @@ public class SimpleLocation extends Location {
             double y = ((Number) data.get("y")).doubleValue();
             double z = ((Number) data.get("z")).doubleValue();
             return new SimpleLocation(world, x, y, z);
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(Throwable ignored) { }
         return null;
     }
 

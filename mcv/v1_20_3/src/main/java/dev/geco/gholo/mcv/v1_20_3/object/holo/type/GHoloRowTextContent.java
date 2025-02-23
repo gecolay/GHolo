@@ -68,7 +68,7 @@ public class GHoloRowTextContent extends Display.TextDisplay implements IGHoloRo
     @Override
     public void load(Player player, String content, boolean create) {
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-        if(create) serverPlayer.connection.send(new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYHeadRot()));
+        if(create) serverPlayer.connection.send(new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYRot()));
         serverPlayer.connection.send(getDataPacket(content));
     }
 
