@@ -5,6 +5,7 @@ import dev.geco.gholo.api.event.GInteractionPlayerEvent;
 import dev.geco.gholo.object.interaction.GInteractionAction;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 public class InteractionEventHandler implements Listener {
@@ -15,7 +16,7 @@ public class InteractionEventHandler implements Listener {
         this.gHoloMain = gHoloMain;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     public void interactionPlayerEvent(GInteractionPlayerEvent event) {
         Player player = event.getPlayer();
         for(GInteractionAction interactionAction : event.getInteraction().getActions()) {
