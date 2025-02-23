@@ -18,6 +18,7 @@ public class MessageAction extends GInteractionActionType {
     public @NotNull GInteractionActionTypeResult execute(@NotNull GHoloMain gHoloMain, @NotNull Player player, @NotNull GInteractType interactType, @NotNull String parameter) {
 
         String message = parameter.replace("%player%", player.getName());
+        message = gHoloMain.getTextFormatUtil().replacePlaceholders(message, player);
 
         gHoloMain.getMessageService().sendMessage(player, message);
 
