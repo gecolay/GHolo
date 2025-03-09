@@ -40,6 +40,7 @@ public class FilesExporter extends GHoloExporter {
                 File holoFile = new File(holoFileDir.getPath(), holo.getId() + ".yml");
                 if(!override && holoFile.exists()) continue;
                 getHoloFileStructure(holo).save(holoFile);
+                exported++;
             } catch(Throwable e) { gHoloMain.getLogger().log(Level.WARNING, "Could not export holo '" + holo.getId() + "'!", e); }
         }
 

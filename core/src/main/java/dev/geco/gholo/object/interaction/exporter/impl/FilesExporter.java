@@ -39,6 +39,7 @@ public class FilesExporter extends GInteractionExporter {
                 File interactionFile = new File(interactionFileDir.getPath(), interaction.getId() + ".yml");
                 if(!override && interactionFile.exists()) continue;
                 getInteractionFileStructure(interaction).save(interactionFile);
+                exported++;
             } catch(Throwable e) { gHoloMain.getLogger().log(Level.WARNING, "Could not export interaction '" + interaction.getId() + "'!", e); }
         }
 

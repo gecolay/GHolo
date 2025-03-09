@@ -11,6 +11,7 @@ import dev.geco.gholo.object.simple.SimpleLocation;
 import dev.geco.gholo.object.simple.SimpleSize;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -84,10 +85,17 @@ public class FilesImporter extends GInteractionImporter {
     private void deserializeData(GInteractionData data, HashMap<String, Object> rawData) {
         if(rawData.containsKey("permission")) data.setPermission((String) rawData.get("permission"));
         if(rawData.containsKey("size")) {
-            Map<?, ?> sizeMap = (Map<?, ?>) rawData.get("size");
-            float sizeWidth = sizeMap.containsKey("width") ? ((Number) sizeMap.get("width")).floatValue() : 1f;
-            float sizeHeight = sizeMap.containsKey("height") ? ((Number) sizeMap.get("height")).floatValue() : 1f;
-            data.setSize(new SimpleSize(sizeWidth, sizeHeight));
+            try {
+                Map<?, ?> sizeMap = (Map<?, ?>) rawData.get("size");
+                float sizeWidth = sizeMap.containsKey("width") ? ((Number) sizeMap.get("width")).floatValue() : 1f;
+                float sizeHeight = sizeMap.containsKey("height") ? ((Number) sizeMap.get("height")).floatValue() : 1f;
+                data.setSize(new SimpleSize(sizeWidth, sizeHeight));
+            } catch(Throwable e) {
+                MemorySection sizeMap = (MemorySection) rawData.get("size");
+                float sizeWidth = (float) sizeMap.getDouble("width", 1f);
+                float sizeHeight = (float) sizeMap.getDouble("height", 1f);
+                data.setSize(new SimpleSize(sizeWidth, sizeHeight));
+            }
         }
     }
 
