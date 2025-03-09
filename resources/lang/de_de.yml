@@ -59,7 +59,7 @@ Messages:
   command-gholo-option-value-error: "[P]&c Wert&6 %Value%&c ist ungültig für Option&6 %Option%&c!"
   command-gholo-option: "[P]&a Wert&6 %Value%&a für Option&6 %Option%&a gesetzt."
   command-gholo-image-use-error: "[P]&c /holo image <id> file/url/avatar/helm <quelle> [<bereite:höhe>]"
-  command-gholo-image-image-error: "[P]&c Es konnte kein Bild vom Typ&6 %Type%&a erstellt werden aus Quelle:&6 %Source%"
+  command-gholo-image-image-error: "[P]&c Es konnte kein Bild vom Typ&6 %Type%&c erstellt werden aus Quelle:&6 %Source%"
   command-gholo-image-size-error: "[P]&c Größe ist ungültig!"
   command-gholo-image: "[P]&a Bild vom Type&6 %Type%&a für Holo&6 %Holo%&a gesetzt aus Quelle:&6 %Source%"
   command-gholo-import-use-error: "[P]&c /holo import <typ> [<überschreiben>]"
