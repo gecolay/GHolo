@@ -206,7 +206,9 @@ public class GHoloCommand implements CommandExecutor {
                     double x = gHoloMain.getLocationUtil().parseLocationInput(args[2], location.getX());
                     double y = gHoloMain.getLocationUtil().parseLocationInput(args[3], location.getY());
                     double z = gHoloMain.getLocationUtil().parseLocationInput(args[4], location.getZ());
-                    location.set(x, y, z);
+                    location.setX(x);
+                    location.setY(y);
+                    location.setZ(z);
                     gHoloMain.getHoloService().updateHoloLocation(holo, location);
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-move", "%Holo%", holo.getId());
                 } catch(NumberFormatException e) {
