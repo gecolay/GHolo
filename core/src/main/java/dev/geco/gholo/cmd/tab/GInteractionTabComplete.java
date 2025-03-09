@@ -79,7 +79,7 @@ public class GInteractionTabComplete implements TabCompleter {
             } else if(args[0].equalsIgnoreCase("insertaction") || args[0].equalsIgnoreCase("setaction")) {
                 complete.addAll(gHoloMain.getInteractionActionService().getInteractionActions().keySet());
             } else if(args[0].equalsIgnoreCase("option")) {
-                if(args[3].equalsIgnoreCase("size")) {
+                if(args[2].equalsIgnoreCase("size")) {
                     complete.addAll(List.of("width", "height"));
                 } else complete.add("*");
             }
@@ -103,7 +103,7 @@ public class GInteractionTabComplete implements TabCompleter {
                     complete.addAll(List.of("~:~:~:~", "world:x:y:z", "world:x:y:z:yaw:pitch"));
                 }
             } else if(args[0].equalsIgnoreCase("option")) {
-                if(args[3].equalsIgnoreCase("size")) {
+                if(args[2].equalsIgnoreCase("size")) {
                     complete.add("*");
                 }
             }

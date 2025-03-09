@@ -435,6 +435,10 @@ public class GInteractionCommand implements CommandExecutor {
                     }
                     case "size" -> {
                         optionArg++;
+                        if(args.length == optionArg + 1) {
+                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-option-use-error");
+                            return true;
+                        }
                         switch(args[optionArg].toLowerCase()) {
                             case "width" -> {
                                 try {

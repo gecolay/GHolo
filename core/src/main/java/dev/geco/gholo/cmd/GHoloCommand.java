@@ -558,6 +558,10 @@ public class GHoloCommand implements CommandExecutor {
                     }
                     case "rotation" -> {
                         optionArg++;
+                        if(args.length == optionArg + 1) {
+                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-use-error");
+                            return true;
+                        }
                         switch(args[optionArg].toLowerCase()) {
                             case "yaw" -> {
                                 try {
@@ -602,6 +606,10 @@ public class GHoloCommand implements CommandExecutor {
                     }
                     case "size" -> {
                         optionArg++;
+                        if(args.length == optionArg + 1) {
+                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-use-error");
+                            return true;
+                        }
                         switch(args[optionArg].toLowerCase()) {
                             case "width" -> {
                                 try {
