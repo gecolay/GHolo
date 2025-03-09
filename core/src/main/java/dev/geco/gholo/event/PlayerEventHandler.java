@@ -26,7 +26,7 @@ public class PlayerEventHandler implements Listener {
         gHoloMain.getTaskService().runDelayed(() -> {
             gHoloMain.getHoloService().loadHolosForPlayer(player);
 
-            gHoloMain.getPacketHandler().setupPlayerPacketHandler(player);
+            if(gHoloMain.getInteractionService().hasInteractions()) gHoloMain.getPacketHandler().setupPlayerPacketHandler(player);
             gHoloMain.getInteractionService().loadInteractionsForPlayer(player);
         }, false, player, 1);
     }
@@ -37,7 +37,6 @@ public class PlayerEventHandler implements Listener {
 
         gHoloMain.getHoloService().clearHolosCurrentContentForPlayer(player);
 
-        gHoloMain.getPacketHandler().removePlayerPacketHandler(player);
         gHoloMain.getInteractionService().clearPlayerInteractions(player);
     }
 

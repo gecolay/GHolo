@@ -187,8 +187,8 @@ public class GHoloMain extends JavaPlugin {
         holoService.loadHolos();
         interactionService.createTables();
         interactionService.loadInteractions();
+        if(interactionService.hasInteractions()) packetHandler.setupPlayerPacketHandlers();
         ImageUtil.generateFolder();
-        packetHandler.setupPlayerPacketHandlers();
     }
 
     public void reload(CommandSender sender) {
@@ -210,7 +210,7 @@ public class GHoloMain extends JavaPlugin {
     private void unload() {
         dataService.close();
         serverConnectUtil.teardownChannel();
-        packetHandler.removePlayerPacketHandlers();
+        if(interactionService.hasInteractions()) packetHandler.removePlayerPacketHandlers();
         holoService.unloadHolos();
         interactionService.unloadInteractions();
         holoAnimationService.stopHoloAnimations();

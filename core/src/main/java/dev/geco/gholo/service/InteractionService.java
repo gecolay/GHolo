@@ -61,6 +61,8 @@ public class InteractionService {
 
     public List<GInteraction> getNearInteractions(Location location, double range) { return interactions.stream().filter(interaction -> interaction.getRawLocation().getWorld().equals(location.getWorld()) && interaction.getRawLocation().distance(location) <= range).toList(); }
 
+    public boolean hasInteractions() { return !interactions.isEmpty(); }
+
     public GInteraction getInteraction(String interactionId) { return interactions.stream().filter(interaction -> interaction.getId().equalsIgnoreCase(interactionId)).findFirst().orElse(null); }
 
     public int getInteractionCount() { return interactions.size(); }
@@ -74,6 +76,8 @@ public class InteractionService {
             interactions.add(interaction);
             gHoloMain.getEntityUtil().createInteractionEntity(interaction);
             interactionMap.put(interaction.getInteractionEntity().getId(), interaction);
+            // Lazy load player packet handlers because we now need them
+            if(interactions.size() == 1) gHoloMain.getPacketHandler().setupPlayerPacketHandlers();
             return interaction;
         } catch(SQLException e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not create interaction '" + interactionId + "'!", e); }
         return null;
@@ -176,6 +180,8 @@ public class InteractionService {
             unloadInteraction(interaction);
             interactionMap.remove(interaction.getInteractionEntity().getId());
             lastInteractionMap.remove(interaction.getInteractionEntity().getId());
+            // Unload player packet handlers because we no longer need them
+            if(interactions.isEmpty()) gHoloMain.getPacketHandler().removePlayerPacketHandlers();
         } catch(SQLException e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not remove interaction '" + interaction.getId() + "'!", e); }
     }
 
