@@ -148,6 +148,8 @@ public class GHoloTabComplete implements TabCompleter {
                 } else if(args[2].equalsIgnoreCase("row")) {
                     complete.addAll(OPTIONS);
                 }
+            } else if(args[0].equalsIgnoreCase("image")) {
+                complete.addAll(List.of("size", "width:height"));
             }
             if(!args[args.length - 1].isEmpty()) {
                 for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);
