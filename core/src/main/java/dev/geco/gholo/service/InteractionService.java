@@ -215,9 +215,9 @@ public class InteractionService {
                                 }
                                 String parameter = rowResultSet.getString("parameter");
 
-                                GInteractionAction holoRow = new GInteractionAction(interaction, interactionActionType, parameter);
+                                GInteractionAction interactionAction = new GInteractionAction(interaction, interactionActionType, parameter);
 
-                                interactionActionMap.put(position, holoRow);
+                                interactionActionMap.put(position, interactionAction);
                             }
 
                             for(GInteractionAction interactionAction : interactionActionMap.values()) {
@@ -279,7 +279,7 @@ public class InteractionService {
 
     public void clearPlayerInteractions(Player player) {
         UUID playerId = player.getUniqueId();
-        for(HashMap<UUID, Long> lastHoloRowInteractions : lastInteractionMap.values()) lastHoloRowInteractions.remove(playerId);
+        for(HashMap<UUID, Long> lastInteraction : lastInteractionMap.values()) lastInteraction.remove(playerId);
     }
 
     public void clearInteractions() {
