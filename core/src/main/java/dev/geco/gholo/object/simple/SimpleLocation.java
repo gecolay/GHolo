@@ -18,7 +18,9 @@ public class SimpleLocation extends Location {
     }
 
     public @NotNull SimpleLocation add(@NotNull SimpleOffset offset) {
-        set(getX() + offset.getX(), getY() + offset.getY(), getZ() + offset.getZ());
+        setX(getX() + offset.getX());
+        setY(getY() + offset.getY());
+        setZ(getZ() + offset.getZ());
         return this;
     }
 
