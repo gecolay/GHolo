@@ -46,7 +46,6 @@ public class GHoloRowItemStackContent extends ItemEntity implements IGHoloRowCon
         this.gHoloMain = gHoloMain;
         persist = false;
         setNoGravity(true);
-        canMobPickup = false;
         setNeverPickUp();
         setUnlimitedLifetime();
         EntityDataAccessor<ItemStack> itemAccessor = null;
