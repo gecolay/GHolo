@@ -6,6 +6,7 @@ import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.importer.GHoloImporter;
 import dev.geco.gholo.object.holo.importer.GHoloImporterResult;
 import dev.geco.gholo.object.simple.SimpleLocation;
+import dev.geco.gholo.object.simple.SimpleOffset;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -56,9 +57,13 @@ public class HolographicDisplaysImporter extends GHoloImporter {
                 GHolo holo = new GHolo(UUID.randomUUID(), id, location);
                 gHoloMain.getHoloService().writeHolo(holo, override);
 
+                double offset = 0;
+
                 for(String rowContent : rows) {
                     GHoloRow row = new GHoloRow(holo, rowContent);
+                    row.setOffset(new SimpleOffset(0, offset, 0));
                     gHoloMain.getHoloService().writeHoloRow(row, row.getPosition());
+                    offset += gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
                 }
 
                 imported++;

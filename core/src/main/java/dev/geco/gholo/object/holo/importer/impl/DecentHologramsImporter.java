@@ -7,6 +7,7 @@ import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.importer.GHoloImporter;
 import dev.geco.gholo.object.holo.importer.GHoloImporterResult;
 import dev.geco.gholo.object.simple.SimpleLocation;
+import dev.geco.gholo.object.simple.SimpleOffset;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -63,8 +64,14 @@ public class DecentHologramsImporter extends GHoloImporter {
                     }
                 }
 
+                double offset = 0;
+
                 gHoloMain.getHoloService().writeHolo(holo, override);
-                for(GHoloRow row : holo.getRows()) gHoloMain.getHoloService().writeHoloRow(row, row.getPosition());
+                for(GHoloRow row : holo.getRows()) {
+                    row.setOffset(new SimpleOffset(0, offset, 0));
+                    gHoloMain.getHoloService().writeHoloRow(row, row.getPosition());
+                    offset += gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
+                }
 
                 imported++;
             } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not import holo '" + id + "'!", e); }
