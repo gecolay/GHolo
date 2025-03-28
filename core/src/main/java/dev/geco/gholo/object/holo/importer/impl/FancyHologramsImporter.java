@@ -101,7 +101,7 @@ public class FancyHologramsImporter extends GHoloImporter {
                     GHoloRow row = new GHoloRow(holo, rowContent);
                     row.setOffset(new SimpleOffset(0, offset, 0));
                     gHoloMain.getHoloService().writeHoloRow(row, row.getPosition());
-                    offset += gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
+                    offset -= gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
                 }
 
                 imported++;
