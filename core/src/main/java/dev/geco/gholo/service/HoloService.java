@@ -102,7 +102,7 @@ public class HoloService {
                         SimpleOffset moveOffset = SimpleOffset.fromString(moveOffsetResultSet.getString("offset"));
                         if(moveOffset == null) continue;
                         moveOffset.setY(moveOffset.getY() - sizeBetweenRows);
-                        gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET `offset` = ? WHERE holo_uuid = ? AND position = ?", moveOffset, holo.getUuid().toString(), movePosition);
+                        gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET `offset` = ? WHERE holo_uuid = ? AND position = ?", moveOffset.toString(), holo.getUuid().toString(), movePosition);
                     }
                 }
                 for(GHoloRow updateHoloRow : holo.getRows().subList(position, holo.getRows().size())) {
@@ -169,7 +169,7 @@ public class HoloService {
                         SimpleOffset moveOffset = SimpleOffset.fromString(moveOffsetResultSet.getString("offset"));
                         if(moveOffset == null) continue;
                         moveOffset.setY(moveOffset.getY() + sizeBetweenRows);
-                        gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET `offset` = ? WHERE holo_uuid = ? AND position = ?", moveOffset, holo.getUuid().toString(), movePosition);
+                        gHoloMain.getDataService().execute("UPDATE gholo_holo_row SET `offset` = ? WHERE holo_uuid = ? AND position = ?", moveOffset.toString(), holo.getUuid().toString(), movePosition);
                     }
                 }
                 for(GHoloRow updateHoloRow : holo.getRows().subList(position + 1, holo.getRows().size())) {
