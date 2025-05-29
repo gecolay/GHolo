@@ -490,8 +490,8 @@ public class GInteractionCommand implements CommandExecutor {
                 boolean override = true;
                 if(args.length > 2) override = Boolean.parseBoolean(args[2]);
                 GInteractionImporterResult importerResult = interactionImporter.importInteractions(gHoloMain, override);
-                gHoloMain.getInteractionService().unloadInteractions();
-                gHoloMain.getInteractionService().loadInteractions();
+                gHoloMain.getInteractionService().unloadInteractions(null);
+                gHoloMain.getInteractionService().loadInteractions(null);
                 if(!importerResult.hasSucceeded()) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-ginteraction-import-import-error", "%Type%", args[1]);
                     break;
