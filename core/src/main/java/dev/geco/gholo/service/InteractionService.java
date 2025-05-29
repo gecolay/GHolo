@@ -11,7 +11,9 @@ import dev.geco.gholo.object.interaction.action.GInteractionActionType;
 import dev.geco.gholo.object.simple.SimpleLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -185,18 +187,19 @@ public class InteractionService {
         } catch(SQLException e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not remove interaction '" + interaction.getId() + "'!", e); }
     }
 
-    public void loadInteractions() {
+    public void loadInteractions(@Nullable World world) {
         try {
+            List<UUID> loadedInteractions = interactions.stream().map(GInteraction::getUuid).toList();
             try(ResultSet resultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_interaction")) {
                 interactionwhile: while(resultSet.next()) {
                     String id = resultSet.getString("id");
                     try {
                         UUID uuid = UUID.fromString(resultSet.getString("uuid"));
+                        if(loadedInteractions.contains(uuid)) continue;
+
                         SimpleLocation location = SimpleLocation.fromString(resultSet.getString("location"));
-                        if(location == null) {
-                            gHoloMain.getLogger().warning("Could not load interaction '" + id + "', invalid location!");
-                            continue;
-                        }
+                        if(location == null || location.getWorld() == null || (world != null && world.equals(location.getWorld()))) continue;
+
                         GInteraction interaction = new GInteraction(uuid, id, location);
 
                         String dataString = resultSet.getString("data");
@@ -246,9 +249,13 @@ public class InteractionService {
 
     public void unloadInteractionForPlayer(GInteraction interaction, Player player) { if(interaction.getInteractionEntity() != null) interaction.getInteractionEntity().unloadInteraction(player); }
 
-    public void unloadInteractions() {
-        for(GInteraction interaction : interactions) unloadInteraction(interaction);
-        interactions.clear();
+    public void unloadInteractions(@Nullable World world) {
+        for(GInteraction interaction : interactions) {
+            if(world != null && world.equals(interaction.getRawLocation().getWorld())) continue;
+            unloadInteraction(interaction);
+        }
+        if(world == null) interactions.clear();
+        else interactions.removeIf(interaction -> interaction.getRawLocation().getWorld().equals(world));
     }
 
     public void writeInteraction(GInteraction interaction, boolean override) throws SQLException {

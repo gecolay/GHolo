@@ -8,7 +8,9 @@ import dev.geco.gholo.object.holo.GHoloUpdateType;
 import dev.geco.gholo.object.simple.SimpleLocation;
 import dev.geco.gholo.object.simple.SimpleOffset;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -254,18 +256,19 @@ public class HoloService {
         } catch(SQLException e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not remove holo '" + holo.getId() + "'!", e); }
     }
 
-    public void loadHolos() {
+    public void loadHolos(@Nullable World world) {
         try {
+            List<UUID> loadedHolos = holos.stream().map(GHolo::getUuid).toList();
             try(ResultSet resultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM gholo_holo")) {
                 holowhile: while(resultSet.next()) {
                     String id = resultSet.getString("id");
                     try {
                         UUID uuid = UUID.fromString(resultSet.getString("uuid"));
+                        if(loadedHolos.contains(uuid)) continue;
+
                         SimpleLocation location = SimpleLocation.fromString(resultSet.getString("location"));
-                        if(location == null) {
-                            gHoloMain.getLogger().warning("Could not load holo '" + id + "', invalid location!");
-                            continue;
-                        }
+                        if(location == null || location.getWorld() == null || (world != null && world.equals(location.getWorld()))) continue;
+
                         GHolo holo = new GHolo(uuid, id, location);
 
                         String dataString = resultSet.getString("data");
@@ -321,12 +324,14 @@ public class HoloService {
 
     private void clearHoloCurrentContentForPlayer(GHolo holo, Player player) { for(GHoloRow row : holo.getRows()) if(row.getHoloRowContent() != null) row.getHoloRowContent().getCurrentContentTypes().remove(player.getUniqueId()); }
 
-    public void unloadHolos() {
+    public void unloadHolos(@Nullable World world) {
         for(GHolo holo : holos) {
+            if(world != null && world.equals(holo.getRawLocation().getWorld())) continue;
             for(GHoloRow holoRow : holo.getRows()) gHoloMain.getHoloAnimationService().unsubscribe(holoRow);
             unloadHolo(holo);
         }
-        holos.clear();
+        if(world == null) holos.clear();
+        else holos.removeIf(holo -> holo.getRawLocation().getWorld().equals(world));
     }
 
     public void writeHolo(GHolo holo, boolean override) throws SQLException {

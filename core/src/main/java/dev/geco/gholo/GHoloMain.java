@@ -11,6 +11,7 @@ import dev.geco.gholo.cmd.tab.GInteractionTabComplete;
 import dev.geco.gholo.event.IPacketHandler;
 import dev.geco.gholo.event.InteractionEventHandler;
 import dev.geco.gholo.event.PlayerEventHandler;
+import dev.geco.gholo.event.WorldEventHandler;
 import dev.geco.gholo.metric.BStatsMetric;
 import dev.geco.gholo.service.ConfigService;
 import dev.geco.gholo.service.DataService;
@@ -184,9 +185,9 @@ public class GHoloMain extends JavaPlugin {
         serverConnectUtil.setupChannel();
         holoAnimationService.loadHoloAnimations();
         holoService.createTables();
-        holoService.loadHolos();
+        holoService.loadHolos(null);
         interactionService.createTables();
-        interactionService.loadInteractions();
+        interactionService.loadInteractions(null);
         if(interactionService.hasInteractions()) packetHandler.setupPlayerPacketHandlers();
         ImageUtil.generateFolder();
     }
@@ -211,8 +212,8 @@ public class GHoloMain extends JavaPlugin {
         dataService.close();
         serverConnectUtil.teardownChannel();
         if(interactionService.hasInteractions()) packetHandler.removePlayerPacketHandlers();
-        holoService.unloadHolos();
-        interactionService.unloadInteractions();
+        holoService.unloadHolos(null);
+        interactionService.unloadInteractions(null);
         holoAnimationService.stopHoloAnimations();
         interactionService.clearInteractions();
         holoImporterService.unregisterHoloImporters();
@@ -237,6 +238,7 @@ public class GHoloMain extends JavaPlugin {
     private void setupEvents() {
         getServer().getPluginManager().registerEvents(new PlayerEventHandler(this), this);
         getServer().getPluginManager().registerEvents(new InteractionEventHandler(this), this);
+        getServer().getPluginManager().registerEvents(new WorldEventHandler(this), this);
     }
 
     private boolean versionCheck() {

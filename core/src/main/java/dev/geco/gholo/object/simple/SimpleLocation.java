@@ -13,7 +13,7 @@ import java.util.logging.Level;
 
 public class SimpleLocation extends Location {
 
-    public SimpleLocation(@NotNull World world, double x, double y, double z) {
+    public SimpleLocation(World world, double x, double y, double z) {
         super(world, x, y, z);
     }
 
@@ -39,7 +39,6 @@ public class SimpleLocation extends Location {
         try {
             JSONObject data = (JSONObject) parser.parse(string);
             World world = Bukkit.getWorld((String) data.get("world"));
-            if(world == null) return null;
             double x = ((Number) data.get("x")).doubleValue();
             double y = ((Number) data.get("y")).doubleValue();
             double z = ((Number) data.get("z")).doubleValue();

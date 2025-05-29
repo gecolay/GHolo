@@ -719,8 +719,8 @@ public class GHoloCommand implements CommandExecutor {
                 boolean override = true;
                 if(args.length > 2) override = Boolean.parseBoolean(args[2]);
                 GHoloImporterResult importerResult = holoImporter.importHolos(gHoloMain, override);
-                gHoloMain.getHoloService().unloadHolos();
-                gHoloMain.getHoloService().loadHolos();
+                gHoloMain.getHoloService().unloadHolos(null);
+                gHoloMain.getHoloService().loadHolos(null);
                 if(!importerResult.hasSucceeded()) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import-import-error", "%Type%", args[1]);
                     break;
