@@ -58,10 +58,7 @@ public class DataService {
             if(type.equals("sqlite")) Class.forName("org.sqlite.JDBC");
             connection = getConnection(false);
             if(connection != null) {
-                if(!type.equals("sqlite")) {
-                    execute("CREATE DATABASE IF NOT EXISTS " + database);
-                    connection = getConnection(true);
-                }
+                if(!type.equals("sqlite")) connection = getConnection(true);
                 if(connection != null) {
                     retries = 0;
                     return true;
@@ -75,7 +72,7 @@ public class DataService {
 
     private Connection getConnection(boolean withDatabase) throws SQLException {
         return switch (type) {
-            case "mysql" -> DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + (withDatabase ? "/" + database : ""), user, password);
+            case "mysql" -> DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + (withDatabase ? "/" + database : "") + "?createDatabaseIfNotExist=true&useUnicode=true", user, password);
             case "sqlite" -> DriverManager.getConnection("jdbc:sqlite:" + new File(gHoloMain.getDataFolder(), "data/data.db").getPath());
             default -> null;
         };
