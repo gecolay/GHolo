@@ -1,7 +1,7 @@
 plugins {
     `java-library`
     `maven-publish`
-    id("com.gradleup.shadow") version "9.0.0-beta13"
+    id("com.gradleup.shadow") version "9.0.0-beta16"
     id("io.papermc.paperweight.userdev") version "2.0.0-beta.17" apply false
 }
 
@@ -27,15 +27,16 @@ allprojects {
 
 dependencies {
     api(project(":core"))
-    api(project(":v1_19_4", "reobf"))
-    api(project(":v1_20", "reobf"))
-    api(project(":v1_20_2", "reobf"))
-    api(project(":v1_20_3", "reobf"))
-    api(project(":v1_20_5", "reobf"))
-    api(project(":v1_21", "reobf"))
-    api(project(":v1_21_2", "reobf"))
-    api(project(":v1_21_4",  "reobf"))
-    api(project(":v1_21_5",  "reobf"))
+    api(project(":v1_19_4", io.papermc.paperweight.util.constants.REOBF_CONFIG))
+    api(project(":v1_20", io.papermc.paperweight.util.constants.REOBF_CONFIG))
+    api(project(":v1_20_2", io.papermc.paperweight.util.constants.REOBF_CONFIG))
+    api(project(":v1_20_3", io.papermc.paperweight.util.constants.REOBF_CONFIG))
+    api(project(":v1_20_5", io.papermc.paperweight.util.constants.REOBF_CONFIG))
+    api(project(":v1_21", io.papermc.paperweight.util.constants.REOBF_CONFIG))
+    api(project(":v1_21_2", io.papermc.paperweight.util.constants.REOBF_CONFIG))
+    api(project(":v1_21_4", io.papermc.paperweight.util.constants.REOBF_CONFIG))
+    api(project(":v1_21_5", io.papermc.paperweight.util.constants.REOBF_CONFIG))
+    api(project(":v1_21_6", "default"))
 }
 
 tasks {
@@ -43,7 +44,7 @@ tasks {
         archiveClassifier = ""
         minimize()
         manifest {
-            attributes["paperweight-mappings-namespace"] = "spigot"
+            attributes["paperweight-mappings-namespace"] = io.papermc.paperweight.util.constants.SPIGOT_NAMESPACE
         }
     }
 
