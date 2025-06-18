@@ -1,4 +1,4 @@
-package dev.geco.gholo.mcv.v1_21_5.object.interaction;
+package dev.geco.gholo.mcv.v1_21_6.object.interaction;
 
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.interaction.GInteraction;

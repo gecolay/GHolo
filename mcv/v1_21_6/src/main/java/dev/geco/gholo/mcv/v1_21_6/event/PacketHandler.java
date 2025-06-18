@@ -1,4 +1,4 @@
-package dev.geco.gholo.mcv.v1_21_5.event;
+package dev.geco.gholo.mcv.v1_21_6.event;
 
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.event.IPacketHandler;

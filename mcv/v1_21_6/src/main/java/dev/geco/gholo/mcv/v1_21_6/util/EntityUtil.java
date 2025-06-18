@@ -1,7 +1,7 @@
-package dev.geco.gholo.mcv.v1_21_5.util;
+package dev.geco.gholo.mcv.v1_21_6.util;
 
-import dev.geco.gholo.mcv.v1_21_5.object.holo.GHoloRowContent;
-import dev.geco.gholo.mcv.v1_21_5.object.interaction.GInteractionEntity;
+import dev.geco.gholo.mcv.v1_21_6.object.holo.GHoloRowContent;
+import dev.geco.gholo.mcv.v1_21_6.object.interaction.GInteractionEntity;
 import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.IGHoloRowContent;
 import dev.geco.gholo.object.interaction.GInteraction;

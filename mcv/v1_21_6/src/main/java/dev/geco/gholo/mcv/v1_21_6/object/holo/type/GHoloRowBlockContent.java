@@ -1,4 +1,4 @@
-package dev.geco.gholo.mcv.v1_21_5.object.holo.type;
+package dev.geco.gholo.mcv.v1_21_6.object.holo.type;
 
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.holo.GHoloData;
