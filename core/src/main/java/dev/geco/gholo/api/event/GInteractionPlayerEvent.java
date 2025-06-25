@@ -8,14 +8,14 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class GPlayerInteractionEvent extends PlayerEvent implements Cancellable {
+public class GInteractionPlayerEvent extends PlayerEvent implements Cancellable {
 
     private final GInteraction interaction;
     private final GInteractType interactType;
     private boolean cancel = false;
     private static final HandlerList handlers = new HandlerList();
 
-    public GPlayerInteractionEvent(@NotNull GInteraction interaction, Player player, GInteractType interactType) {
+    public GInteractionPlayerEvent(@NotNull GInteraction interaction, Player player, GInteractType interactType) {
         super(player);
         this.interaction = interaction;
         this.interactType = interactType;

@@ -42,20 +42,20 @@ public class GHolo {
 
     public @NotNull List<GHoloRow> getRows() { return rows; }
 
-    public @Nullable GHoloRow getRow(int position) throws IndexOutOfBoundsException { return rows.get(position); }
+    public @Nullable GHoloRow getRow(int position) { return (position >= 0 && position < rows.size()) ? rows.get(position) : null; }
 
     public @NotNull GHolo addRow(@NotNull GHoloRow holoRow) {
         rows.add(holoRow);
         return this;
     }
 
-    public @NotNull GHolo insertRow(@NotNull GHoloRow holoRow, int position) throws IndexOutOfBoundsException {
+    public @NotNull GHolo insertRow(@NotNull GHoloRow holoRow, int position) {
         rows.add(position, holoRow);
         return this;
     }
 
-    public @NotNull GHolo removeRow(int position) throws IndexOutOfBoundsException {
-        rows.remove(position);
+    public @NotNull GHolo removeRow(int position) {
+        if(position >= 0 && position < rows.size()) rows.remove(position);
         return this;
     }
 

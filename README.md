@@ -19,7 +19,7 @@ git clone https://github.com/Gecolay/GHolo.git
 
 ### Build
 
-Run the `gradle build` command.
+Run the `gradlew clean build` command.
 
 The final `GHolo-x.x-x.jar` file will be in the [`build/libs`](./build/libs) folder.
 

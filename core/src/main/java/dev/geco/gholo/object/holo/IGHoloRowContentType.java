@@ -1,6 +1,5 @@
-package dev.geco.gholo.mcv.v1_20.object.holo.type;
+package dev.geco.gholo.object.holo;
 
-import dev.geco.gholo.object.holo.GHoloUpdateType;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 

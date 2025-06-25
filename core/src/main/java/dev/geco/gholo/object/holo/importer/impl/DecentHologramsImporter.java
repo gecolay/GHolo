@@ -7,6 +7,7 @@ import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.importer.GHoloImporter;
 import dev.geco.gholo.object.holo.importer.GHoloImporterResult;
 import dev.geco.gholo.object.simple.SimpleLocation;
+import dev.geco.gholo.object.simple.SimpleOffset;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -17,6 +18,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class DecentHologramsImporter extends GHoloImporter {
 
@@ -31,8 +33,8 @@ public class DecentHologramsImporter extends GHoloImporter {
         if(!hologramsDir.exists()) return new GHoloImporterResult(true, 0);
 
         for(File file : hologramsDir.listFiles()) {
+            String id = file.getName().replace(" ", "").replace(".yml", "");
             try {
-                String id = file.getName().replace(" ", "").replace(".yml", "");
                 if(!override && gHoloMain.getHoloService().getHolo(id) != null) continue;
 
                 FileConfiguration fileContent = YamlConfiguration.loadConfiguration(file);
@@ -62,11 +64,17 @@ public class DecentHologramsImporter extends GHoloImporter {
                     }
                 }
 
+                double offset = 0;
+
                 gHoloMain.getHoloService().writeHolo(holo, override);
-                for(GHoloRow row : holo.getRows()) gHoloMain.getHoloService().writeHoloRow(row, row.getPosition());
+                for(GHoloRow row : holo.getRows()) {
+                    row.setOffset(new SimpleOffset(0, offset, 0));
+                    gHoloMain.getHoloService().writeHoloRow(row, row.getPosition());
+                    offset -= gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
+                }
 
                 imported++;
-            } catch(Throwable e) { e.printStackTrace(); }
+            } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not import holo '" + id + "'!", e); }
         }
 
         return new GHoloImporterResult(true, imported);

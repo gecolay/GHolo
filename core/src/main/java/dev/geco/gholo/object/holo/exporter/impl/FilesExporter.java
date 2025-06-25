@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
 
 public class FilesExporter extends GHoloExporter {
 
@@ -39,7 +40,8 @@ public class FilesExporter extends GHoloExporter {
                 File holoFile = new File(holoFileDir.getPath(), holo.getId() + ".yml");
                 if(!override && holoFile.exists()) continue;
                 getHoloFileStructure(holo).save(holoFile);
-            } catch(Throwable e) { e.printStackTrace(); }
+                exported++;
+            } catch(Throwable e) { gHoloMain.getLogger().log(Level.WARNING, "Could not export holo '" + holo.getId() + "'!", e); }
         }
 
         return new GHoloExporterResult(true, exported);
@@ -51,7 +53,7 @@ public class FilesExporter extends GHoloExporter {
         Map<String, Object> holoData = serializeData(holo.getRawData());
         if(!holoData.isEmpty()) structure.set("Holo.data", holoData);
         List<Map<String, Object>> rows = new ArrayList<>();
-        for (GHoloRow holoRow : holo.getRows()) {
+        for(GHoloRow holoRow : holo.getRows()) {
             Map<String, Object> rowMap = new HashMap<>();
             rowMap.put("content", holoRow.getContent());
             Map<String, Object> offset = serializeOffset(holoRow.getRawOffset());
@@ -90,25 +92,25 @@ public class FilesExporter extends GHoloExporter {
         if(!Objects.equals(data.getTextAlignment(), GHoloData.DEFAULT_TEXT_ALIGNMENT)) dataMap.put("textAlignment", data.getTextAlignment());
         if(!Objects.equals(data.getBillboard(), GHoloData.DEFAULT_BILLBOARD)) dataMap.put("billboard", data.getBillboard());
         if(data.getSeeThrough() != GHoloData.DEFAULT_CAN_SEE_THROUGH) dataMap.put("seeThrough", data.getSeeThrough());
-        if(!Objects.equals(data.getRawScale(), GHoloData.DEFAULT_SCALE)) {
+        if(data.getRawScale().x != GHoloData.DEFAULT_SCALE.x || data.getRawScale().y != GHoloData.DEFAULT_SCALE.y || data.getRawScale().z != GHoloData.DEFAULT_SCALE.z) {
             Map<String, Object> scaleMap = new HashMap<>();
-            scaleMap.put("x", data.getRawScale().x);
-            scaleMap.put("y", data.getRawScale().y);
-            scaleMap.put("z", data.getRawScale().z);
+            if(data.getRawScale().x != GHoloData.DEFAULT_SCALE.x) scaleMap.put("x", data.getRawScale().x);
+            if(data.getRawScale().y != GHoloData.DEFAULT_SCALE.y) scaleMap.put("y", data.getRawScale().y);
+            if(data.getRawScale().z != GHoloData.DEFAULT_SCALE.z) scaleMap.put("z", data.getRawScale().z);
             dataMap.put("scale", scaleMap);
         }
-        if(!Objects.equals(data.getRawRotation(), GHoloData.DEFAULT_ROTATION)) {
+        if(!Objects.equals(data.getRawRotation().getYaw(), GHoloData.DEFAULT_ROTATION.getYaw()) || !Objects.equals(data.getRawRotation().getPitch(), GHoloData.DEFAULT_ROTATION.getPitch())) {
             Map<String, Object> rotationMap = new HashMap<>();
-            rotationMap.put("yaw", data.getRawRotation().getYaw());
-            rotationMap.put("pitch", data.getRawRotation().getPitch());
+            if(!Objects.equals(data.getRawRotation().getYaw(), GHoloData.DEFAULT_ROTATION.getYaw())) rotationMap.put("yaw", data.getRawRotation().getYaw());
+            if(!Objects.equals(data.getRawRotation().getPitch(), GHoloData.DEFAULT_ROTATION.getPitch())) rotationMap.put("pitch", data.getRawRotation().getPitch());
             dataMap.put("rotation", rotationMap);
         }
         if(data.getBrightness() != GHoloData.DEFAULT_BRIGHTNESS) dataMap.put("brightness", data.getBrightness());
         if(!Objects.equals(data.getPermission(), GHoloData.DEFAULT_PERMISSION)) dataMap.put("permission", data.getPermission());
-        if(!Objects.equals(data.getRawSize(), GHoloData.DEFAULT_SIZE)) {
+        if(data.getRawSize().getWidth() != GHoloData.DEFAULT_SIZE.getWidth() || data.getRawSize().getHeight() != GHoloData.DEFAULT_SIZE.getHeight()) {
             Map<String, Object> sizeMap = new HashMap<>();
-            sizeMap.put("width", data.getRawSize().getWidth());
-            sizeMap.put("height", data.getRawSize().getHeight());
+            if(data.getRawSize().getWidth() != GHoloData.DEFAULT_SIZE.getWidth()) sizeMap.put("width", data.getRawSize().getWidth());
+            if(data.getRawSize().getHeight() != GHoloData.DEFAULT_SIZE.getHeight()) sizeMap.put("height", data.getRawSize().getHeight());
             dataMap.put("size", sizeMap);
         }
         return dataMap;

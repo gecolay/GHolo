@@ -4,6 +4,7 @@ import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.holo.GHoloData;
 import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.GHoloUpdateType;
+import dev.geco.gholo.object.holo.IGHoloRowContentType;
 import dev.geco.gholo.object.simple.SimpleLocation;
 import dev.geco.gholo.object.simple.SimpleOffset;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -51,7 +52,7 @@ public class GHoloRowEntityContent extends Entity implements IGHoloRowContentTyp
             EntityType<?> entityType = BuiltInRegistries.ENTITY_TYPE.get(resourceLocation);
             if(create || currentEntityTypes.get(player.getUniqueId()) != entityType) {
                 currentEntityTypes.put(player.getUniqueId(), entityType);
-                serverPlayer.connection.send(new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), entityType, 0, getDeltaMovement(), getYHeadRot()));
+                serverPlayer.connection.send(new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), entityType, 0, getDeltaMovement(), getYRot()));
             }
             serverPlayer.connection.send(getDataPacket());
         } catch(Throwable ignored) { }
@@ -119,12 +120,12 @@ public class GHoloRowEntityContent extends Entity implements IGHoloRowContentTyp
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {}
+    protected void defineSynchedData(SynchedEntityData.Builder builder) { }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag compoundTag) {}
+    protected void readAdditionalSaveData(CompoundTag compoundTag) { }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag compoundTag) {}
+    protected void addAdditionalSaveData(CompoundTag compoundTag) { }
 
 }

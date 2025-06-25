@@ -45,7 +45,7 @@ public class TextFormatUtil {
         return replacePlaceholders(text, player);
     }
 
-    private String replacePlaceholders(String text, Player player) {
+    public String replacePlaceholders(String text, Player player) {
         if(gHoloMain.hasPlaceholderAPILink()) text = PlaceholderAPI.setPlaceholders(player, text);
         return text;
     }

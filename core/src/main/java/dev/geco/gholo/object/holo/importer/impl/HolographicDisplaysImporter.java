@@ -6,6 +6,7 @@ import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.importer.GHoloImporter;
 import dev.geco.gholo.object.holo.importer.GHoloImporterResult;
 import dev.geco.gholo.object.simple.SimpleLocation;
+import dev.geco.gholo.object.simple.SimpleOffset;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class HolographicDisplaysImporter extends GHoloImporter {
 
@@ -55,13 +57,17 @@ public class HolographicDisplaysImporter extends GHoloImporter {
                 GHolo holo = new GHolo(UUID.randomUUID(), id, location);
                 gHoloMain.getHoloService().writeHolo(holo, override);
 
+                double offset = 0;
+
                 for(String rowContent : rows) {
                     GHoloRow row = new GHoloRow(holo, rowContent);
+                    row.setOffset(new SimpleOffset(0, offset, 0));
                     gHoloMain.getHoloService().writeHoloRow(row, row.getPosition());
+                    offset -= gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
                 }
 
                 imported++;
-            } catch(Throwable e) { e.printStackTrace(); }
+            } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not import holo '" + id + "'!", e); }
         }
 
         return new GHoloImporterResult(true, imported);

@@ -4,6 +4,7 @@ import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.holo.GHoloData;
 import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.GHoloUpdateType;
+import dev.geco.gholo.object.holo.IGHoloRowContentType;
 import dev.geco.gholo.object.simple.SimpleLocation;
 import dev.geco.gholo.object.simple.SimpleOffset;
 import net.minecraft.core.Holder;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.logging.Level;
 
 public class GHoloRowItemStackContent extends ItemEntity implements IGHoloRowContentType {
 
@@ -44,7 +46,6 @@ public class GHoloRowItemStackContent extends ItemEntity implements IGHoloRowCon
         this.gHoloMain = gHoloMain;
         persist = false;
         setNoGravity(true);
-        canMobPickup = false;
         setNeverPickUp();
         setUnlimitedLifetime();
         EntityDataAccessor<ItemStack> itemAccessor = null;
@@ -54,7 +55,7 @@ public class GHoloRowItemStackContent extends ItemEntity implements IGHoloRowCon
             Field field = fieldList.getFirst();
             field.setAccessible(true);
             itemAccessor = (EntityDataAccessor<ItemStack>) field.get(this);
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not load field", e); }
         holoItemData = itemAccessor;
         for(GHoloUpdateType updateType : GHoloUpdateType.values()) handleUpdate(updateType);
     }
@@ -62,7 +63,7 @@ public class GHoloRowItemStackContent extends ItemEntity implements IGHoloRowCon
     @Override
     public void load(Player player, String content, boolean create) {
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-        if(create) serverPlayer.connection.send(new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYHeadRot()));
+        if(create) serverPlayer.connection.send(new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYRot()));
         serverPlayer.connection.send(getDataPacket(content));
     }
 

@@ -7,6 +7,7 @@ import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.importer.GHoloImporter;
 import dev.geco.gholo.object.holo.importer.GHoloImporterResult;
 import dev.geco.gholo.object.simple.SimpleLocation;
+import dev.geco.gholo.object.simple.SimpleOffset;
 import dev.geco.gholo.object.simple.SimpleRotation;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -18,6 +19,7 @@ import org.joml.Vector3f;
 import java.io.File;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class FancyHologramsImporter extends GHoloImporter {
 
@@ -92,13 +94,18 @@ public class FancyHologramsImporter extends GHoloImporter {
 
                 List<String> rows = fileContent.getStringList("holograms." + id + ".text");
                 rows.replaceAll(rowContent -> rowContent.replaceAll("(?i)<#([0-9A-F]+)>", "#$1").replaceAll("(?i)&#([0-9A-F]{6})[0-9A-F]*", "#$1"));
+
+                double offset = 0;
+
                 for(String rowContent : rows) {
                     GHoloRow row = new GHoloRow(holo, rowContent);
+                    row.setOffset(new SimpleOffset(0, offset, 0));
                     gHoloMain.getHoloService().writeHoloRow(row, row.getPosition());
+                    offset -= gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
                 }
 
                 imported++;
-            } catch(Throwable e) { e.printStackTrace(); }
+            } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not import holo '" + id + "'!", e); }
         }
 
         return new GHoloImporterResult(true, imported);

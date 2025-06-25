@@ -19,6 +19,7 @@ public class ServerCommandAction extends GInteractionActionType {
     public @NotNull GInteractionActionTypeResult execute(@NotNull GHoloMain gHoloMain, @NotNull Player player, @NotNull GInteractType interactType, @NotNull String parameter) {
 
         String command = parameter.replace("%player%", player.getName());
+        command = gHoloMain.getTextFormatUtil().replacePlaceholders(command, player);
 
         boolean success = Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
 

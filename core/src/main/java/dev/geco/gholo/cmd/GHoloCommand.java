@@ -206,7 +206,9 @@ public class GHoloCommand implements CommandExecutor {
                     double x = gHoloMain.getLocationUtil().parseLocationInput(args[2], location.getX());
                     double y = gHoloMain.getLocationUtil().parseLocationInput(args[3], location.getY());
                     double z = gHoloMain.getLocationUtil().parseLocationInput(args[4], location.getZ());
-                    location.set(x, y, z);
+                    location.setX(x);
+                    location.setY(y);
+                    location.setZ(z);
                     gHoloMain.getHoloService().updateHoloLocation(holo, location);
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-move", "%Holo%", holo.getId());
                 } catch(NumberFormatException e) {
@@ -376,7 +378,9 @@ public class GHoloCommand implements CommandExecutor {
                         gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Position%", args[2]);
                         break;
                     }
-                    gHoloMain.getHoloService().removeHoloRow(holoRow, true);
+                    boolean updateOffsets = true;
+                    if(args.length > 3) updateOffsets = Boolean.parseBoolean(args[3]);
+                    gHoloMain.getHoloService().removeHoloRow(holoRow, updateOffsets);
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-removerow", "%Holo%", holo.getId(), "%Position%", Integer.parseInt(args[2]));
                 } catch(NumberFormatException e) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-row-error", "%Position%", args[2]);
@@ -556,6 +560,10 @@ public class GHoloCommand implements CommandExecutor {
                     }
                     case "rotation" -> {
                         optionArg++;
+                        if(args.length == optionArg + 1) {
+                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-use-error");
+                            return true;
+                        }
                         switch(args[optionArg].toLowerCase()) {
                             case "yaw" -> {
                                 try {
@@ -600,6 +608,10 @@ public class GHoloCommand implements CommandExecutor {
                     }
                     case "size" -> {
                         optionArg++;
+                        if(args.length == optionArg + 1) {
+                            gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-use-error");
+                            return true;
+                        }
                         switch(args[optionArg].toLowerCase()) {
                             case "width" -> {
                                 try {
@@ -704,9 +716,11 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import-exist-error", "%Type%", args[1]);
                     break;
                 }
-                GHoloImporterResult importerResult = holoImporter.importHolos(gHoloMain, true);
-                gHoloMain.getHoloService().unloadHolos();
-                gHoloMain.getHoloService().loadHolos();
+                boolean override = true;
+                if(args.length > 2) override = Boolean.parseBoolean(args[2]);
+                GHoloImporterResult importerResult = holoImporter.importHolos(gHoloMain, override);
+                gHoloMain.getHoloService().unloadHolos(null);
+                gHoloMain.getHoloService().loadHolos(null);
                 if(!importerResult.hasSucceeded()) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-import-import-error", "%Type%", args[1]);
                     break;
@@ -723,7 +737,9 @@ public class GHoloCommand implements CommandExecutor {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-export-exist-error", "%Type%", args[1]);
                     break;
                 }
-                GHoloExporterResult exporterResult = holoExporter.exportHolos(gHoloMain, true);
+                boolean override = true;
+                if(args.length > 2) override = Boolean.parseBoolean(args[2]);
+                GHoloExporterResult exporterResult = holoExporter.exportHolos(gHoloMain, override);
                 if(!exporterResult.hasSucceeded()) {
                     gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-export-export-error", "%Type%", args[1]);
                     break;

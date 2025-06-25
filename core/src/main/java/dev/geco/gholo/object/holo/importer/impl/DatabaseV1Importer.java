@@ -18,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class DatabaseV1Importer extends GHoloImporter {
 
@@ -38,25 +39,24 @@ public class DatabaseV1Importer extends GHoloImporter {
                         FROM information_schema.tables
                         WHERE table_schema = DATABASE() AND table_name = 'holo'
                     """);
-
             if(!migrateTableSet.next()) return new GHoloImporterResult(true, imported);
         } catch(SQLException e) {
-            e.printStackTrace();
+            gHoloMain.getLogger().log(Level.SEVERE, "Could not check database tables", e);
             return new GHoloImporterResult(false, imported);
         }
 
         try {
             try(ResultSet resultSet = gHoloMain.getDataService().executeAndGet("SELECT * FROM holo")) {
                 while(resultSet.next()) {
+                    String id = resultSet.getString("id");
                     try {
-                        String id = resultSet.getString("id");
                         String worldString = resultSet.getString("l_world");
                         World world;
                         try {
                             UUID worldUuid = UUID.fromString(worldString);
                             world = Bukkit.getWorld(worldUuid);
                             if(world == null) continue;
-                        } catch (IllegalArgumentException e) {
+                        } catch(IllegalArgumentException e) {
                             world = Bukkit.getWorld(worldString);
                         }
                         if(world == null) continue;
@@ -101,16 +101,10 @@ public class DatabaseV1Importer extends GHoloImporter {
                         for(GHoloRow row : holo.getRows()) gHoloMain.getHoloService().writeHoloRow(row, row.getPosition());
 
                         imported++;
-                    } catch(Throwable e) { e.printStackTrace(); }
+                    } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not import holo '" + id + "'!", e); }
                 }
             }
-
-            gHoloMain.getDataService().close();
-            gHoloMain.getDataService().connect();
-
-            gHoloMain.getDataService().execute("DROP TABLE holo");
-            gHoloMain.getDataService().execute("DROP TABLE holo_row");
-        } catch(SQLException e) { e.printStackTrace(); }
+        } catch(SQLException e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not import holos!", e); }
 
         return new GHoloImporterResult(true, imported);
     }
@@ -152,7 +146,7 @@ public class DatabaseV1Importer extends GHoloImporter {
                         data.setPermission(dataSplit[1]);
                         break;
                 }
-            } catch(Throwable e) { e.printStackTrace(); }
+            } catch(Throwable e) { GHoloMain.getInstance().getLogger().log(Level.SEVERE, "Could not load holo data!", e); }
         }
     }
 

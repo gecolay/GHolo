@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
 
 public class DataService {
 
@@ -47,7 +48,7 @@ public class DataService {
 
     public boolean isConnected() {
         try {
-            if(connection != null && !connection.isClosed()) return true;
+            if(connection != null && !connection.isClosed() && connection.isValid(5)) return true;
         } catch(SQLException ignored) { }
         return false;
     }
@@ -57,16 +58,13 @@ public class DataService {
             if(type.equals("sqlite")) Class.forName("org.sqlite.JDBC");
             connection = getConnection(false);
             if(connection != null) {
-                if(!type.equals("sqlite")) {
-                    execute("CREATE DATABASE IF NOT EXISTS " + database);
-                    connection = getConnection(true);
-                }
+                if(!type.equals("sqlite")) connection = getConnection(true);
                 if(connection != null) {
                     retries = 0;
                     return true;
                 }
             }
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not connect to database!", e); }
         if(retries == MAX_RETRIES) return false;
         retries++;
         return reconnect();
@@ -74,7 +72,7 @@ public class DataService {
 
     private Connection getConnection(boolean withDatabase) throws SQLException {
         return switch (type) {
-            case "mysql" -> DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + (withDatabase ? "/" + database : ""), user, password);
+            case "mysql" -> DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + (withDatabase ? "/" + database : "") + "?createDatabaseIfNotExist=true&useUnicode=true", user, password);
             case "sqlite" -> DriverManager.getConnection("jdbc:sqlite:" + new File(gHoloMain.getDataFolder(), "data/data.db").getPath());
             default -> null;
         };
@@ -97,6 +95,7 @@ public class DataService {
 
     private void ensureConnection() throws SQLException {
         if(isConnected()) return;
+        if(reconnect()) return;
         if(!reconnect()) throw new SQLException("Failed to reconnect to the " + type + " database.");
     }
 

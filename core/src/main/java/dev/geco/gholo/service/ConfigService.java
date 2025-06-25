@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 public class ConfigService {
 
@@ -68,7 +69,7 @@ public class ConfigService {
                     SYMBOLS.put(symbol, String.valueOf(gHoloMain.getConfig().getString("Options.Symbols." + symbol).toCharArray()[0]));
                 }
             }
-        } catch(Throwable ignored) { }
+        } catch(Throwable e) { gHoloMain.getLogger().log(Level.WARNING, "Could not load config symbols correctly!", e); }
         FEATUREFLAGS = gHoloMain.getConfig().getStringList("Options.FeatureFlags");
     }
 

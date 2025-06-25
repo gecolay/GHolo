@@ -63,6 +63,8 @@ public class GInteractionTabComplete implements TabCompleter {
                 if(interaction != null) for(int position = 1; position <= interaction.getActions().size(); position++) complete.add("" + position);
             } else if(args[0].equalsIgnoreCase("option")) {
                 complete.addAll(List.of("permission", "size"));
+            } else if(args[0].equalsIgnoreCase("import") || args[0].equalsIgnoreCase("export")) {
+                complete.addAll(List.of("true", "false"));
             }
             if(!args[args.length - 1].isEmpty()) {
                 for(String entry : complete) if(entry.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) completeStarted.add(entry);
@@ -77,7 +79,7 @@ public class GInteractionTabComplete implements TabCompleter {
             } else if(args[0].equalsIgnoreCase("insertaction") || args[0].equalsIgnoreCase("setaction")) {
                 complete.addAll(gHoloMain.getInteractionActionService().getInteractionActions().keySet());
             } else if(args[0].equalsIgnoreCase("option")) {
-                if(args[3].equalsIgnoreCase("size")) {
+                if(args[2].equalsIgnoreCase("size")) {
                     complete.addAll(List.of("width", "height"));
                 } else complete.add("*");
             }
@@ -101,7 +103,7 @@ public class GInteractionTabComplete implements TabCompleter {
                     complete.addAll(List.of("~:~:~:~", "world:x:y:z", "world:x:y:z:yaw:pitch"));
                 }
             } else if(args[0].equalsIgnoreCase("option")) {
-                if(args[3].equalsIgnoreCase("size")) {
+                if(args[2].equalsIgnoreCase("size")) {
                     complete.add("*");
                 }
             }

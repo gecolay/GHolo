@@ -11,6 +11,7 @@ import dev.geco.gholo.cmd.tab.GInteractionTabComplete;
 import dev.geco.gholo.event.IPacketHandler;
 import dev.geco.gholo.event.InteractionEventHandler;
 import dev.geco.gholo.event.PlayerEventHandler;
+import dev.geco.gholo.event.WorldEventHandler;
 import dev.geco.gholo.metric.BStatsMetric;
 import dev.geco.gholo.service.ConfigService;
 import dev.geco.gholo.service.DataService;
@@ -184,11 +185,11 @@ public class GHoloMain extends JavaPlugin {
         serverConnectUtil.setupChannel();
         holoAnimationService.loadHoloAnimations();
         holoService.createTables();
-        holoService.loadHolos();
+        holoService.loadHolos(null);
         interactionService.createTables();
-        interactionService.loadInteractions();
+        interactionService.loadInteractions(null);
+        if(interactionService.hasInteractions()) packetHandler.setupPlayerPacketHandlers();
         ImageUtil.generateFolder();
-        packetHandler.setupPlayerPacketHandlers();
     }
 
     public void reload(CommandSender sender) {
@@ -210,9 +211,9 @@ public class GHoloMain extends JavaPlugin {
     private void unload() {
         dataService.close();
         serverConnectUtil.teardownChannel();
-        packetHandler.removePlayerPacketHandlers();
-        holoService.unloadHolos();
-        interactionService.unloadInteractions();
+        if(interactionService.hasInteractions()) packetHandler.removePlayerPacketHandlers();
+        holoService.unloadHolos(null);
+        interactionService.unloadInteractions(null);
         holoAnimationService.stopHoloAnimations();
         interactionService.clearInteractions();
         holoImporterService.unregisterHoloImporters();
@@ -237,6 +238,7 @@ public class GHoloMain extends JavaPlugin {
     private void setupEvents() {
         getServer().getPluginManager().registerEvents(new PlayerEventHandler(this), this);
         getServer().getPluginManager().registerEvents(new InteractionEventHandler(this), this);
+        getServer().getPluginManager().registerEvents(new WorldEventHandler(this), this);
     }
 
     private boolean versionCheck() {
@@ -259,12 +261,12 @@ public class GHoloMain extends JavaPlugin {
         try {
             Class.forName("io.papermc.paper.event.entity.EntityMoveEvent");
             supportsPaperFeature = true;
-        } catch(ClassNotFoundException ignored) { supportsPaperFeature = false; }
+        } catch(ClassNotFoundException e) { supportsPaperFeature = false; }
 
         try {
             Class.forName("io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler");
             supportsTaskFeature = true;
-        } catch(ClassNotFoundException ignored) { supportsTaskFeature = false; }
+        } catch(ClassNotFoundException e) { supportsTaskFeature = false; }
     }
 
     private void loadPluginDependencies() {

@@ -9,7 +9,7 @@
 # Animations can contain other animations, but only those created before the containing animation
 # In the default example with "test" and "test_2" -> only "test_2" may contain "test" but "test" may not contain "test_2"
 #
-# Animation can be used in holos in the format "%animation_id%" like "%test%"
+# A animation can be used in a holo in the format "%animation_id%" like "%test%"
 #
 # ===============================================================================================
 

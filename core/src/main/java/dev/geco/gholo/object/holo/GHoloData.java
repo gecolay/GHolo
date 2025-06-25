@@ -1,13 +1,16 @@
 package dev.geco.gholo.object.holo;
 
+import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.simple.SimpleRotation;
 import dev.geco.gholo.object.simple.SimpleSize;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import java.util.Objects;
+import java.util.logging.Level;
 
 public class GHoloData implements Cloneable {
 
@@ -24,111 +27,111 @@ public class GHoloData implements Cloneable {
     public static final String DEFAULT_PERMISSION = null;
     public static final SimpleSize DEFAULT_SIZE = new SimpleSize(1f, 1f);
 
-    private Double range = DEFAULT_RANGE;
+    private double range = DEFAULT_RANGE;
     private String backgroundColor = DEFAULT_BACKGROUND_COLOR;
-    private Byte textOpacity = DEFAULT_TEXT_OPACITY;
-    private Boolean hasTextShadow = DEFAULT_HAS_TEXT_SHADOW;
+    private byte textOpacity = DEFAULT_TEXT_OPACITY;
+    private boolean hasTextShadow = DEFAULT_HAS_TEXT_SHADOW;
     private String textAlignment = DEFAULT_TEXT_ALIGNMENT;
     private String billboard = DEFAULT_BILLBOARD;
-    private Boolean canSeeThrough = DEFAULT_CAN_SEE_THROUGH;
-    private Vector3f scale = DEFAULT_SCALE;
-    private SimpleRotation rotation = DEFAULT_ROTATION;
+    private boolean canSeeThrough = DEFAULT_CAN_SEE_THROUGH;
+    private Vector3f scale = new Vector3f(1f, 1f, 1f);
+    private SimpleRotation rotation = new SimpleRotation(null, null);
     private Byte brightness = DEFAULT_BRIGHTNESS;
     private String permission = DEFAULT_PERMISSION;
-    private SimpleSize size = DEFAULT_SIZE;
+    private SimpleSize size = new SimpleSize(1f, 1f);
 
-    public Double getRange() { return range; }
+    public double getRange() { return range; }
 
-    public GHoloData setRange(Double range) {
+    public @NotNull GHoloData setRange(double range) {
         this.range = range;
         return this;
     }
 
-    public String getBackgroundColor() { return backgroundColor; }
+    public @Nullable String getBackgroundColor() { return backgroundColor; }
 
-    public GHoloData setBackgroundColor(String backgroundColor) {
+    public @NotNull GHoloData setBackgroundColor(@Nullable String backgroundColor) {
         this.backgroundColor = backgroundColor;
         return this;
     }
 
-    public Byte getTextOpacity() { return textOpacity; }
+    public byte getTextOpacity() { return textOpacity; }
 
-    public GHoloData setTextOpacity(Byte textOpacity) {
+    public @NotNull GHoloData setTextOpacity(byte textOpacity) {
         this.textOpacity = textOpacity;
         return this;
     }
 
-    public Boolean getTextShadow() { return hasTextShadow; }
+    public boolean getTextShadow() { return hasTextShadow; }
 
-    public GHoloData setTextShadow(Boolean hasTextShadow) {
+    public @NotNull GHoloData setTextShadow(boolean hasTextShadow) {
         this.hasTextShadow = hasTextShadow;
         return this;
     }
 
-    public String getTextAlignment() { return textAlignment; }
+    public @NotNull String getTextAlignment() { return textAlignment; }
 
-    public GHoloData setTextAlignment(String textAlignment) {
+    public @NotNull GHoloData setTextAlignment(@NotNull String textAlignment) {
         this.textAlignment = textAlignment;
         return this;
     }
 
-    public String getBillboard() { return billboard; }
+    public @NotNull String getBillboard() { return billboard; }
 
-    public GHoloData setBillboard(String billboard) {
+    public @NotNull GHoloData setBillboard(@NotNull String billboard) {
         this.billboard = billboard;
         return this;
     }
 
-    public Boolean getSeeThrough() { return canSeeThrough; }
+    public boolean getSeeThrough() { return canSeeThrough; }
 
-    public GHoloData setSeeThrough(Boolean canSeeThrough) {
+    public @NotNull GHoloData setSeeThrough(boolean canSeeThrough) {
         this.canSeeThrough = canSeeThrough;
         return this;
     }
 
-    public Vector3f getScale() { return scale; }
+    public @NotNull Vector3f getScale() { return scale; }
 
-    public Vector3f getRawScale() { try { return (Vector3f) scale.clone(); } catch(CloneNotSupportedException e) { throw new Error(e); } }
+    public @NotNull Vector3f getRawScale() { try { return (Vector3f) scale.clone(); } catch(CloneNotSupportedException e) { throw new Error(e); } }
 
-    public GHoloData setScale(Vector3f scale) {
+    public @NotNull GHoloData setScale(@NotNull Vector3f scale) {
         this.scale = scale;
         return this;
     }
 
-    public SimpleRotation getRotation() { return rotation.clone(); }
+    public @NotNull SimpleRotation getRotation() { return rotation.clone(); }
 
-    public SimpleRotation getRawRotation() { return rotation; }
+    public @NotNull SimpleRotation getRawRotation() { return rotation; }
 
-    public GHoloData setRotation(SimpleRotation rotation) {
+    public @NotNull GHoloData setRotation(@NotNull SimpleRotation rotation) {
         this.rotation = rotation.clone();
         return this;
     }
 
-    public Byte getBrightness() { return brightness; }
+    public @Nullable Byte getBrightness() { return brightness; }
 
-    public GHoloData setBrightness(Byte brightness) {
+    public @NotNull GHoloData setBrightness(@Nullable Byte brightness) {
         this.brightness = brightness;
         return this;
     }
 
-    public String getPermission() { return permission; }
+    public @Nullable String getPermission() { return permission; }
 
-    public GHoloData setPermission(String permission) {
+    public @NotNull GHoloData setPermission(@Nullable String permission) {
         this.permission = permission;
         return this;
     }
 
-    public SimpleSize getSize() { return size.clone(); }
+    public @NotNull SimpleSize getSize() { return size.clone(); }
 
-    public SimpleSize getRawSize() { return size; }
+    public @NotNull SimpleSize getRawSize() { return size; }
 
-    public GHoloData setSize(SimpleSize size) {
+    public @NotNull GHoloData setSize(@NotNull SimpleSize size) {
         this.size = size.clone();
         return this;
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         JSONObject data = new JSONObject();
         if(range != DEFAULT_RANGE) data.put("range", range);
         if(!Objects.equals(backgroundColor, DEFAULT_BACKGROUND_COLOR)) data.put("background_color", backgroundColor);
@@ -137,25 +140,25 @@ public class GHoloData implements Cloneable {
         if(!Objects.equals(textAlignment, DEFAULT_TEXT_ALIGNMENT)) data.put("text_alignment", textAlignment);
         if(!Objects.equals(billboard, DEFAULT_BILLBOARD)) data.put("billboard", billboard);
         if(canSeeThrough != DEFAULT_CAN_SEE_THROUGH) data.put("see_through", canSeeThrough);
-        if(!Objects.equals(scale, DEFAULT_SCALE)) {
+        if(scale.x != DEFAULT_SCALE.x || scale.y != DEFAULT_SCALE.y || scale.z != DEFAULT_SCALE.z) {
             JSONObject scaleData = new JSONObject();
-            scaleData.put("x", scale.x);
-            scaleData.put("y", scale.y);
-            scaleData.put("z", scale.z);
+            if(scale.x != DEFAULT_SCALE.x) scaleData.put("x", scale.x);
+            if(scale.y != DEFAULT_SCALE.y) scaleData.put("y", scale.y);
+            if(scale.z != DEFAULT_SCALE.z) scaleData.put("z", scale.z);
             data.put("scale", scaleData);
         }
-        if(!Objects.equals(rotation, DEFAULT_ROTATION)) {
+        if(!Objects.equals(rotation.getYaw(), DEFAULT_ROTATION.getYaw()) || !Objects.equals(rotation.getPitch(), DEFAULT_ROTATION.getPitch())) {
             JSONObject rotationData = new JSONObject();
-            rotationData.put("yaw", rotation.getYaw());
-            rotationData.put("pitch", rotation.getPitch());
+            if(!Objects.equals(rotation.getYaw(), DEFAULT_ROTATION.getYaw())) rotationData.put("yaw", rotation.getYaw());
+            if(!Objects.equals(rotation.getPitch(), DEFAULT_ROTATION.getPitch())) rotationData.put("pitch", rotation.getPitch());
             data.put("rotation", rotationData);
         }
         if(brightness != DEFAULT_BRIGHTNESS) data.put("brightness", brightness);
         if(!Objects.equals(permission, DEFAULT_PERMISSION)) data.put("permission", permission);
-        if(!Objects.equals(size, DEFAULT_SIZE)) {
+        if(size.getWidth() != DEFAULT_SIZE.getWidth() || size.getHeight() != DEFAULT_SIZE.getHeight()) {
             JSONObject sizeData = new JSONObject();
-            sizeData.put("width", size.getWidth());
-            sizeData.put("height", size.getHeight());
+            if(size.getWidth() != DEFAULT_SIZE.getWidth()) sizeData.put("width", size.getWidth());
+            if(size.getHeight() != DEFAULT_SIZE.getHeight()) sizeData.put("height", size.getHeight());
             data.put("size", sizeData);
         }
         return data.toJSONString();
@@ -165,35 +168,35 @@ public class GHoloData implements Cloneable {
         JSONParser parser = new JSONParser();
         try {
             JSONObject data = (JSONObject) parser.parse(string);
-            if(data.containsKey("range")) range = ((Number) data.get("range")).doubleValue();
-            if(data.containsKey("background_color")) backgroundColor = (String) data.get("background_color");
-            if(data.containsKey("text_opacity")) textOpacity = ((Number) data.get("text_opacity")).byteValue();
-            if(data.containsKey("text_shadow")) hasTextShadow = (Boolean) data.get("text_shadow");
-            if(data.containsKey("text_alignment")) textAlignment = (String) data.get("text_alignment");
-            if(data.containsKey("billboard")) billboard = (String) data.get("billboard");
-            if(data.containsKey("see_through")) canSeeThrough = (Boolean) data.get("see_through");
-            if(data.containsKey("scale")) {
+            if(data.get("range") != null) range = ((Number) data.get("range")).doubleValue();
+            if(data.get("background_color") != null) backgroundColor = (String) data.get("background_color");
+            if(data.get("text_opacity") != null) textOpacity = ((Number) data.get("text_opacity")).byteValue();
+            if(data.get("text_shadow") != null) hasTextShadow = (Boolean) data.get("text_shadow");
+            if(data.get("text_alignment") != null) textAlignment = (String) data.get("text_alignment");
+            if(data.get("billboard") != null) billboard = (String) data.get("billboard");
+            if(data.get("see_through") != null) canSeeThrough = (Boolean) data.get("see_through");
+            if(data.get("scale") != null) {
                 JSONObject scaleData = (JSONObject) data.get("scale");
-                float x = ((Number) scaleData.get("x")).floatValue();
-                float y = ((Number) scaleData.get("y")).floatValue();
-                float z = ((Number) scaleData.get("z")).floatValue();
+                float x = scaleData.get("x") != null ? ((Number) scaleData.get("x")).floatValue() : DEFAULT_SCALE.x;
+                float y = scaleData.get("y") != null ? ((Number) scaleData.get("y")).floatValue() : DEFAULT_SCALE.y;
+                float z = scaleData.get("z") != null ? ((Number) scaleData.get("z")).floatValue() : DEFAULT_SCALE.z;
                 scale = new Vector3f(x, y, z);
             }
-            if(data.containsKey("rotation")) {
+            if(data.get("rotation") != null) {
                 JSONObject rotationData = (JSONObject) data.get("rotation");
-                float yaw = ((Number) rotationData.get("yaw")).floatValue();
-                float pitch = ((Number) rotationData.get("pitch")).floatValue();
+                Float yaw = rotationData.get("yaw") != null ? Float.valueOf(((Number) rotationData.get("yaw")).floatValue()) : DEFAULT_ROTATION.getYaw();
+                Float pitch = rotationData.get("pitch") != null ? Float.valueOf(((Number) rotationData.get("pitch")).floatValue()) : DEFAULT_ROTATION.getPitch();
                 rotation = new SimpleRotation(yaw, pitch);
             }
-            if(data.containsKey("brightness")) brightness = ((Number) data.get("brightness")).byteValue();
-            if(data.containsKey("permission")) permission = (String) data.get("permission");
-            if(data.containsKey("size")) {
+            if(data.get("brightness") != null) brightness = ((Number) data.get("brightness")).byteValue();
+            if(data.get("permission") != null) permission = (String) data.get("permission");
+            if(data.get("size") != null) {
                 JSONObject sizeData = (JSONObject) data.get("size");
-                float width = ((Number) sizeData.get("width")).floatValue();
-                float height = ((Number) sizeData.get("height")).floatValue();
+                float width = sizeData.get("width") != null ? ((Number) sizeData.get("width")).floatValue() : DEFAULT_SIZE.getWidth();
+                float height = sizeData.get("height") != null ? ((Number) sizeData.get("height")).floatValue() : DEFAULT_SIZE.getWidth();
                 size = new SimpleSize(width, height);
             }
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { GHoloMain.getInstance().getLogger().log(Level.SEVERE, "Could not load holo data!", e); }
         return this;
     }
 

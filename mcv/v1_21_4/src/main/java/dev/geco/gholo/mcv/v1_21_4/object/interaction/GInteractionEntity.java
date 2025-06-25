@@ -39,7 +39,7 @@ public class GInteractionEntity extends Interaction implements IGInteractionEnti
 
     @Override
     public void loadInteraction() {
-        ClientboundAddEntityPacket addEntityPacket = new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYHeadRot());
+        ClientboundAddEntityPacket addEntityPacket = new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYRot());
         ClientboundSetEntityDataPacket setEntityDataPacket = getDataPacket();
         String permission = getPermission();
         for(Player player : interaction.getRawLocation().getWorld().getPlayers()) {
@@ -56,7 +56,7 @@ public class GInteractionEntity extends Interaction implements IGInteractionEnti
         String permission = getPermission();
         if(permission != null && !gHoloMain.getPermissionService().hasPermission(player, permission)) return;
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-        serverPlayer.connection.send(new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYHeadRot()));
+        serverPlayer.connection.send(new ClientboundAddEntityPacket(getId(), uuid, getX(), getY(), getZ(), getXRot(), getYRot(), getType(), 0, getDeltaMovement(), getYRot()));
         serverPlayer.connection.send(getDataPacket());
     }
 

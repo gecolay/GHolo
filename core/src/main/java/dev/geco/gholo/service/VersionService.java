@@ -5,10 +5,11 @@ import org.bukkit.Bukkit;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 public class VersionService {
 
-    private final String LATEST_VERSION = "v1_21_4";
+    private final String LATEST_VERSION = "v1_21_6";
     private final HashMap<String, String> VERSION_MAPPING = new HashMap<>(); {
         VERSION_MAPPING.put("v1_20_1", "v1_20");
         VERSION_MAPPING.put("v1_20_4", "v1_20_3");
@@ -46,7 +47,7 @@ public class VersionService {
             if(parameters.length == 0) return mcvPackageClass.getConstructor().newInstance();
             Class<?>[] parameterTypes = Arrays.stream(parameters).map(Object::getClass).toArray(Class<?>[]::new);
             return mcvPackageClass.getConstructor(parameterTypes).newInstance(parameters);
-        } catch(Throwable e) { e.printStackTrace(); }
+        } catch(Throwable e) { GHoloMain.getInstance().getLogger().log(Level.SEVERE, "Could not get package object with class name '" + className + "'!", e); }
         return null;
     }
 
