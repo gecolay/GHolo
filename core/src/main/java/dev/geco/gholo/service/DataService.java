@@ -24,6 +24,7 @@ public class DataService {
     private String database = null;
     private String user = null;
     private String password = null;
+    private String args = "";
     private int retries = 0;
 
     public DataService(GHoloMain gHoloMain) {
@@ -41,6 +42,7 @@ public class DataService {
         database = dataConfig.getString("Database.database", "");
         user = dataConfig.getString("Database.user", "");
         password = dataConfig.getString("Database.password", "");
+        args = dataConfig.getString("Database.args", "");
         return reconnect();
     }
 
@@ -72,7 +74,7 @@ public class DataService {
 
     private Connection getConnection(boolean withDatabase) throws SQLException {
         return switch (type) {
-            case "mysql" -> DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + (withDatabase ? "/" + database : "") + "?createDatabaseIfNotExist=true&useUnicode=true", user, password);
+            case "mysql" -> DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + (withDatabase ? "/" + database : "") + "?createDatabaseIfNotExist=true&useUnicode=true" + args, user, password);
             case "sqlite" -> DriverManager.getConnection("jdbc:sqlite:" + new File(gHoloMain.getDataFolder(), "data/data.db").getPath());
             default -> null;
         };
