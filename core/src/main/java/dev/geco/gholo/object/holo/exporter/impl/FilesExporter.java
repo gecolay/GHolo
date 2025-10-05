@@ -92,11 +92,11 @@ public class FilesExporter extends GHoloExporter {
         if(!Objects.equals(data.getTextAlignment(), GHoloData.DEFAULT_TEXT_ALIGNMENT)) dataMap.put("textAlignment", data.getTextAlignment());
         if(!Objects.equals(data.getBillboard(), GHoloData.DEFAULT_BILLBOARD)) dataMap.put("billboard", data.getBillboard());
         if(data.getSeeThrough() != GHoloData.DEFAULT_CAN_SEE_THROUGH) dataMap.put("seeThrough", data.getSeeThrough());
-        if(data.getRawScale().x != GHoloData.DEFAULT_SCALE.x || data.getRawScale().y != GHoloData.DEFAULT_SCALE.y || data.getRawScale().z != GHoloData.DEFAULT_SCALE.z) {
+        if(data.getRawScale().getX() != GHoloData.DEFAULT_SCALE.getX() || data.getRawScale().getY() != GHoloData.DEFAULT_SCALE.getY() || data.getRawScale().getZ() != GHoloData.DEFAULT_SCALE.getZ()) {
             Map<String, Object> scaleMap = new HashMap<>();
-            if(data.getRawScale().x != GHoloData.DEFAULT_SCALE.x) scaleMap.put("x", data.getRawScale().x);
-            if(data.getRawScale().y != GHoloData.DEFAULT_SCALE.y) scaleMap.put("y", data.getRawScale().y);
-            if(data.getRawScale().z != GHoloData.DEFAULT_SCALE.z) scaleMap.put("z", data.getRawScale().z);
+            if(data.getRawScale().getX() != GHoloData.DEFAULT_SCALE.getX()) scaleMap.put("x", data.getRawScale().getX());
+            if(data.getRawScale().getY() != GHoloData.DEFAULT_SCALE.getY()) scaleMap.put("y", data.getRawScale().getY());
+            if(data.getRawScale().getZ() != GHoloData.DEFAULT_SCALE.getZ()) scaleMap.put("z", data.getRawScale().getZ());
             dataMap.put("scale", scaleMap);
         }
         if(!Objects.equals(data.getRawRotation().getYaw(), GHoloData.DEFAULT_ROTATION.getYaw()) || !Objects.equals(data.getRawRotation().getPitch(), GHoloData.DEFAULT_ROTATION.getPitch())) {
