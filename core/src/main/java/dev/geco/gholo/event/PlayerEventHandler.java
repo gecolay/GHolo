@@ -51,7 +51,7 @@ public class PlayerEventHandler implements Listener {
             gHoloMain.getHoloService().loadHolosForPlayer(player);
 
             gHoloMain.getInteractionService().loadInteractionsForPlayer(event.getPlayer());
-        }, false, player, 1);
+        }, false, player, 4);
     }
 
     @EventHandler
@@ -63,7 +63,7 @@ public class PlayerEventHandler implements Listener {
         gHoloMain.getTaskService().runDelayed(() -> {
             gHoloMain.getHoloService().unloadHolosForPlayer(player);
             gHoloMain.getHoloService().loadHolosForPlayer(player);
-        }, false, player, 1);
+        }, false, player, 4);
     }
 
 }
