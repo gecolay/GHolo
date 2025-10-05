@@ -17,7 +17,7 @@ public class SimpleLocation extends Location {
         super(world, x, y, z);
     }
 
-    public @NotNull SimpleLocation add(@NotNull SimpleOffset offset) {
+    public @NotNull SimpleLocation add(@NotNull SimpleVector offset) {
         setX(getX() + offset.getX());
         setY(getY() + offset.getY());
         setZ(getZ() + offset.getZ());

@@ -7,7 +7,7 @@ import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.importer.GHoloImporter;
 import dev.geco.gholo.object.holo.importer.GHoloImporterResult;
 import dev.geco.gholo.object.simple.SimpleLocation;
-import dev.geco.gholo.object.simple.SimpleOffset;
+import dev.geco.gholo.object.simple.SimpleVector;
 import dev.geco.gholo.object.simple.SimpleRotation;
 import dev.geco.gholo.object.simple.SimpleSize;
 import org.bukkit.Bukkit;
@@ -16,7 +16,6 @@ import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector3f;
 
 import java.io.File;
 import java.util.HashMap;
@@ -71,7 +70,7 @@ public class FilesImporter extends GHoloImporter {
                             Double offsetX = (Double) offset.get("x");
                             Double offsetY = (Double) offset.get("y");
                             Double offsetZ = (Double) offset.get("z");
-                            row.setOffset(new SimpleOffset(offsetX != null ? offsetX : 0, offsetY != null ? offsetY : 0, offsetZ != null ? offsetZ : 0));
+                            row.setOffset(new SimpleVector(offsetX != null ? offsetX : 0, offsetY != null ? offsetY : 0, offsetZ != null ? offsetZ : 0));
                         }
 
                         if(rowSection.containsKey("data")) deserializeData(row.getRawData(), (HashMap<String, Object>) rowSection.get("data"));
@@ -104,13 +103,13 @@ public class FilesImporter extends GHoloImporter {
                 float scaleX = (float) scaleMap.getDouble("x", 1f);
                 float scaleY = (float) scaleMap.getDouble("y", 1f);
                 float scaleZ = (float) scaleMap.getDouble("z", 1f);
-                data.setScale(new Vector3f(scaleX, scaleY, scaleZ));
+                data.setScale(new SimpleVector(scaleX, scaleY, scaleZ));
             } catch(Throwable e) {
                 Map<?, ?> scaleMap = (Map<?, ?>) rawData.get("scale");
                 float scaleX = scaleMap.containsKey("x") ? ((Number) scaleMap.get("x")).floatValue() : 1f;
                 float scaleY = scaleMap.containsKey("y") ? ((Number) scaleMap.get("y")).floatValue() : 1f;
                 float scaleZ = scaleMap.containsKey("z") ? ((Number) scaleMap.get("z")).floatValue() : 1f;
-                data.setScale(new Vector3f(scaleX, scaleY, scaleZ));
+                data.setScale(new SimpleVector(scaleX, scaleY, scaleZ));
             }
         }
         if(rawData.containsKey("rotation")) {

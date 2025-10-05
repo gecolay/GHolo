@@ -7,12 +7,11 @@ import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.importer.GHoloImporter;
 import dev.geco.gholo.object.holo.importer.GHoloImporterResult;
 import dev.geco.gholo.object.simple.SimpleLocation;
-import dev.geco.gholo.object.simple.SimpleOffset;
+import dev.geco.gholo.object.simple.SimpleVector;
 import dev.geco.gholo.object.simple.SimpleRotation;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector3f;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -80,7 +79,7 @@ public class DatabaseV1Importer extends GHoloImporter {
                                 double offsetX = rowResultSet.getDouble("o_x");
                                 double offsetY = rowResultSet.getDouble("o_y");
                                 double offsetZ = rowResultSet.getDouble("o_z");
-                                SimpleOffset offset = new SimpleOffset(offsetX, offsetY, offsetZ);
+                                SimpleVector offset = new SimpleVector(offsetX, offsetY, offsetZ);
                                 holoRow.setOffset(offset);
 
                                 float locationYaw = rowResultSet.getFloat("l_yaw");
@@ -137,7 +136,7 @@ public class DatabaseV1Importer extends GHoloImporter {
                         break;
                     case "scale":
                         String[] scaleSplit = dataSplit[1].split(",");
-                        data.setScale(new Vector3f(Float.parseFloat(scaleSplit[0]), Float.parseFloat(scaleSplit[1]), Float.parseFloat(scaleSplit[2])));
+                        data.setScale(new SimpleVector(Double.parseDouble(scaleSplit[0]), Double.parseDouble(scaleSplit[1]), Double.parseDouble(scaleSplit[2])));
                         break;
                     case "brightness":
                         data.setBrightness(Byte.parseByte(dataSplit[1]));

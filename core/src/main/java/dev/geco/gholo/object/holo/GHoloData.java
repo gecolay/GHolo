@@ -3,9 +3,9 @@ package dev.geco.gholo.object.holo;
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.simple.SimpleRotation;
 import dev.geco.gholo.object.simple.SimpleSize;
+import dev.geco.gholo.object.simple.SimpleVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -21,7 +21,7 @@ public class GHoloData implements Cloneable {
     public static final String DEFAULT_TEXT_ALIGNMENT = "center";
     public static final String DEFAULT_BILLBOARD = "center";
     public static final boolean DEFAULT_CAN_SEE_THROUGH = false;
-    public static final Vector3f DEFAULT_SCALE = new Vector3f(1f, 1f, 1f);
+    public static final SimpleVector DEFAULT_SCALE = new SimpleVector(1f, 1f, 1f);
     public static final SimpleRotation DEFAULT_ROTATION = new SimpleRotation(null, null);
     public static final Byte DEFAULT_BRIGHTNESS = null;
     public static final String DEFAULT_PERMISSION = null;
@@ -34,7 +34,7 @@ public class GHoloData implements Cloneable {
     private String textAlignment = DEFAULT_TEXT_ALIGNMENT;
     private String billboard = DEFAULT_BILLBOARD;
     private boolean canSeeThrough = DEFAULT_CAN_SEE_THROUGH;
-    private Vector3f scale = new Vector3f(1f, 1f, 1f);
+    private SimpleVector scale = new SimpleVector(1f, 1f, 1f);
     private SimpleRotation rotation = new SimpleRotation(null, null);
     private Byte brightness = DEFAULT_BRIGHTNESS;
     private String permission = DEFAULT_PERMISSION;
@@ -89,11 +89,11 @@ public class GHoloData implements Cloneable {
         return this;
     }
 
-    public @NotNull Vector3f getScale() { return scale; }
+    public @NotNull SimpleVector getScale() { return scale; }
 
-    public @NotNull Vector3f getRawScale() { try { return (Vector3f) scale.clone(); } catch(CloneNotSupportedException e) { throw new Error(e); } }
+    public @NotNull SimpleVector getRawScale() { return scale.clone(); }
 
-    public @NotNull GHoloData setScale(@NotNull Vector3f scale) {
+    public @NotNull GHoloData setScale(@NotNull SimpleVector scale) {
         this.scale = scale;
         return this;
     }
@@ -140,11 +140,11 @@ public class GHoloData implements Cloneable {
         if(!Objects.equals(textAlignment, DEFAULT_TEXT_ALIGNMENT)) data.put("text_alignment", textAlignment);
         if(!Objects.equals(billboard, DEFAULT_BILLBOARD)) data.put("billboard", billboard);
         if(canSeeThrough != DEFAULT_CAN_SEE_THROUGH) data.put("see_through", canSeeThrough);
-        if(scale.x != DEFAULT_SCALE.x || scale.y != DEFAULT_SCALE.y || scale.z != DEFAULT_SCALE.z) {
+        if(scale.getX() != DEFAULT_SCALE.getX() || scale.getY() != DEFAULT_SCALE.getY() || scale.getZ() != DEFAULT_SCALE.getZ()) {
             JSONObject scaleData = new JSONObject();
-            if(scale.x != DEFAULT_SCALE.x) scaleData.put("x", scale.x);
-            if(scale.y != DEFAULT_SCALE.y) scaleData.put("y", scale.y);
-            if(scale.z != DEFAULT_SCALE.z) scaleData.put("z", scale.z);
+            if(scale.getX() != DEFAULT_SCALE.getX()) scaleData.put("x", scale.getX());
+            if(scale.getY() != DEFAULT_SCALE.getY()) scaleData.put("y", scale.getY());
+            if(scale.getZ() != DEFAULT_SCALE.getZ()) scaleData.put("z", scale.getZ());
             data.put("scale", scaleData);
         }
         if(!Objects.equals(rotation.getYaw(), DEFAULT_ROTATION.getYaw()) || !Objects.equals(rotation.getPitch(), DEFAULT_ROTATION.getPitch())) {
@@ -177,10 +177,10 @@ public class GHoloData implements Cloneable {
             if(data.get("see_through") != null) canSeeThrough = (Boolean) data.get("see_through");
             if(data.get("scale") != null) {
                 JSONObject scaleData = (JSONObject) data.get("scale");
-                float x = scaleData.get("x") != null ? ((Number) scaleData.get("x")).floatValue() : DEFAULT_SCALE.x;
-                float y = scaleData.get("y") != null ? ((Number) scaleData.get("y")).floatValue() : DEFAULT_SCALE.y;
-                float z = scaleData.get("z") != null ? ((Number) scaleData.get("z")).floatValue() : DEFAULT_SCALE.z;
-                scale = new Vector3f(x, y, z);
+                double x = scaleData.get("x") != null ? ((Number) scaleData.get("x")).doubleValue() : DEFAULT_SCALE.getX();
+                double y = scaleData.get("y") != null ? ((Number) scaleData.get("y")).doubleValue() : DEFAULT_SCALE.getY();
+                double z = scaleData.get("z") != null ? ((Number) scaleData.get("z")).doubleValue() : DEFAULT_SCALE.getZ();
+                scale = new SimpleVector(x, y, z);
             }
             if(data.get("rotation") != null) {
                 JSONObject rotationData = (JSONObject) data.get("rotation");

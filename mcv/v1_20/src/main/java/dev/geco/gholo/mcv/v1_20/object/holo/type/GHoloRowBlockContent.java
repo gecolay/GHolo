@@ -6,7 +6,7 @@ import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.GHoloUpdateType;
 import dev.geco.gholo.object.holo.IGHoloRowContentType;
 import dev.geco.gholo.object.simple.SimpleLocation;
-import dev.geco.gholo.object.simple.SimpleOffset;
+import dev.geco.gholo.object.simple.SimpleVector;
 import dev.geco.gholo.object.simple.SimpleSize;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
@@ -114,7 +114,7 @@ public class GHoloRowBlockContent extends Display.BlockDisplay implements IGHolo
         switch(updateType) {
             case LOCATION -> {
                 SimpleLocation location = holoRow.getHolo().getLocation();
-                SimpleOffset offset = holoRow.getRawOffset();
+                SimpleVector offset = holoRow.getRawOffset();
                 location.add(offset);
                 setPos(location.getX(), location.getY(), location.getZ());
                 float yaw = rowData.getRotation().getYaw() != null ? rowData.getRotation().getYaw() : (holoData.getRotation().getYaw() != null ? holoData.getRotation().getYaw() : 0f);
@@ -130,8 +130,8 @@ public class GHoloRowBlockContent extends Display.BlockDisplay implements IGHolo
                 setBillboard(billboard);
             }
             case SCALE -> {
-                Vector3f scale = !Objects.equals(rowData.getRawScale(), GHoloData.DEFAULT_SCALE) ? rowData.getRawScale() : (!Objects.equals(holoData.getRawScale(), GHoloData.DEFAULT_SCALE) ? holoData.getRawScale() : GHoloData.DEFAULT_SCALE);
-                entityData.set(holoScaleData, scale);
+                SimpleVector scale = !Objects.equals(rowData.getRawScale(), GHoloData.DEFAULT_SCALE) ? rowData.getRawScale() : (!Objects.equals(holoData.getRawScale(), GHoloData.DEFAULT_SCALE) ? holoData.getRawScale() : GHoloData.DEFAULT_SCALE);
+                entityData.set(holoScaleData, new Vector3f((float) scale.getX(), (float) scale.getY(), (float) scale.getZ()));
             }
             case BRIGHTNESS -> {
                 Byte brightness = rowData.getBrightness() != GHoloData.DEFAULT_BRIGHTNESS ? rowData.getBrightness() : (holoData.getBrightness() != GHoloData.DEFAULT_BRIGHTNESS ? holoData.getBrightness() : GHoloData.DEFAULT_BRIGHTNESS);

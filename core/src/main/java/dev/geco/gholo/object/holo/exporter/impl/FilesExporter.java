@@ -7,7 +7,7 @@ import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.exporter.GHoloExporter;
 import dev.geco.gholo.object.holo.exporter.GHoloExporterResult;
 import dev.geco.gholo.object.simple.SimpleLocation;
-import dev.geco.gholo.object.simple.SimpleOffset;
+import dev.geco.gholo.object.simple.SimpleVector;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
@@ -75,7 +75,7 @@ public class FilesExporter extends GHoloExporter {
         return locationMap;
     }
 
-    private static Map<String, Object> serializeOffset(SimpleOffset offset) {
+    private static Map<String, Object> serializeOffset(SimpleVector offset) {
         Map<String, Object> offsetMap = new HashMap<>();
         if(offset.getX() != 0) offsetMap.put("x", offset.getX());
         if(offset.getY() != 0) offsetMap.put("y", offset.getY());

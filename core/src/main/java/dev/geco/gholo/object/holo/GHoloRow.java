@@ -1,6 +1,6 @@
 package dev.geco.gholo.object.holo;
 
-import dev.geco.gholo.object.simple.SimpleOffset;
+import dev.geco.gholo.object.simple.SimpleVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,7 +8,7 @@ public class GHoloRow {
 
     private final GHolo holo;
     private String content;
-    private SimpleOffset offset = new SimpleOffset(0, 0, 0);
+    private SimpleVector offset = new SimpleVector(0, 0, 0);
     private GHoloData data = new GHoloData();
     private IGHoloRowContent holoRowContent = null;
 
@@ -28,11 +28,11 @@ public class GHoloRow {
         return this;
     }
 
-    public @NotNull SimpleOffset getOffset() { return offset.clone(); }
+    public @NotNull SimpleVector getOffset() { return offset.clone(); }
 
-    public @NotNull SimpleOffset getRawOffset() { return offset; }
+    public @NotNull SimpleVector getRawOffset() { return offset; }
 
-    public @NotNull GHoloRow setOffset(@NotNull SimpleOffset offset) {
+    public @NotNull GHoloRow setOffset(@NotNull SimpleVector offset) {
         this.offset = offset.clone();
         return this;
     }

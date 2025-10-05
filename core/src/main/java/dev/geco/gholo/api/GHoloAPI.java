@@ -9,7 +9,7 @@ import dev.geco.gholo.object.interaction.GInteractionAction;
 import dev.geco.gholo.object.interaction.GInteractionData;
 import dev.geco.gholo.object.interaction.action.GInteractionActionType;
 import dev.geco.gholo.object.simple.SimpleLocation;
-import dev.geco.gholo.object.simple.SimpleOffset;
+import dev.geco.gholo.object.simple.SimpleVector;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -119,7 +119,7 @@ public class GHoloAPI {
      * @param holoRow Holo row
      * @param offset Offset
      */
-    public static void updateHoloRowOffset(@NotNull GHoloRow holoRow, @NotNull SimpleOffset offset) {
+    public static void updateHoloRowOffset(@NotNull GHoloRow holoRow, @NotNull SimpleVector offset) {
         getInstance().getHoloService().updateHoloRowOffset(holoRow, offset);
     }
 

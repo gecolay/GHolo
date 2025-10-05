@@ -7,14 +7,13 @@ import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.importer.GHoloImporter;
 import dev.geco.gholo.object.holo.importer.GHoloImporterResult;
 import dev.geco.gholo.object.simple.SimpleLocation;
-import dev.geco.gholo.object.simple.SimpleOffset;
+import dev.geco.gholo.object.simple.SimpleVector;
 import dev.geco.gholo.object.simple.SimpleRotation;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Vector3f;
 
 import java.io.File;
 import java.util.List;
@@ -75,11 +74,11 @@ public class FancyHologramsImporter extends GHoloImporter {
                 boolean seeThrough = fileContent.getBoolean("holograms." + id + ".see_through", GHoloData.DEFAULT_CAN_SEE_THROUGH);
                 if(GHoloData.DEFAULT_CAN_SEE_THROUGH != seeThrough) data.setSeeThrough(seeThrough);
 
-                Vector3f defaultScale = GHoloData.DEFAULT_SCALE;
-                float scaleX = (float) fileContent.getDouble("holograms." + id + ".scale_x", defaultScale.x);
-                float scaleY = (float) fileContent.getDouble("holograms." + id + ".scale_y", defaultScale.y);
-                float scaleZ = (float) fileContent.getDouble("holograms." + id + ".scale_z", defaultScale.z);
-                if(scaleX != defaultScale.x || scaleY != defaultScale.y || scaleZ != defaultScale.z) data.setScale(new Vector3f(scaleX, scaleY, scaleZ));
+                SimpleVector defaultScale = GHoloData.DEFAULT_SCALE;
+                double scaleX = fileContent.getDouble("holograms." + id + ".scale_x", defaultScale.getX());
+                double scaleY = fileContent.getDouble("holograms." + id + ".scale_y", defaultScale.getY());
+                double scaleZ = fileContent.getDouble("holograms." + id + ".scale_z", defaultScale.getZ());
+                if(scaleX != defaultScale.getX() || scaleY != defaultScale.getY() || scaleZ != defaultScale.getZ()) data.setScale(new SimpleVector(scaleX, scaleY, scaleZ));
 
                 SimpleRotation defaultRotation = GHoloData.DEFAULT_ROTATION;
                 float yaw = (float) fileContent.getDouble(locationPath + "yaw");
@@ -99,7 +98,7 @@ public class FancyHologramsImporter extends GHoloImporter {
 
                 for(String rowContent : rows) {
                     GHoloRow row = new GHoloRow(holo, rowContent);
-                    row.setOffset(new SimpleOffset(0, offset, 0));
+                    row.setOffset(new SimpleVector(0, offset, 0));
                     gHoloMain.getHoloService().writeHoloRow(row, row.getPosition());
                     offset -= gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
                 }

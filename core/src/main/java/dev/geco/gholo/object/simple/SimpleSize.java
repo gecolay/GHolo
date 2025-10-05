@@ -34,10 +34,10 @@ public class SimpleSize implements Cloneable {
 
     @Override
     public @NotNull String toString() {
-        JSONObject interactionSize = new JSONObject();
-        interactionSize.put("width", width);
-        interactionSize.put("height", height);
-        return interactionSize.toJSONString();
+        JSONObject simpleSize = new JSONObject();
+        simpleSize.put("width", width);
+        simpleSize.put("height", height);
+        return simpleSize.toJSONString();
     }
 
     public static @Nullable SimpleSize fromString(@NotNull String string) {

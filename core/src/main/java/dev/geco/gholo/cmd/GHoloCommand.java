@@ -10,7 +10,7 @@ import dev.geco.gholo.object.holo.exporter.GHoloExporterResult;
 import dev.geco.gholo.object.holo.importer.GHoloImporter;
 import dev.geco.gholo.object.holo.importer.GHoloImporterResult;
 import dev.geco.gholo.object.simple.SimpleLocation;
-import dev.geco.gholo.object.simple.SimpleOffset;
+import dev.geco.gholo.object.simple.SimpleVector;
 import dev.geco.gholo.util.ImageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -403,7 +403,7 @@ public class GHoloCommand implements CommandExecutor {
                         break;
                     }
                     try {
-                        SimpleOffset offset = holoRow.getOffset();
+                        SimpleVector offset = holoRow.getOffset();
                         offset.setX(args[3].equalsIgnoreCase("*") ? 0 : gHoloMain.getLocationUtil().parseLocationInput(args[3], offset.getX()));
                         if(args[4].equalsIgnoreCase("*")) {
                             double sizeBetweenRows = gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
@@ -551,7 +551,7 @@ public class GHoloCommand implements CommandExecutor {
                     case "scale" -> {
                         try {
                             if(args[optionArg + 1].equalsIgnoreCase("*")) data.setScale(GHoloData.DEFAULT_SCALE);
-                            else data.setScale(new org.joml.Vector3f(Float.parseFloat(args[optionArg + 1]), Float.parseFloat(args[optionArg + 1]), Float.parseFloat(args[optionArg + 1])));
+                            else data.setScale(new SimpleVector(Float.parseFloat(args[optionArg + 1]), Float.parseFloat(args[optionArg + 1]), Float.parseFloat(args[optionArg + 1])));
                             optionUpdateType = GHoloUpdateType.SCALE;
                         } catch(NumberFormatException e) {
                             gHoloMain.getMessageService().sendMessage(sender, "Messages.command-gholo-option-value-error", "%Option%", args[optionArg], "%Value%", args[optionArg + 1]);

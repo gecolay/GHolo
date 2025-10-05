@@ -8,13 +8,13 @@ import org.json.simple.parser.JSONParser;
 
 import java.util.logging.Level;
 
-public class SimpleOffset implements Cloneable {
+public class SimpleVector implements Cloneable {
 
     private double x;
     private double y;
     private double z;
 
-    public SimpleOffset(double x, double y, double z) {
+    public SimpleVector(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -22,47 +22,47 @@ public class SimpleOffset implements Cloneable {
 
     public double getX() { return x; }
 
-    public @NotNull SimpleOffset setX(double x) {
+    public @NotNull SimpleVector setX(double x) {
         this.x = x;
         return this;
     }
 
     public double getY() { return y; }
 
-    public @NotNull SimpleOffset setY(double y) {
+    public @NotNull SimpleVector setY(double y) {
         this.y = y;
         return this;
     }
 
     public double getZ() { return z; }
 
-    public @NotNull SimpleOffset setZ(double z) {
+    public @NotNull SimpleVector setZ(double z) {
         this.z = z;
         return this;
     }
 
     @Override
     public @NotNull String toString() {
-        JSONObject simpleLocation = new JSONObject();
-        if(x != 0) simpleLocation.put("x", x);
-        if(y != 0) simpleLocation.put("y", y);
-        if(z != 0) simpleLocation.put("z", z);
-        return simpleLocation.toJSONString();
+        JSONObject simpleVector = new JSONObject();
+        if(x != 0) simpleVector.put("x", x);
+        if(y != 0) simpleVector.put("y", y);
+        if(z != 0) simpleVector.put("z", z);
+        return simpleVector.toJSONString();
     }
 
-    public static @Nullable SimpleOffset fromString(@NotNull String string) {
+    public static @Nullable SimpleVector fromString(@NotNull String string) {
         JSONParser parser = new JSONParser();
         try {
             JSONObject data = (JSONObject) parser.parse(string);
             double x = data.get("x") != null ? ((Number) data.get("x")).doubleValue() : 0;
             double y = data.get("y") != null ? ((Number) data.get("y")).doubleValue() : 0;
             double z = data.get("z") != null ? ((Number) data.get("z")).doubleValue() : 0;
-            return new SimpleOffset(x, y, z);
-        } catch(Throwable e) { GHoloMain.getInstance().getLogger().log(Level.SEVERE, "Could not load offset data!", e); }
+            return new SimpleVector(x, y, z);
+        } catch(Throwable e) { GHoloMain.getInstance().getLogger().log(Level.SEVERE, "Could not load vector data!", e); }
         return null;
     }
 
     @Override
-    public @NotNull SimpleOffset clone() { try { return (SimpleOffset) super.clone(); } catch(CloneNotSupportedException e) { throw new Error(e); } }
+    public @NotNull SimpleVector clone() { try { return (SimpleVector) super.clone(); } catch(CloneNotSupportedException e) { throw new Error(e); } }
 
 }

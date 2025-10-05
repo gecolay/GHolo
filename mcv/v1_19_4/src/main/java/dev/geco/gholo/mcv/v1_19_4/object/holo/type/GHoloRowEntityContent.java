@@ -6,7 +6,7 @@ import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.GHoloUpdateType;
 import dev.geco.gholo.object.holo.IGHoloRowContentType;
 import dev.geco.gholo.object.simple.SimpleLocation;
-import dev.geco.gholo.object.simple.SimpleOffset;
+import dev.geco.gholo.object.simple.SimpleVector;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
@@ -88,7 +88,7 @@ public class GHoloRowEntityContent extends Entity implements IGHoloRowContentTyp
         switch(updateType) {
             case LOCATION -> {
                 SimpleLocation location = holoRow.getHolo().getLocation();
-                SimpleOffset offset = holoRow.getRawOffset();
+                SimpleVector offset = holoRow.getRawOffset();
                 location.add(offset);
                 setPos(location.getX(), location.getY(), location.getZ());
                 float yaw = rowData.getRotation().getYaw() != null ? rowData.getRotation().getYaw() : (holoData.getRotation().getYaw() != null ? holoData.getRotation().getYaw() : 0f);
