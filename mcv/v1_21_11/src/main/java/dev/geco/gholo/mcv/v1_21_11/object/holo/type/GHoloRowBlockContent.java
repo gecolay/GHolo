@@ -16,7 +16,7 @@ import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Brightness;
 import net.minecraft.world.entity.Display;
@@ -85,9 +85,9 @@ public class GHoloRowBlockContent extends Display.BlockDisplay implements IGHolo
         List<SynchedEntityData.DataValue<?>> defaultResetData = getEntityData().packDirty();
         if(defaultResetData != null) data.addAll(defaultResetData);
         if(content != null) {
-            ResourceLocation resourceLocation = ResourceLocation.tryParse(content.toLowerCase());
-            if(resourceLocation != null) {
-                Optional<Holder.Reference<Block>> blockData = BuiltInRegistries.BLOCK.get(resourceLocation);
+            Identifier identifier = Identifier.tryParse(content.toLowerCase());
+            if(identifier != null) {
+                Optional<Holder.Reference<Block>> blockData = BuiltInRegistries.BLOCK.get(identifier);
                 if(blockData.isPresent()) data.add(new SynchedEntityData.DataValue<>(holoBlockData.id(), holoBlockData.serializer(), blockData.get().value().defaultBlockState()));
             }
         }

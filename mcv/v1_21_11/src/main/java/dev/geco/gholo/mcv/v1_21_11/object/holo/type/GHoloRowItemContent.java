@@ -16,7 +16,7 @@ import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Brightness;
 import net.minecraft.world.entity.Display;
@@ -85,9 +85,9 @@ public class GHoloRowItemContent extends Display.ItemDisplay implements IGHoloRo
         List<SynchedEntityData.DataValue<?>> defaultResetData = getEntityData().packDirty();
         if(defaultResetData != null) data.addAll(defaultResetData);
         if(content != null) {
-            ResourceLocation resourceLocation = ResourceLocation.tryParse(content.toLowerCase());
-            if(resourceLocation != null) {
-                Optional<Holder.Reference<Item>> itemData = BuiltInRegistries.ITEM.get(resourceLocation);
+            Identifier identifier = Identifier.tryParse(content.toLowerCase());
+            if(identifier != null) {
+                Optional<Holder.Reference<Item>> itemData = BuiltInRegistries.ITEM.get(identifier);
                 if(itemData.isPresent()) data.add(new SynchedEntityData.DataValue<>(holoItemData.id(), holoItemData.serializer(), itemData.get().value().getDefaultInstance()));
             }
         }

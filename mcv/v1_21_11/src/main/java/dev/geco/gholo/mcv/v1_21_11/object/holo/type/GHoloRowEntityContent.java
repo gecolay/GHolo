@@ -53,9 +53,9 @@ public class GHoloRowEntityContent extends Entity implements IGHoloRowContentTyp
     @Override
     public void load(Player player, String content, boolean create) {
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-        Identifier resourceLocation = Identifier.tryParse(content.toLowerCase());
-        if(resourceLocation == null) return;
-        Optional<Holder.Reference<EntityType<?>>> entityData = BuiltInRegistries.ENTITY_TYPE.get(resourceLocation);
+        Identifier identifier = Identifier.tryParse(content.toLowerCase());
+        if(identifier == null) return;
+        Optional<Holder.Reference<EntityType<?>>> entityData = BuiltInRegistries.ENTITY_TYPE.get(identifier);
         if(entityData.isEmpty()) return;
         EntityType<?> entityType = entityData.get().value();
         if(create || currentEntityTypes.get(player.getUniqueId()) != entityType) {
