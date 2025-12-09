@@ -1,4 +1,4 @@
-package dev.geco.gholo.mcv.v1_21_9.object.holo.type;
+package dev.geco.gholo.mcv.v1_21_11.object.holo.type;
 
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.holo.GHoloData;
@@ -7,22 +7,25 @@ import dev.geco.gholo.object.holo.GHoloUpdateType;
 import dev.geco.gholo.object.holo.IGHoloRowContentType;
 import dev.geco.gholo.object.simple.SimpleLocation;
 import dev.geco.gholo.object.simple.SimpleVector;
-import io.papermc.paper.adventure.PaperAdventure;
-import net.minecraft.network.chat.Component;
+import dev.geco.gholo.object.simple.SimpleSize;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Brightness;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PositionMoveRotation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
-import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
@@ -31,31 +34,31 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 
-public class GHoloRowTextContent extends Display.TextDisplay implements IGHoloRowContentType {
+public class GHoloRowBlockContent extends Display.BlockDisplay implements IGHoloRowContentType {
 
     private final GHoloRow holoRow;
     private final GHoloMain gHoloMain;
-    private final EntityDataAccessor<Component> holoTextData;
+    private final EntityDataAccessor<BlockState> holoBlockData;
     private final EntityDataAccessor<Vector3f> holoScaleData;
 
-    public GHoloRowTextContent(GHoloRow holoRow, GHoloMain gHoloMain) {
-        super(EntityType.TEXT_DISPLAY, ((CraftWorld) holoRow.getHolo().getRawLocation().getWorld()).getHandle());
+    public GHoloRowBlockContent(GHoloRow holoRow, GHoloMain gHoloMain) {
+        super(EntityType.BLOCK_DISPLAY, ((CraftWorld) holoRow.getHolo().getRawLocation().getWorld()).getHandle());
         this.holoRow = holoRow;
         this.gHoloMain = gHoloMain;
         persist = false;
-        entityData.set(DATA_LINE_WIDTH_ID, 10000);
-        EntityDataAccessor<Component> textAccessor = null;
+        EntityDataAccessor<BlockState> blockAccessor = null;
         try {
             List<Field> fieldList = new ArrayList<>();
-            for(Field field : Display.TextDisplay.class.getDeclaredFields()) if(field.getType().equals(EntityDataAccessor.class)) fieldList.add(field);
+            for(Field field : Display.BlockDisplay.class.getDeclaredFields()) if(field.getType().equals(EntityDataAccessor.class)) fieldList.add(field);
             Field field = fieldList.getFirst();
             field.setAccessible(true);
-            textAccessor = (EntityDataAccessor<Component>) field.get(this);
+            blockAccessor = (EntityDataAccessor<BlockState>) field.get(this);
         } catch(Throwable e) { gHoloMain.getLogger().log(Level.SEVERE, "Could not load field", e); }
-        holoTextData = textAccessor;
+        holoBlockData = blockAccessor;
         EntityDataAccessor<Vector3f> scaleAccessor = null;
         try {
             List<Field> fieldList = new ArrayList<>();
@@ -78,12 +81,15 @@ public class GHoloRowTextContent extends Display.TextDisplay implements IGHoloRo
     private ClientboundSetEntityDataPacket getDataPacket(String content) {
         List<SynchedEntityData.DataValue<?>> data = getEntityData().getNonDefaultValues();
         if(data == null) data = new ArrayList<>();
-        else data.removeIf(dataValue -> dataValue.id() == holoTextData.id());
+        else data.removeIf(dataValue -> dataValue.id() == holoBlockData.id());
         List<SynchedEntityData.DataValue<?>> defaultResetData = getEntityData().packDirty();
         if(defaultResetData != null) data.addAll(defaultResetData);
         if(content != null) {
-            Component textData = gHoloMain.supportsPaperFeature() ? PaperAdventure.asVanilla((net.kyori.adventure.text.Component) gHoloMain.getTextFormatUtil().toFormattedComponent(content)) : CraftChatMessage.fromString(gHoloMain.getTextFormatUtil().toFormattedText(content), false, true)[0];
-            data.add(new SynchedEntityData.DataValue<>(holoTextData.id(), holoTextData.serializer(), textData));
+            ResourceLocation resourceLocation = ResourceLocation.tryParse(content.toLowerCase());
+            if(resourceLocation != null) {
+                Optional<Holder.Reference<Block>> blockData = BuiltInRegistries.BLOCK.get(resourceLocation);
+                if(blockData.isPresent()) data.add(new SynchedEntityData.DataValue<>(holoBlockData.id(), holoBlockData.serializer(), blockData.get().value().defaultBlockState()));
+            }
         }
         return new ClientboundSetEntityDataPacket(getId(), data);
     }
@@ -121,29 +127,9 @@ public class GHoloRowTextContent extends Display.TextDisplay implements IGHoloRo
                 double range = rowData.getRange() != GHoloData.DEFAULT_RANGE ? rowData.getRange() : (holoData.getRange() != GHoloData.DEFAULT_RANGE ? holoData.getRange() : GHoloData.DEFAULT_RANGE);
                 setViewRange((float) (range / 64));
             }
-            case BACKGROUND_COLOR -> {
-                String backgroundColor = !Objects.equals(rowData.getBackgroundColor(), GHoloData.DEFAULT_BACKGROUND_COLOR) ? rowData.getBackgroundColor() : (!Objects.equals(holoData.getBackgroundColor(), GHoloData.DEFAULT_BACKGROUND_COLOR) ? holoData.getBackgroundColor() : GHoloData.DEFAULT_BACKGROUND_COLOR);
-                setBackgroundColor(backgroundColor);
-            }
-            case TEXT_OPACITY -> {
-                byte textOpacity = rowData.getTextOpacity() != GHoloData.DEFAULT_TEXT_OPACITY ? rowData.getTextOpacity() : (holoData.getTextOpacity() != GHoloData.DEFAULT_TEXT_OPACITY ? holoData.getTextOpacity() : GHoloData.DEFAULT_TEXT_OPACITY);
-                setRealTextOpacity(textOpacity);
-            }
-            case TEXT_SHADOW -> {
-                boolean textShadow = rowData.getTextShadow() != GHoloData.DEFAULT_HAS_TEXT_SHADOW ? rowData.getTextShadow() : (holoData.getTextShadow() != GHoloData.DEFAULT_HAS_TEXT_SHADOW ? holoData.getTextShadow() : GHoloData.DEFAULT_HAS_TEXT_SHADOW);
-                setTextShadow(textShadow);
-            }
-            case TEXT_ALIGNMENT -> {
-                String textAlignment = !Objects.equals(rowData.getTextAlignment(), GHoloData.DEFAULT_TEXT_ALIGNMENT) ? rowData.getTextAlignment() : (!Objects.equals(holoData.getTextAlignment(), GHoloData.DEFAULT_TEXT_ALIGNMENT) ? holoData.getTextAlignment() : GHoloData.DEFAULT_TEXT_ALIGNMENT);
-                setTextAlignment(textAlignment);
-            }
             case BILLBOARD -> {
                 String billboard = !Objects.equals(rowData.getBillboard(), GHoloData.DEFAULT_BILLBOARD) ? rowData.getBillboard() : (!Objects.equals(holoData.getBillboard(), GHoloData.DEFAULT_BILLBOARD) ? holoData.getBillboard() : GHoloData.DEFAULT_BILLBOARD);
                 setBillboard(billboard);
-            }
-            case SEE_THROUGH -> {
-                boolean seeThrough = rowData.getSeeThrough() != GHoloData.DEFAULT_CAN_SEE_THROUGH ? rowData.getSeeThrough() : (holoData.getSeeThrough() != GHoloData.DEFAULT_CAN_SEE_THROUGH ? holoData.getSeeThrough() : GHoloData.DEFAULT_CAN_SEE_THROUGH);
-                setSeeThrough(seeThrough);
             }
             case SCALE -> {
                 SimpleVector scale = !Objects.equals(rowData.getRawScale(), GHoloData.DEFAULT_SCALE) ? rowData.getRawScale() : (!Objects.equals(holoData.getRawScale(), GHoloData.DEFAULT_SCALE) ? holoData.getRawScale() : GHoloData.DEFAULT_SCALE);
@@ -153,37 +139,15 @@ public class GHoloRowTextContent extends Display.TextDisplay implements IGHoloRo
                 Byte brightness = rowData.getBrightness() != GHoloData.DEFAULT_BRIGHTNESS ? rowData.getBrightness() : (holoData.getBrightness() != GHoloData.DEFAULT_BRIGHTNESS ? holoData.getBrightness() : GHoloData.DEFAULT_BRIGHTNESS);
                 setBrightnessOverride(brightness != null ? new Brightness(brightness, Brightness.FULL_BRIGHT.sky()) : null);
             }
+            case SIZE -> {
+                SimpleSize size = !Objects.equals(rowData.getRawSize(), GHoloData.DEFAULT_SIZE) ? rowData.getRawSize() : (!Objects.equals(holoData.getRawSize(), GHoloData.DEFAULT_SIZE) ? holoData.getRawSize() : GHoloData.DEFAULT_SIZE);
+                setWidth(size.getWidth());
+                setHeight(size.getHeight());
+            }
         }
-    }
-
-    private void setBackgroundColor(String color) {
-        if(color.equalsIgnoreCase("transparent")) {
-            entityData.set(DATA_BACKGROUND_COLOR_ID, 0);
-            return;
-        }
-        color = color.startsWith("#") ? color.substring(1) : color;
-        if(color.length() == 6) color = color + "40";
-        color = color.substring(color.length() - 2) + color.substring(0, color.length() - 2);
-        entityData.set(DATA_BACKGROUND_COLOR_ID, (int) Long.parseLong(color, 16));
-    }
-
-    private void setRealTextOpacity(byte textOpacity) {
-        int clampedPercent = java.lang.Math.max(0, java.lang.Math.min(textOpacity, 100));
-        int valueInRange26To255 = 255 - (clampedPercent * 231 / 100);
-        byte signedAlphaValue = (byte) (valueInRange26To255 > 127 ? valueInRange26To255 - 256 : valueInRange26To255);
-        setTextOpacity(signedAlphaValue);
-    }
-
-    private void setTextAlignment(String textAlignment) {
-        setFlags((byte) (textAlignment.equalsIgnoreCase(Align.LEFT.name()) ? getFlags() | FLAG_ALIGN_LEFT : getFlags() & ~FLAG_ALIGN_LEFT));
-        setFlags((byte) (textAlignment.equalsIgnoreCase(Align.RIGHT.name()) ? getFlags() | FLAG_ALIGN_RIGHT : getFlags() & ~FLAG_ALIGN_RIGHT));
     }
 
     private void setBillboard(String billboard) { setBillboardConstraints(BillboardConstraints.valueOf(billboard.toUpperCase())); }
-
-    private void setTextShadow(boolean hasTextShadow) { setFlags((byte) (hasTextShadow ? getFlags() | FLAG_SHADOW : getFlags() & ~FLAG_SHADOW)); }
-
-    private void setSeeThrough(boolean canSeeThrough) { setFlags((byte) (canSeeThrough ? getFlags() | FLAG_SEE_THROUGH : getFlags() & ~FLAG_SEE_THROUGH)); }
 
     private void finishUpdate() {
         String permission = getPermission();

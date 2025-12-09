@@ -1,11 +1,11 @@
-package dev.geco.gholo.mcv.v1_21_9.object.holo;
+package dev.geco.gholo.mcv.v1_21_11.object.holo;
 
 import dev.geco.gholo.GHoloMain;
-import dev.geco.gholo.mcv.v1_21_9.object.holo.type.GHoloRowBlockContent;
-import dev.geco.gholo.mcv.v1_21_9.object.holo.type.GHoloRowEntityContent;
-import dev.geco.gholo.mcv.v1_21_9.object.holo.type.GHoloRowItemContent;
-import dev.geco.gholo.mcv.v1_21_9.object.holo.type.GHoloRowItemStackContent;
-import dev.geco.gholo.mcv.v1_21_9.object.holo.type.GHoloRowTextContent;
+import dev.geco.gholo.mcv.v1_21_11.object.holo.type.GHoloRowBlockContent;
+import dev.geco.gholo.mcv.v1_21_11.object.holo.type.GHoloRowEntityContent;
+import dev.geco.gholo.mcv.v1_21_11.object.holo.type.GHoloRowItemContent;
+import dev.geco.gholo.mcv.v1_21_11.object.holo.type.GHoloRowItemStackContent;
+import dev.geco.gholo.mcv.v1_21_11.object.holo.type.GHoloRowTextContent;
 import dev.geco.gholo.object.holo.GHoloData;
 import dev.geco.gholo.object.holo.GHoloRow;
 import dev.geco.gholo.object.holo.GHoloUpdateType;
