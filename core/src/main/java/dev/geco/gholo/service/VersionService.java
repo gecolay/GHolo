@@ -9,7 +9,7 @@ import java.util.logging.Level;
 
 public class VersionService {
 
-    private final String LATEST_VERSION = "v1_21_9";
+    private final String LATEST_VERSION = "v1_21_11";
     private final HashMap<String, String> VERSION_MAPPING = new HashMap<>(); {
         VERSION_MAPPING.put("v1_20_1", "v1_20");
         VERSION_MAPPING.put("v1_20_4", "v1_20_3");
