@@ -14,7 +14,7 @@ import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -53,7 +53,7 @@ public class GHoloRowEntityContent extends Entity implements IGHoloRowContentTyp
     @Override
     public void load(Player player, String content, boolean create) {
         ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-        ResourceLocation resourceLocation = ResourceLocation.tryParse(content.toLowerCase());
+        Identifier resourceLocation = Identifier.tryParse(content.toLowerCase());
         if(resourceLocation == null) return;
         Optional<Holder.Reference<EntityType<?>>> entityData = BuiltInRegistries.ENTITY_TYPE.get(resourceLocation);
         if(entityData.isEmpty()) return;
