@@ -242,7 +242,7 @@ public class GHoloMain extends JavaPlugin {
     }
 
     private boolean versionCheck() {
-        if(versionService.isNewerOrVersion(19, 4) && versionService.isAvailable()) return true;
+        if(versionService.isNewerOrVersion(new int[]{1, 19, 4}) && versionService.isAvailable()) return true;
         messageService.sendMessage(Bukkit.getConsoleSender(), "Plugin.plugin-version", "%Version%", versionService.getServerVersion());
         updateService.checkForUpdates();
         Bukkit.getPluginManager().disablePlugin(this);
