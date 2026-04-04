@@ -7,6 +7,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -51,9 +52,9 @@ public class PacketHandler implements IPacketHandler {
 
     private boolean handlePacket(Object packet, Player player) {
         if(!(packet instanceof ServerboundInteractPacket serverboundInteractPacket)) return false;
-        int targetId = serverboundInteractPacket.getEntityId();
-        boolean mainHand = serverboundInteractPacket.isAttack();
-        boolean secondaryAction = serverboundInteractPacket.isUsingSecondaryAction();
+        int targetId = serverboundInteractPacket.entityId();
+        boolean mainHand = serverboundInteractPacket.hand() == InteractionHand.MAIN_HAND;
+        boolean secondaryAction = serverboundInteractPacket.usingSecondaryAction();
         return gHoloMain.getInteractionService().callInteraction(targetId, player, mainHand, secondaryAction);
     }
 
