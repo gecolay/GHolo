@@ -1,8 +1,8 @@
 plugins {
     `java-library`
     `maven-publish`
-    id("com.gradleup.shadow") version "9.3.1"
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.19" apply false
+    id("com.gradleup.shadow") version "9.4.1"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.21" apply false
 }
 
 allprojects {
@@ -39,6 +39,7 @@ dependencies {
     api(project(":v1_21_6", io.papermc.paperweight.util.constants.REOBF_CONFIG))
     api(project(":v1_21_9", io.papermc.paperweight.util.constants.REOBF_CONFIG))
     api(project(":v1_21_11", io.papermc.paperweight.util.constants.REOBF_CONFIG))
+    api(project(":v26_1", "default"))
 }
 
 tasks {
