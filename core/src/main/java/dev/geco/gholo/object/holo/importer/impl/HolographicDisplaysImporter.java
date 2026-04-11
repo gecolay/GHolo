@@ -61,6 +61,7 @@ public class HolographicDisplaysImporter extends GHoloImporter {
 
                 for(String rowContent : rows) {
                     GHoloRow row = new GHoloRow(holo, rowContent);
+                    holo.addRow(row);
                     row.setOffset(new SimpleVector(0, offset, 0));
                     gHoloMain.getHoloService().writeHoloRow(row, row.getPosition());
                     offset -= gHoloMain.getConfigService().DEFAULT_SIZE_BETWEEN_ROWS;
