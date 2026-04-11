@@ -50,6 +50,7 @@ public class FancyHologramsImporter extends GHoloImporter {
                 if(world == null) throw new RuntimeException("Can not import holo with id '" + id + "', because the world is invalid!");
                 double x = fileContent.getDouble(locationPath + "x");
                 double y = fileContent.getDouble(locationPath + "y");
+                y += 0.75;
                 double z = fileContent.getDouble(locationPath + "z");
                 SimpleLocation location = new SimpleLocation(world, x, y ,z);
 
