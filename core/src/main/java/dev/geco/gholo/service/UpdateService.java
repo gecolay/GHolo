@@ -1,13 +1,10 @@
 package dev.geco.gholo.service;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import dev.geco.gholo.GHoloMain;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
+import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -55,11 +52,14 @@ public class UpdateService {
 
     private void getGitHubVersion(Consumer<String> versionConsumer) {
         gHoloMain.getTaskService().run(() -> {
-            try(InputStream inputStream = new URL(GITHUB_REMOTE_URL).openStream(); InputStreamReader reader = new InputStreamReader(inputStream)) {
-                JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
-                String tag = json.get("tag_name").getAsString();
+            try(InputStream inputStream = new URL(GITHUB_REMOTE_URL).openStream(); BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                StringBuilder response = new StringBuilder();
+                String line;
+                while((line = reader.readLine()) != null) response.append(line);
+                String json = response.toString();
+                String tag = extractJsonValue(json, "tag_name");
                 if(tag != null && versionConsumer != null) versionConsumer.accept(tag);
-            } catch(IOException e) {
+            } catch(Throwable e) {
                 if (e.getMessage().contains("50")) return;
                 gHoloMain.getLogger().log(Level.WARNING, "Could not get github remote version!", e);
             }
@@ -71,13 +71,17 @@ public class UpdateService {
             try {
                 URLConnection connection = new URL(MODRINTH_REMOTE_URL).openConnection();
                 connection.setRequestProperty("User-Agent", GHoloMain.NAME + "/" + gHoloMain.getDescription().getVersion());
-                try(InputStream inputStream = connection.getInputStream(); InputStreamReader reader = new InputStreamReader(inputStream)) {
-                    JsonArray jsonArray = JsonParser.parseReader(reader).getAsJsonArray();
-                    if(jsonArray.isEmpty()) return;
-                    String tag = jsonArray.get(0).getAsJsonObject().get("version_number").getAsString();
+                try(InputStream inputStream = connection.getInputStream(); BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while((line = reader.readLine()) != null) response.append(line);
+                    String json = response.toString();
+                    String firstObject = extractFirstJsonObject(json);
+                    if(firstObject == null) return;
+                    String tag = extractJsonValue(firstObject, "version_number");
                     if(tag != null && versionConsumer != null) versionConsumer.accept(tag);
                 }
-            } catch(IOException e) {
+            } catch(Throwable e) {
                 if (e.getMessage().contains("50")) return;
                 gHoloMain.getLogger().log(Level.WARNING, "Could not get modrinth remote version!", e);
             }
@@ -88,7 +92,7 @@ public class UpdateService {
         gHoloMain.getTaskService().run(() -> {
             try(InputStream inputStream = new URL(SPIGOT_REMOTE_URL).openStream(); Scanner scanner = new Scanner(inputStream)) {
                 if(scanner.hasNext() && versionConsumer != null) versionConsumer.accept(scanner.next());
-            } catch(IOException e) {
+            } catch(Throwable e) {
                 if(e.getMessage().contains("50")) return;
                 gHoloMain.getLogger().log(Level.WARNING, "Could not get spigot remote version!", e);
             }
@@ -99,11 +103,28 @@ public class UpdateService {
         gHoloMain.getTaskService().run(() -> {
             try(InputStream inputStream = new URL(PAPER_REMOTE_URL).openStream(); Scanner scanner = new Scanner(inputStream)) {
                 if(scanner.hasNext() && versionConsumer != null) versionConsumer.accept(scanner.next());
-            } catch(IOException e) {
+            } catch(Throwable e) {
                 if(e.getMessage().contains("50")) return;
                 gHoloMain.getLogger().log(Level.WARNING, "Could not get paper remote version!", e);
             }
         }, false);
+    }
+
+    private String extractJsonValue(String json, String key) {
+        String search = "\"" + key + "\":\"";
+        int start = json.indexOf(search);
+        if(start == -1) return null;
+        start += search.length();
+        int end = json.indexOf("\"", start);
+        if(end == -1) return null;
+        return json.substring(start, end);
+    }
+
+    private String extractFirstJsonObject(String jsonArray) {
+        int start = jsonArray.indexOf("{");
+        int end = jsonArray.indexOf("}");
+        if(start == -1 || end == -1 || end <= start) return null;
+        return jsonArray.substring(start, end + 1);
     }
 
     private void checkVersion(Runnable runnable) {

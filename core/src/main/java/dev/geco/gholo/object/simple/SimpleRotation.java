@@ -1,10 +1,10 @@
 package dev.geco.gholo.object.simple;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dev.geco.gholo.GHoloMain;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 import java.util.logging.Level;
 
@@ -34,18 +34,17 @@ public class SimpleRotation implements Cloneable {
 
     @Override
     public @NotNull String toString() {
-        JSONObject simpleRotation = new JSONObject();
-        if(yaw != null) simpleRotation.put("yaw", yaw);
-        if(pitch != null) simpleRotation.put("pitch", pitch);
-        return simpleRotation.toJSONString();
+        JsonObject simpleRotation = new JsonObject();
+        if(yaw != null) simpleRotation.addProperty("yaw", yaw);
+        if(pitch != null) simpleRotation.addProperty("pitch", pitch);
+        return simpleRotation.toString();
     }
 
     public static @Nullable SimpleRotation fromString(@NotNull String string) {
-        JSONParser parser = new JSONParser();
         try {
-            JSONObject data = (JSONObject) parser.parse(string);
-            Float yaw = data.get("yaw") != null ? ((Number) data.get("yaw")).floatValue() : null;
-            Float pitch = data.get("pitch") != null ? ((Number) data.get("pitch")).floatValue() : null;
+            JsonObject data = (JsonObject) JsonParser.parseString(string);
+            Float yaw = data.has("yaw") && !data.get("yaw").isJsonNull() ? data.get("yaw").getAsFloat() : null;
+            Float pitch = data.has("pitch") && !data.get("pitch").isJsonNull() ? data.get("pitch").getAsFloat() : null;
             return new SimpleRotation(yaw, pitch);
         } catch(Throwable e) { GHoloMain.getInstance().getLogger().log(Level.SEVERE, "Could not load rotation data!", e); }
         return null;

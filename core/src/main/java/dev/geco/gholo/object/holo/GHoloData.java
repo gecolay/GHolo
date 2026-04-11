@@ -1,13 +1,13 @@
 package dev.geco.gholo.object.holo;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.simple.SimpleRotation;
 import dev.geco.gholo.object.simple.SimpleSize;
 import dev.geco.gholo.object.simple.SimpleVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 import java.util.Objects;
 import java.util.logging.Level;
@@ -132,68 +132,67 @@ public class GHoloData implements Cloneable {
 
     @Override
     public @NotNull String toString() {
-        JSONObject data = new JSONObject();
-        if(range != DEFAULT_RANGE) data.put("range", range);
-        if(!Objects.equals(backgroundColor, DEFAULT_BACKGROUND_COLOR)) data.put("background_color", backgroundColor);
-        if(textOpacity != DEFAULT_TEXT_OPACITY) data.put("text_opacity", textOpacity);
-        if(hasTextShadow != DEFAULT_HAS_TEXT_SHADOW) data.put("text_shadow", hasTextShadow);
-        if(!Objects.equals(textAlignment, DEFAULT_TEXT_ALIGNMENT)) data.put("text_alignment", textAlignment);
-        if(!Objects.equals(billboard, DEFAULT_BILLBOARD)) data.put("billboard", billboard);
-        if(canSeeThrough != DEFAULT_CAN_SEE_THROUGH) data.put("see_through", canSeeThrough);
+        JsonObject data = new JsonObject();
+        if(range != DEFAULT_RANGE) data.addProperty("range", range);
+        if(!Objects.equals(backgroundColor, DEFAULT_BACKGROUND_COLOR)) data.addProperty("background_color", backgroundColor);
+        if(textOpacity != DEFAULT_TEXT_OPACITY) data.addProperty("text_opacity", textOpacity);
+        if(hasTextShadow != DEFAULT_HAS_TEXT_SHADOW) data.addProperty("text_shadow", hasTextShadow);
+        if(!Objects.equals(textAlignment, DEFAULT_TEXT_ALIGNMENT)) data.addProperty("text_alignment", textAlignment);
+        if(!Objects.equals(billboard, DEFAULT_BILLBOARD)) data.addProperty("billboard", billboard);
+        if(canSeeThrough != DEFAULT_CAN_SEE_THROUGH) data.addProperty("see_through", canSeeThrough);
         if(scale.getX() != DEFAULT_SCALE.getX() || scale.getY() != DEFAULT_SCALE.getY() || scale.getZ() != DEFAULT_SCALE.getZ()) {
-            JSONObject scaleData = new JSONObject();
-            if(scale.getX() != DEFAULT_SCALE.getX()) scaleData.put("x", scale.getX());
-            if(scale.getY() != DEFAULT_SCALE.getY()) scaleData.put("y", scale.getY());
-            if(scale.getZ() != DEFAULT_SCALE.getZ()) scaleData.put("z", scale.getZ());
-            data.put("scale", scaleData);
+            JsonObject scaleData = new JsonObject();
+            if(scale.getX() != DEFAULT_SCALE.getX()) scaleData.addProperty("x", scale.getX());
+            if(scale.getY() != DEFAULT_SCALE.getY()) scaleData.addProperty("y", scale.getY());
+            if(scale.getZ() != DEFAULT_SCALE.getZ()) scaleData.addProperty("z", scale.getZ());
+            data.add("scale", scaleData);
         }
         if(!Objects.equals(rotation.getYaw(), DEFAULT_ROTATION.getYaw()) || !Objects.equals(rotation.getPitch(), DEFAULT_ROTATION.getPitch())) {
-            JSONObject rotationData = new JSONObject();
-            if(!Objects.equals(rotation.getYaw(), DEFAULT_ROTATION.getYaw())) rotationData.put("yaw", rotation.getYaw());
-            if(!Objects.equals(rotation.getPitch(), DEFAULT_ROTATION.getPitch())) rotationData.put("pitch", rotation.getPitch());
-            data.put("rotation", rotationData);
+            JsonObject rotationData = new JsonObject();
+            if(!Objects.equals(rotation.getYaw(), DEFAULT_ROTATION.getYaw())) rotationData.addProperty("yaw", rotation.getYaw());
+            if(!Objects.equals(rotation.getPitch(), DEFAULT_ROTATION.getPitch())) rotationData.addProperty("pitch", rotation.getPitch());
+            data.add("rotation", rotationData);
         }
-        if(brightness != DEFAULT_BRIGHTNESS) data.put("brightness", brightness);
-        if(!Objects.equals(permission, DEFAULT_PERMISSION)) data.put("permission", permission);
+        if(brightness != DEFAULT_BRIGHTNESS) data.addProperty("brightness", brightness);
+        if(!Objects.equals(permission, DEFAULT_PERMISSION)) data.addProperty("permission", permission);
         if(size.getWidth() != DEFAULT_SIZE.getWidth() || size.getHeight() != DEFAULT_SIZE.getHeight()) {
-            JSONObject sizeData = new JSONObject();
-            if(size.getWidth() != DEFAULT_SIZE.getWidth()) sizeData.put("width", size.getWidth());
-            if(size.getHeight() != DEFAULT_SIZE.getHeight()) sizeData.put("height", size.getHeight());
-            data.put("size", sizeData);
+            JsonObject sizeData = new JsonObject();
+            if(size.getWidth() != DEFAULT_SIZE.getWidth()) sizeData.addProperty("width", size.getWidth());
+            if(size.getHeight() != DEFAULT_SIZE.getHeight()) sizeData.addProperty("height", size.getHeight());
+            data.add("size", sizeData);
         }
-        return data.toJSONString();
+        return data.toString();
     }
 
     public @NotNull GHoloData loadString(@NotNull String string) {
-        JSONParser parser = new JSONParser();
         try {
-            JSONObject data = (JSONObject) parser.parse(string);
-            if(data.get("range") != null) range = ((Number) data.get("range")).doubleValue();
-            if(data.get("background_color") != null) backgroundColor = (String) data.get("background_color");
-            if(data.get("text_opacity") != null) textOpacity = ((Number) data.get("text_opacity")).byteValue();
-            if(data.get("text_shadow") != null) hasTextShadow = (Boolean) data.get("text_shadow");
-            if(data.get("text_alignment") != null) textAlignment = (String) data.get("text_alignment");
-            if(data.get("billboard") != null) billboard = (String) data.get("billboard");
-            if(data.get("see_through") != null) canSeeThrough = (Boolean) data.get("see_through");
-            if(data.get("scale") != null) {
-                JSONObject scaleData = (JSONObject) data.get("scale");
-                double x = scaleData.get("x") != null ? ((Number) scaleData.get("x")).doubleValue() : DEFAULT_SCALE.getX();
-                double y = scaleData.get("y") != null ? ((Number) scaleData.get("y")).doubleValue() : DEFAULT_SCALE.getY();
-                double z = scaleData.get("z") != null ? ((Number) scaleData.get("z")).doubleValue() : DEFAULT_SCALE.getZ();
+            JsonObject data = (JsonObject) JsonParser.parseString(string);
+            if(data.has("range") && !data.get("range").isJsonNull()) range = data.get("range").getAsDouble();
+            if(data.has("background_color") && !data.get("background_color").isJsonNull()) backgroundColor = data.get("background_color").getAsString();
+            if(data.has("text_opacity") && !data.get("text_opacity").isJsonNull()) textOpacity = data.get("text_opacity").getAsByte();
+            if(data.has("text_shadow") && !data.get("text_shadow").isJsonNull()) hasTextShadow = data.get("text_shadow").getAsBoolean();
+            if(data.has("text_alignment") && !data.get("text_alignment").isJsonNull()) textAlignment = data.get("text_alignment").getAsString();
+            if(data.has("billboard") && !data.get("billboard").isJsonNull()) billboard = data.get("billboard").getAsString();
+            if(data.has("see_through") && !data.get("see_through").isJsonNull()) canSeeThrough = data.get("see_through").getAsBoolean();
+            if(data.has("scale") && !data.get("scale").isJsonNull()) {
+                JsonObject scaleData = data.getAsJsonObject("scale");
+                double x = scaleData.has("x") && !scaleData.get("x").isJsonNull() ? scaleData.get("x").getAsDouble() : DEFAULT_SCALE.getX();
+                double y = scaleData.has("y") && !scaleData.get("y").isJsonNull() ? scaleData.get("y").getAsDouble() : DEFAULT_SCALE.getY();
+                double z = scaleData.has("z") && !scaleData.get("z").isJsonNull() ? scaleData.get("z").getAsDouble() : DEFAULT_SCALE.getZ();
                 scale = new SimpleVector(x, y, z);
             }
-            if(data.get("rotation") != null) {
-                JSONObject rotationData = (JSONObject) data.get("rotation");
-                Float yaw = rotationData.get("yaw") != null ? Float.valueOf(((Number) rotationData.get("yaw")).floatValue()) : DEFAULT_ROTATION.getYaw();
-                Float pitch = rotationData.get("pitch") != null ? Float.valueOf(((Number) rotationData.get("pitch")).floatValue()) : DEFAULT_ROTATION.getPitch();
+            if(data.has("rotation") && !data.get("rotation").isJsonNull()) {
+                JsonObject rotationData = data.getAsJsonObject("rotation");
+                Float yaw = rotationData.has("yaw") && !rotationData.get("yaw").isJsonNull() ? Float.valueOf(rotationData.get("yaw").getAsFloat()) : DEFAULT_ROTATION.getYaw();
+                Float pitch = rotationData.has("pitch") && !rotationData.get("pitch").isJsonNull() ? Float.valueOf(rotationData.get("pitch").getAsFloat()) : DEFAULT_ROTATION.getYaw();
                 rotation = new SimpleRotation(yaw, pitch);
             }
-            if(data.get("brightness") != null) brightness = ((Number) data.get("brightness")).byteValue();
-            if(data.get("permission") != null) permission = (String) data.get("permission");
-            if(data.get("size") != null) {
-                JSONObject sizeData = (JSONObject) data.get("size");
-                float width = sizeData.get("width") != null ? ((Number) sizeData.get("width")).floatValue() : DEFAULT_SIZE.getWidth();
-                float height = sizeData.get("height") != null ? ((Number) sizeData.get("height")).floatValue() : DEFAULT_SIZE.getWidth();
+            if(data.has("brightness") && !data.get("brightness").isJsonNull()) brightness = data.get("brightness").getAsByte();
+            if(data.has("permission") && !data.get("permission").isJsonNull()) permission = data.get("permission").getAsString();
+            if(data.has("size") && !data.get("size").isJsonNull()) {
+                JsonObject sizeData = data.getAsJsonObject("size");
+                float width = sizeData.has("width") && !sizeData.get("width").isJsonNull() ? sizeData.get("width").getAsFloat() : DEFAULT_SIZE.getWidth();
+                float height = sizeData.has("height") && !sizeData.get("height").isJsonNull() ? sizeData.get("height").getAsFloat() : DEFAULT_SIZE.getWidth();
                 size = new SimpleSize(width, height);
             }
         } catch(Throwable e) { GHoloMain.getInstance().getLogger().log(Level.SEVERE, "Could not load holo data!", e); }

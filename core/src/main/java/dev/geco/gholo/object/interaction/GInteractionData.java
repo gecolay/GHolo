@@ -1,11 +1,11 @@
 package dev.geco.gholo.object.interaction;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dev.geco.gholo.GHoloMain;
 import dev.geco.gholo.object.simple.SimpleSize;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 import java.util.Objects;
 import java.util.logging.Level;
@@ -36,26 +36,25 @@ public class GInteractionData implements Cloneable {
 
     @Override
     public @NotNull String toString() {
-        JSONObject data = new JSONObject();
-        if(!Objects.equals(permission, DEFAULT_PERMISSION)) data.put("permission", permission);
+        JsonObject data = new JsonObject();
+        if(!Objects.equals(permission, DEFAULT_PERMISSION)) data.addProperty("permission", permission);
         if(size.getWidth() != DEFAULT_SIZE.getWidth() || size.getHeight() != DEFAULT_SIZE.getHeight()) {
-            JSONObject sizeData = new JSONObject();
-            sizeData.put("width", size.getWidth());
-            sizeData.put("height", size.getHeight());
-            data.put("size", sizeData);
+            JsonObject sizeData = new JsonObject();
+            sizeData.addProperty("width", size.getWidth());
+            sizeData.addProperty("height", size.getHeight());
+            data.add("size", sizeData);
         }
-        return data.toJSONString();
+        return data.toString();
     }
 
     public @NotNull GInteractionData loadString(@NotNull String string) {
-        JSONParser parser = new JSONParser();
         try {
-            JSONObject data = (JSONObject) parser.parse(string);
-            if(data.get("permission") != null) permission = (String) data.get("permission");
-            if(data.get("size") != null) {
-                JSONObject sizeData = (JSONObject) data.get("size");
-                float width = sizeData.get("width") != null ? ((Number) sizeData.get("width")).floatValue() : DEFAULT_SIZE.getWidth();
-                float height = sizeData.get("height") != null ? ((Number) sizeData.get("height")).floatValue() : DEFAULT_SIZE.getWidth();
+            JsonObject data = (JsonObject) JsonParser.parseString(string);
+            if(data.has("permission") && !data.get("permission").isJsonNull()) permission = data.get("permission").getAsString();
+            if(data.has("size") && !data.get("size").isJsonNull()) {
+                JsonObject sizeData = data.getAsJsonObject("size");
+                float width = sizeData.has("width") && !sizeData.get("width").isJsonNull() ? sizeData.get("width").getAsFloat() : DEFAULT_SIZE.getWidth();
+                float height = sizeData.has("height") && !sizeData.get("height").isJsonNull() ? sizeData.get("height").getAsFloat() : DEFAULT_SIZE.getWidth();
                 size = new SimpleSize(width, height);
             }
         } catch(Throwable e) { GHoloMain.getInstance().getLogger().log(Level.SEVERE, "Could not load interaction data!", e); }

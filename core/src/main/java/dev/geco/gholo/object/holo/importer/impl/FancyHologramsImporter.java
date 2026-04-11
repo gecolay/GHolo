@@ -57,7 +57,7 @@ public class FancyHologramsImporter extends GHoloImporter {
                 GHoloData data = holo.getRawData();
 
                 double range = fileContent.getDouble("holograms." + id + ".visibility_distance", GHoloData.DEFAULT_RANGE);
-                if(GHoloData.DEFAULT_RANGE != range) data.setRange(range);
+                if(GHoloData.DEFAULT_RANGE != range && range != -1) data.setRange(range);
 
                 String backgroundColor = fileContent.getString("holograms." + id + ".background", GHoloData.DEFAULT_BACKGROUND_COLOR);
                 if(!GHoloData.DEFAULT_BACKGROUND_COLOR.equalsIgnoreCase(backgroundColor)) data.setBackgroundColor(backgroundColor);

@@ -1,13 +1,13 @@
 package dev.geco.gholo.object.simple;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dev.geco.gholo.GHoloMain;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 import java.util.logging.Level;
 
@@ -26,22 +26,21 @@ public class SimpleLocation extends Location {
 
     @Override
     public @NotNull String toString() {
-        JSONObject simpleLocation = new JSONObject();
-        simpleLocation.put("world", getWorld().getName());
-        simpleLocation.put("x", getX());
-        simpleLocation.put("y", getY());
-        simpleLocation.put("z", getZ());
-        return simpleLocation.toJSONString();
+        JsonObject simpleLocation = new JsonObject();
+        simpleLocation.addProperty("world", getWorld().getName());
+        simpleLocation.addProperty("x", getX());
+        simpleLocation.addProperty("y", getY());
+        simpleLocation.addProperty("z", getZ());
+        return simpleLocation.toString();
     }
 
     public static @Nullable SimpleLocation fromString(@NotNull String string) {
-        JSONParser parser = new JSONParser();
         try {
-            JSONObject data = (JSONObject) parser.parse(string);
-            World world = Bukkit.getWorld((String) data.get("world"));
-            double x = ((Number) data.get("x")).doubleValue();
-            double y = ((Number) data.get("y")).doubleValue();
-            double z = ((Number) data.get("z")).doubleValue();
+            JsonObject data = (JsonObject) JsonParser.parseString(string);
+            World world = Bukkit.getWorld(data.get("world").getAsString());
+            double x = data.get("x").getAsDouble();
+            double y = data.get("y").getAsDouble();
+            double z = data.get("z").getAsDouble();
             return new SimpleLocation(world, x, y, z);
         } catch(Throwable e) { GHoloMain.getInstance().getLogger().log(Level.SEVERE, "Could not load location data!", e); }
         return null;
