@@ -1,3 +1,6 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.language.jvm.tasks.ProcessResources
+
 plugins {
     `java-library`
     `maven-publish`
@@ -43,30 +46,70 @@ dependencies {
 }
 
 tasks {
-    shadowJar {
-        archiveClassifier = ""
-        minimize()
-        manifest {
-            attributes["paperweight-mappings-namespace"] = io.papermc.paperweight.util.constants.SPIGOT_NAMESPACE
-        }
-    }
-
-    build {
-        dependsOn(shadowJar)
-    }
-
     compileJava {
         options.release = 17
     }
 
-    processResources {
-        from("resources")
-        expand(
-            "name" to project.name,
-            "version" to project.version,
-            "description" to "${project.description}",
-            "main" to "${project.group}.${project.name}Main"
-        )
+    named<ShadowJar>("shadowJar") {
+        enabled = false
+    }
+
+    named<Jar>("jar") {
+        enabled = false
+    }
+
+    val sources = mapOf(
+        "dev" to mapOf("website" to "https://github.com/gecolay/GHolo"),
+        "github" to mapOf("website" to "https://github.com/gecolay/GHolo"),
+        "modrinth" to mapOf("website" to "https://modrinth.com/plugin/gholo"),
+        "spigot" to mapOf("website" to "https://www.spigotmc.org/resources/GHolo.121144"),
+        "paper" to mapOf("website" to "https://hangar.papermc.io/gecolay/GHolo")
+    )
+
+    val resourceTasks = sources.mapValues { (sourceName, sourceProps) ->
+        register<ProcessResources>("processResources${sourceName.replaceFirstChar { it.uppercase() }}") {
+            from("resources")
+            into(layout.buildDirectory.dir("generated/resources/$sourceName"))
+
+            val baseProps = project.properties.filterValues { it is String || it is Number || it is Boolean }.mapValues { it.value.toString() }
+            val props = baseProps + sourceProps + mapOf(
+                "source" to sourceName,
+                "main" to "${project.group}.${project.name}Main"
+            )
+
+            inputs.property("source", sourceName)
+            inputs.properties(sourceProps)
+
+            expand(props)
+        }
+    }
+
+    val jarTasks = sources.keys.associateWith { sourceName ->
+        register<ShadowJar>("shadowJar${sourceName.replaceFirstChar { it.uppercase() }}") {
+            group = "build"
+
+            val resourceTask = resourceTasks.getValue(sourceName)
+
+            dependsOn(resourceTask)
+
+            archiveClassifier.set("")
+            destinationDirectory.set(layout.buildDirectory.dir(if (sourceName == "dev") "libs" else "libs/$sourceName"))
+
+            from(sourceSets.main.get().output)
+            from(resourceTask)
+
+            configurations = listOf(project.configurations.runtimeClasspath.get())
+
+            minimize()
+
+            manifest {
+                attributes["paperweight-mappings-namespace"] = io.papermc.paperweight.util.constants.SPIGOT_NAMESPACE
+            }
+        }
+    }
+
+    build {
+        dependsOn(jarTasks.values)
     }
 }
 

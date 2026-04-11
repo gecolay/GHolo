@@ -1,7 +1,6 @@
 package dev.geco.gholo.mcv.v1_20_5.event;
 
 import dev.geco.gholo.GHoloMain;
-import dev.geco.gholo.event.IPacketHandler;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
@@ -11,7 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-public class PacketHandler implements IPacketHandler {
+public class PacketHandler implements dev.geco.gholo.event.PacketHandler {
 
     protected final GHoloMain gHoloMain;
 

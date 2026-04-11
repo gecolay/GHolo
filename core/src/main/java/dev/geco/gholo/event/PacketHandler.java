@@ -2,7 +2,7 @@ package dev.geco.gholo.event;
 
 import org.bukkit.entity.Player;
 
-public interface IPacketHandler {
+public interface PacketHandler {
 
     void setupPlayerPacketHandlers();
 

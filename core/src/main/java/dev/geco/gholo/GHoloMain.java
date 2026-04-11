@@ -8,7 +8,7 @@ import dev.geco.gholo.cmd.GInteractionCommand;
 import dev.geco.gholo.cmd.tab.EmptyTabComplete;
 import dev.geco.gholo.cmd.tab.GHoloTabComplete;
 import dev.geco.gholo.cmd.tab.GInteractionTabComplete;
-import dev.geco.gholo.event.IPacketHandler;
+import dev.geco.gholo.event.PacketHandler;
 import dev.geco.gholo.event.InteractionEventHandler;
 import dev.geco.gholo.event.PlayerEventHandler;
 import dev.geco.gholo.event.WorldEventHandler;
@@ -39,13 +39,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.yaml.snakeyaml.Yaml;
 
 import java.util.Map;
 
 public class GHoloMain extends JavaPlugin {
 
     public static final String NAME = "GHolo";
-    public static final String RESOURCE_ID = "121144";
 
     private final int BSTATS_RESOURCE_ID = 24075;
     private static GHoloMain gHoloMain;
@@ -64,7 +64,7 @@ public class GHoloMain extends JavaPlugin {
     private InteractionActionService interactionActionService;
     private InteractionImporterService interactionImporterService;
     private InteractionExporterService interactionExporterService;
-    private IPacketHandler packetHandler;
+    private PacketHandler packetHandler;
     private TextFormatUtil textFormatUtil;
     private IEntityUtil entityUtil;
     private LocationUtil locationUtil;
@@ -105,7 +105,7 @@ public class GHoloMain extends JavaPlugin {
 
     public InteractionExporterService getInteractionExporterService() { return interactionExporterService; }
 
-    public IPacketHandler getPacketHandler() { return packetHandler; }
+    public PacketHandler getPacketHandler() { return packetHandler; }
 
     public TextFormatUtil getTextFormatUtil() { return textFormatUtil; }
 
@@ -152,7 +152,7 @@ public class GHoloMain extends JavaPlugin {
     public void onEnable() {
         if(!versionCheck()) return;
 
-        packetHandler = (IPacketHandler)  versionService.getPackageObjectInstance("event.PacketHandler", this);
+        packetHandler = (PacketHandler)  versionService.getPackageObjectInstance("event.PacketHandler", this);
         entityUtil = (IEntityUtil) versionService.getPackageObjectInstance("util.EntityUtil");
 
         loadPluginDependencies();
@@ -278,10 +278,16 @@ public class GHoloMain extends JavaPlugin {
         if(placeholderAPILink) messageService.sendMessage(sender, "Plugin.plugin-link", "%Link%", Bukkit.getPluginManager().getPlugin("PlaceholderAPI").getName());
     }
 
+    public String getSource() {
+        Map<?, ?> map = (new Yaml()).load(getClassLoader().getResourceAsStream("plugin.yml"));
+        return map.get("source").toString().toLowerCase();
+    }
+
     private void setupBStatsMetric() {
         BStatsMetric bStatsMetric = new BStatsMetric(this, BSTATS_RESOURCE_ID);
 
         bStatsMetric.addCustomChart(new BStatsMetric.SimplePie("plugin_language", () -> configService.L_LANG));
+        bStatsMetric.addCustomChart(new BStatsMetric.SimplePie("plugin_source", this::getSource));
         bStatsMetric.addCustomChart(new BStatsMetric.AdvancedPie("minecraft_version_player_amount", () -> Map.of(versionService.getServerVersion(), Bukkit.getOnlinePlayers().size())));
         bStatsMetric.addCustomChart(new BStatsMetric.SingleLineChart("holo_count", () -> holoService.getHoloCount()));
         bStatsMetric.addCustomChart(new BStatsMetric.SingleLineChart("holo_row_count", () -> holoService.getHoloRowCount()));

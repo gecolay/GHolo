@@ -10,17 +10,18 @@ import java.util.logging.Level;
 public class VersionService {
 
     private final String LATEST_VERSION = "v26_1";
-    private final HashMap<String, String> VERSION_MAPPING = new HashMap<>(); {
-        VERSION_MAPPING.put("v1_20_1", "v1_20");
-        VERSION_MAPPING.put("v1_20_4", "v1_20_3");
-        VERSION_MAPPING.put("v1_20_6", "v1_20_5");
-        VERSION_MAPPING.put("v1_21_1", "v1_21");
-        VERSION_MAPPING.put("v1_21_3", "v1_21_2");
-        VERSION_MAPPING.put("v1_21_7", "v1_21_6");
-        VERSION_MAPPING.put("v1_21_8", "v1_21_6");
-        VERSION_MAPPING.put("v1_21_10", "v1_21_9");
-        VERSION_MAPPING.put("v26_1_1", "v26_1");
-    }
+    private final HashMap<String, String> VERSION_MAPPING = new HashMap<>() {{
+        put("v1_20_1", "v1_20");
+        put("v1_20_4", "v1_20_3");
+        put("v1_20_6", "v1_20_5");
+        put("v1_21_1", "v1_21");
+        put("v1_21_3", "v1_21_2");
+        put("v1_21_7", "v1_21_6");
+        put("v1_21_8", "v1_21_6");
+        put("v1_21_10", "v1_21_9");
+        put("v26_1_1", "v26_1");
+        put("v26_1_2", "v26_1");
+    }};
     private final GHoloMain gHoloMain;
     private final String serverVersion;
     private final int[] serverVersionParts;
