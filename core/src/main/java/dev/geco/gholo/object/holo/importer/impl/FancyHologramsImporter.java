@@ -80,11 +80,10 @@ public class FancyHologramsImporter extends GHoloImporter {
                 double scaleZ = fileContent.getDouble("holograms." + id + ".scale_z", defaultScale.getZ());
                 if(scaleX != defaultScale.getX() || scaleY != defaultScale.getY() || scaleZ != defaultScale.getZ()) data.setScale(new SimpleVector(scaleX, scaleY, scaleZ));
 
-                SimpleRotation defaultRotation = GHoloData.DEFAULT_ROTATION;
                 float yaw = (float) fileContent.getDouble(locationPath + "yaw");
                 float pitch = (float) fileContent.getDouble(locationPath + "pitch");
                 SimpleRotation rotation = new SimpleRotation(yaw, pitch);
-                if(yaw != defaultRotation.getYaw() || pitch != defaultRotation.getPitch()) data.setRotation(rotation);
+                data.setRotation(rotation);
 
                 String brightness = fileContent.getString("holograms." + id + ".brightness");
                 if(brightness != null) data.setBrightness(Byte.parseByte(brightness));
