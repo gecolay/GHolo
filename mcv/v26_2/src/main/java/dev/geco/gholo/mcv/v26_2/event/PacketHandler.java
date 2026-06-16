@@ -1,0 +1,60 @@
+package dev.geco.gholo.mcv.v26_2.event;
+
+import dev.geco.gholo.GHoloMain;
+import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPipeline;
+import net.minecraft.network.protocol.game.ServerboundInteractPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.entity.Player;
+
+public class PacketHandler implements dev.geco.gholo.event.PacketHandler {
+
+    protected final GHoloMain gHoloMain;
+
+    public PacketHandler(GHoloMain gHoloMain) {
+        this.gHoloMain = gHoloMain;
+    }
+
+    @Override
+    public void setupPlayerPacketHandlers() { for(Player player : Bukkit.getOnlinePlayers()) setupPlayerPacketHandler(player); }
+
+    @Override
+    public void setupPlayerPacketHandler(Player player) {
+        ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+        ChannelPipeline channelPipeline = getPipeline(serverPlayer);
+        if(channelPipeline == null) return;
+        if(channelPipeline.get(GHoloMain.NAME) != null) channelPipeline.remove(GHoloMain.NAME);
+        channelPipeline.addBefore("packet_handler", GHoloMain.NAME, new ChannelDuplexHandler() {
+            @Override
+            public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
+                if(handlePacket(packet, player)) return;
+                super.channelRead(channelHandlerContext, packet);
+            }
+        });
+    }
+
+    @Override
+    public void removePlayerPacketHandlers() { for(Player player : Bukkit.getOnlinePlayers()) removePlayerPacketHandler(player); }
+
+    @Override
+    public void removePlayerPacketHandler(Player player) {
+        ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+        ChannelPipeline channelPipeline = getPipeline(serverPlayer);
+        if(channelPipeline != null && channelPipeline.get(GHoloMain.NAME) != null) channelPipeline.remove(GHoloMain.NAME);
+    }
+
+    private ChannelPipeline getPipeline(ServerPlayer serverPlayer) { return serverPlayer.connection.connection.channel.pipeline(); }
+
+    private boolean handlePacket(Object packet, Player player) {
+        if(!(packet instanceof ServerboundInteractPacket serverboundInteractPacket)) return false;
+        int targetId = serverboundInteractPacket.entityId();
+        boolean mainHand = serverboundInteractPacket.hand() == InteractionHand.MAIN_HAND;
+        boolean secondaryAction = serverboundInteractPacket.usingSecondaryAction();
+        return gHoloMain.getInteractionService().callInteraction(targetId, player, mainHand, secondaryAction);
+    }
+
+}
