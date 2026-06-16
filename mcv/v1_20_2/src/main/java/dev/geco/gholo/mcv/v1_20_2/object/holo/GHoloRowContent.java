@@ -70,7 +70,7 @@ public class GHoloRowContent implements IGHoloRowContent {
                 if(itemContent == null) itemContent = new GHoloRowItemContent(holoRow, gHoloMain);
                 yield itemContent;
             }
-            case "itemstack" -> {
+            case "itemstack", "skull", "player_skull" -> {
                 if(itemStackContent == null) itemStackContent = new GHoloRowItemStackContent(holoRow, gHoloMain);
                 yield itemStackContent;
             }
@@ -82,9 +82,9 @@ public class GHoloRowContent implements IGHoloRowContent {
         IGHoloRowContentType currentContentType = currentContentTypes.get(playerUuid);
         if(currentContentType != contentType) {
             if(currentContentType != null) currentContentType.unload(player);
-            contentType.load(player, contentType instanceof GHoloRowTextContent ? content : contentSplit[1], true);
+            contentType.load(player, contentType instanceof GHoloRowTextContent || contentType instanceof GHoloRowItemStackContent ? content : contentSplit[1], true);
             currentContentTypes.put(playerUuid, contentType);
-        } else contentType.load(player, contentType instanceof GHoloRowTextContent ? content : contentSplit[1], false);
+        } else contentType.load(player, contentType instanceof GHoloRowTextContent || contentType instanceof GHoloRowItemStackContent ? content : contentSplit[1], false);
     }
 
     @Override

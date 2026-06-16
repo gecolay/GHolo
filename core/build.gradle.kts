@@ -5,6 +5,7 @@ plugins {
 dependencies {
     compileOnly("io.papermc.paper:paper-api:26.2.build.+")
     compileOnly("me.clip:placeholderapi:2.12.2")
+    compileOnly("com.mojang:authlib:1.5.25")
 }
 
 java {
