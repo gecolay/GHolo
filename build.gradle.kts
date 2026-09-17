@@ -139,7 +139,7 @@ publishing {
             groupId = project.group.toString()
             artifactId = project.name
             version = project.version.toString()
-            from(project.components["java"])
+            artifact(tasks.named("shadowJarDev"))
         }
     }
 }
