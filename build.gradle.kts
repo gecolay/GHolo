@@ -1,11 +1,8 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.gradle.language.jvm.tasks.ProcessResources
-
 plugins {
     `java-library`
     `maven-publish`
-    id("com.gradleup.shadow") version "9.4.1"
-    id("io.papermc.paperweight.userdev") version "2.0.0-beta.21" apply false
+    id("com.gradleup.shadow") version "9.6.1"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.23" apply false
 }
 
 allprojects {
@@ -28,6 +25,10 @@ allprojects {
     }
 }
 
+java {
+    disableAutoTargetJvm()
+}
+
 dependencies {
     api(project(":core"))
     api(project(":v1_19_4", io.papermc.paperweight.util.constants.REOBF_CONFIG))
@@ -44,6 +45,7 @@ dependencies {
     api(project(":v1_21_11", io.papermc.paperweight.util.constants.REOBF_CONFIG))
     api(project(":v26_1", "default"))
     api(project(":v26_2", "default"))
+    api(project(":v26_3", "default"))
 }
 
 tasks {
@@ -51,12 +53,25 @@ tasks {
         options.release = 17
     }
 
-    named<ShadowJar>("shadowJar") {
+    jar {
         enabled = false
     }
 
-    named<Jar>("jar") {
-        enabled = false
+    shadowJar {
+        group = "build"
+
+        archiveClassifier.set("")
+        archiveBaseName.set("${project.name}-base")
+        destinationDirectory.set(layout.buildDirectory.dir("generated/shadow-base"))
+
+        from(sourceSets.main.get().output)
+        from("resources") {
+            exclude("plugin.yml")
+        }
+
+        configurations = listOf(project.configurations.runtimeClasspath.get())
+
+        minimize()
     }
 
     val sources = mapOf(
@@ -69,10 +84,16 @@ tasks {
 
     val resourceTasks = sources.mapValues { (sourceName, sourceProps) ->
         register<ProcessResources>("processResources${sourceName.replaceFirstChar { it.uppercase() }}") {
-            from("resources")
+            from("resources") {
+                include("plugin.yml")
+            }
             into(layout.buildDirectory.dir("generated/resources/$sourceName"))
 
-            val baseProps = project.properties.filterValues { it is String || it is Number || it is Boolean }.mapValues { it.value.toString() }
+            val baseProps = mapOf(
+                "name" to project.name,
+                "version" to project.version.toString(),
+                "description" to project.description.orEmpty()
+            )
             val props = baseProps + sourceProps + mapOf(
                 "source" to sourceName,
                 "main" to "${project.group}.${project.name}Main"
@@ -86,22 +107,20 @@ tasks {
     }
 
     val jarTasks = sources.keys.associateWith { sourceName ->
-        register<ShadowJar>("shadowJar${sourceName.replaceFirstChar { it.uppercase() }}") {
+        register<Jar>("shadowJar${sourceName.replaceFirstChar { it.uppercase() }}") {
             group = "build"
 
             val resourceTask = resourceTasks.getValue(sourceName)
 
-            dependsOn(resourceTask)
+            dependsOn(shadowJar, resourceTask)
 
             archiveClassifier.set("")
             destinationDirectory.set(layout.buildDirectory.dir(if (sourceName == "dev") "libs" else "libs/$sourceName"))
 
-            from(sourceSets.main.get().output)
+            from(zipTree(shadowJar.get().archiveFile)) {
+                exclude("META-INF/MANIFEST.MF")
+            }
             from(resourceTask)
-
-            configurations = listOf(project.configurations.runtimeClasspath.get())
-
-            minimize()
 
             manifest {
                 attributes["paperweight-mappings-namespace"] = io.papermc.paperweight.util.constants.SPIGOT_NAMESPACE

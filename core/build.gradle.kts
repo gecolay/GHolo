@@ -3,8 +3,8 @@ plugins {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:26.2.build.+")
-    compileOnly("me.clip:placeholderapi:2.12.2")
+    compileOnly("io.papermc.paper:paper-api:26.3.build.+")
+    compileOnly("me.clip:placeholderapi:2.12.3")
 }
 
 java {
